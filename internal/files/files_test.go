@@ -12,3 +12,9 @@ func deleteLockFile(t *testing.T) {
 		assert.Fail(t, err.Error())
 	}
 }
+
+func deleteProjectFile(t *testing.T) {
+	if err := os.Remove("mona.yml"); err != nil {
+		assert.Fail(t, err.Error())
+	}
+}

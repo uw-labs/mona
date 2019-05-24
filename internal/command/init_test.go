@@ -52,7 +52,6 @@ func TestInit(t *testing.T) {
 
 			assert.Equal(t, tc.ProjectName, lock.Name)
 			assert.Equal(t, tc.ProjectVersion, lock.Version)
-
 		})
 	}
 }
