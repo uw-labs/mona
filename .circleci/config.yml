@@ -8,8 +8,7 @@ jobs:
       - checkout
       - run: make build
       - store_artifacts:
-          path:
-          - dist
+          path: dist
 
   lint:
     docker:
