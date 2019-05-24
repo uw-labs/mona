@@ -1,6 +1,6 @@
 # mona
 
-Mona is a command-line tool for managing monorepos and is intended for use in CI pipelines. Each application in your monorepo is declared in a `mona.yml` file as a module. In turn, each application has a `module.yml` file that specifies commands for testing/building the application. Changes to these modules are tracked in a `mona.lock` file which should be cached and shared amonst your builds.
+Mona is a command-line tool for managing monorepos and is intended for use in CI pipelines. Each application/library in your monorepo is tracked in a `mona.yml` file as a module. In turn, each module has a `module.yml` file that specifies commands for testing/building. Changes to these modules are tracked in a `mona.lock` file which should be cached and shared amongst your builds.
 
 ## Getting Started
 
