@@ -43,13 +43,13 @@ name: module
 commands:
   build: ""     # Command to run to build the module
   test: ""      # Command to run to test the module
-excludes:       # File patterns to ignore
+exclude:       # File patterns to ignore
   - "*.txt"
 ```
 
 In here you can specify how to build/test your module. Note that this must be a single line command, so it is recommended to pass responsibility for building/testing to a `Makefile` or other script runner.
 
-You can also provide file patterns to ignore from hash generation using the `excludes` key.
+You can also provide file patterns to ignore from hash generation using the `exclude` key.
 
 ### Checking for changes
 
