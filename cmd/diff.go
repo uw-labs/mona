@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/davidsbond/mona/internal/command"
 
 	"github.com/urfave/cli"
@@ -13,7 +15,19 @@ func Diff() cli.Command {
 		Name:  "diff",
 		Usage: "Outputs all modules where changes are detected",
 		Action: func(ctx *cli.Context) error {
-			return command.Diff()
+			names, err := command.Diff()
+
+			if err != nil {
+				return err
+			}
+
+			for _, name := range names {
+				if _, err := fmt.Println(name); err != nil {
+					return err
+				}
+			}
+
+			return nil
 		},
 	}
 }
