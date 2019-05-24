@@ -110,9 +110,5 @@ func streamCommand(cmd *exec.Cmd) error {
 		return err
 	}
 
-	if err := cmd.Wait(); err != nil {
-		return err
-	}
-
-	return nil
+	return cmd.Wait()
 }
