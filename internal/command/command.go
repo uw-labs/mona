@@ -22,21 +22,19 @@ func getChangedModules() ([]*files.Module, error) {
 
 	var out []*files.Module
 	for _, lockInfo := range lock.Modules {
-		_, location, oldHash := files.ParseLockLine(lockInfo)
-		module, err := files.LoadModuleFile(location)
+		module, err := files.LoadModuleFile(lockInfo.Location)
 
 		if err != nil {
 			return nil, err
 		}
 
-		newHash, err := hash.Generate(location, module.Exclude...)
+		newHash, err := hash.Generate(lockInfo.Location, module.Exclude...)
 
 		if err != nil {
 			return nil, err
 		}
 
-		if oldHash != newHash {
-			module.Location = location
+		if lockInfo.BuildHash != newHash {
 			out = append(out, module)
 		}
 	}

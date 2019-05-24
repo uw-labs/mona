@@ -2,9 +2,7 @@ package files
 
 import (
 	"errors"
-	"fmt"
 	"os"
-	"strings"
 
 	"gopkg.in/yaml.v2"
 )
@@ -23,9 +21,17 @@ type (
 	// The Lock type represents the structure of a lock file, it stores the project name,
 	// version and the last build hashes used for each module
 	Lock struct {
-		Name    string   `yaml:"name"`
-		Version string   `yaml:"version"`
-		Modules []string `yaml:"modules,omitempty"`
+		Name    string          `yaml:"name"`
+		Version string          `yaml:"version"`
+		Modules []ModuleVersion `yaml:"modules,omitempty"`
+	}
+
+	// The ModuleVersion type represents individual module information as stored
+	// in the lock file.
+	ModuleVersion struct {
+		Name      string `yaml:"name"`
+		Location  string `yaml:"location"`
+		BuildHash string `yaml:"build"`
 	}
 )
 
@@ -87,8 +93,11 @@ func LoadLockFile() (*Lock, error) {
 // AddModule adds a new module entry to the lock file using the provided name,
 // location and hash. The "mona.lock" file is then updated with the new values.
 func (l *Lock) AddModule(name, location, hash string) error {
-	info := fmt.Sprintf("%s %s %s", name, location, hash)
-	l.Modules = append(l.Modules, info)
+	l.Modules = append(l.Modules, ModuleVersion{
+		Name:      name,
+		Location:  location,
+		BuildHash: hash,
+	})
 
 	file, err := os.Create(lockFileName)
 
@@ -98,22 +107,4 @@ func (l *Lock) AddModule(name, location, hash string) error {
 
 	defer file.Close()
 	return yaml.NewEncoder(file).Encode(l)
-}
-
-// ParseLockLine reads a module line from the "mona.lock" file and splits it into
-// its name, location and hash.
-func ParseLockLine(line string) (name, location, hash string) {
-	parts := strings.Split(line, " ")
-
-	name = parts[0]
-	location = parts[1]
-	hash = parts[2]
-
-	return
-}
-
-// CreateLockLine formats a new module line for the provided name,
-// location and hash.
-func CreateLockLine(name, location, hash string) string {
-	return fmt.Sprintf("%s %s %s", name, location, hash)
 }

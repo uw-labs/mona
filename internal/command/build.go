@@ -26,7 +26,7 @@ func Build() error {
 			return err
 		}
 
-		newHashes[module.Name] = newHash
+		newHashes[module.Name+module.Location] = newHash
 	}
 
 	lock, err := files.LoadLockFile()
@@ -36,10 +36,8 @@ func Build() error {
 	}
 
 	for i, lockInfo := range lock.Modules {
-		name, location, _ := files.ParseLockLine(lockInfo)
-
-		if hash, ok := newHashes[name]; ok {
-			lock.Modules[i] = files.CreateLockLine(name, location, hash)
+		if hash, ok := newHashes[lockInfo.Name+lockInfo.Location]; ok {
+			lock.Modules[i].BuildHash = hash
 		}
 	}
 
