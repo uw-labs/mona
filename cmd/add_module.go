@@ -2,8 +2,9 @@ package cmd
 
 import (
 	"errors"
-	"github.com/davidsbond/mona/internal/command"
 	"path/filepath"
+
+	"github.com/davidsbond/mona/internal/command"
 
 	"github.com/urfave/cli"
 )
@@ -27,6 +28,10 @@ func AddModule() cli.Command {
 
 			if dir == "" {
 				return errors.New("Argument 'location' is required")
+			}
+
+			if ctx.String("name") != "" {
+				return nil
 			}
 
 			return ctx.Set("name", filepath.Base(dir))
