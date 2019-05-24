@@ -18,9 +18,9 @@ var (
 )
 
 type (
-	// The Lock type represents the structure of a lock file, it stores the project name,
+	// The LockFile type represents the structure of a lock file, it stores the project name,
 	// version and the last build hashes used for each module
-	Lock struct {
+	LockFile struct {
 		Name    string          `yaml:"name"`
 		Version string          `yaml:"version"`
 		Modules []ModuleVersion `yaml:"modules,omitempty"`
@@ -46,7 +46,7 @@ func NewLockFile(name, version string) error {
 	}
 
 	defer file.Close()
-	lock := Lock{
+	lock := LockFile{
 		Name:    name,
 		Version: version,
 	}
@@ -56,7 +56,7 @@ func NewLockFile(name, version string) error {
 
 // UpdateLockFile overwrites the current "mona.lock" file at the project root with
 // the data provided.
-func UpdateLockFile(lock *Lock) error {
+func UpdateLockFile(lock *LockFile) error {
 	file, err := os.Create(lockFileName)
 
 	if err != nil {
@@ -69,7 +69,7 @@ func UpdateLockFile(lock *Lock) error {
 
 // LoadLockFile reads the "mona.lock" file from the project root into
 // memory.
-func LoadLockFile() (*Lock, error) {
+func LoadLockFile() (*LockFile, error) {
 	file, err := os.Open(lockFileName)
 
 	if os.IsNotExist(err) {
@@ -82,7 +82,7 @@ func LoadLockFile() (*Lock, error) {
 
 	defer file.Close()
 
-	var out Lock
+	var out LockFile
 
 	if err := yaml.NewDecoder(file).Decode(&out); err != nil {
 		return nil, err
@@ -93,7 +93,7 @@ func LoadLockFile() (*Lock, error) {
 
 // AddModule adds a new module entry to the lock file using the provided name,
 // location and hash. The "mona.lock" file is then updated with the new values.
-func (l *Lock) AddModule(name, location, hash string) error {
+func (l *LockFile) AddModule(name, location, hash string) error {
 	l.Modules = append(l.Modules, ModuleVersion{
 		Name:      name,
 		Location:  location,

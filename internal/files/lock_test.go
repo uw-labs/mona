@@ -70,7 +70,7 @@ func TestUpdateLockFile(t *testing.T) {
 			defer deleteLockFile(t)
 			assert.FileExists(t, "mona.lock")
 
-			if err := files.UpdateLockFile(&files.Lock{
+			if err := files.UpdateLockFile(&files.LockFile{
 				Name:    tc.NewProjectName,
 				Version: tc.NewProjectVersion,
 			}); err != nil {

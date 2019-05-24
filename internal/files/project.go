@@ -13,8 +13,8 @@ const (
 )
 
 type (
-	// The Project type represents the structure of the "mona.yml" file.
-	Project struct {
+	// The ProjectFile type represents the structure of the "mona.yml" file.
+	ProjectFile struct {
 		Name    string   `yaml:"name"`              // The name of the project
 		Version string   `yaml:"version"`           // The mona version used to create the project
 		Modules []string `yaml:"modules,omitempty"` // The modules used within the project.
@@ -31,7 +31,7 @@ func NewProjectFile(name, version string) error {
 	}
 
 	defer file.Close()
-	pj := Project{
+	pj := ProjectFile{
 		Name:    name,
 		Version: version,
 	}
@@ -40,7 +40,7 @@ func NewProjectFile(name, version string) error {
 }
 
 // LoadProjectFile attempts to read a "mona.yml" file into memory.
-func LoadProjectFile() (*Project, error) {
+func LoadProjectFile() (*ProjectFile, error) {
 	file, err := os.Open(projectFileName)
 
 	if err != nil {
@@ -49,7 +49,7 @@ func LoadProjectFile() (*Project, error) {
 
 	defer file.Close()
 
-	var out Project
+	var out ProjectFile
 
 	if err := yaml.NewDecoder(file).Decode(&out); err != nil {
 		return nil, err
@@ -59,7 +59,7 @@ func LoadProjectFile() (*Project, error) {
 }
 
 // AddModule writes a new module to the "mona.yml" file.
-func (p *Project) AddModule(name, location string) error {
+func (p *ProjectFile) AddModule(name, location string) error {
 	for _, mod := range p.Modules {
 		parts := strings.Split(mod, " ")
 

@@ -22,14 +22,14 @@ const (
 	changeTypeTest  changeType = 1
 )
 
-func getChangedModules(change changeType) ([]*files.Module, error) {
+func getChangedModules(change changeType) ([]*files.ModuleFile, error) {
 	lock, err := files.LoadLockFile()
 
 	if err != nil {
 		return nil, err
 	}
 
-	var out []*files.Module
+	var out []*files.ModuleFile
 	for _, lockInfo := range lock.Modules {
 		module, err := files.LoadModuleFile(lockInfo.Location)
 
@@ -75,7 +75,7 @@ func streamOutputs(outputs ...io.ReadCloser) {
 	}
 }
 
-func buildModule(module *files.Module) error {
+func buildModule(module *files.ModuleFile) error {
 	parts := strings.Split(module.Commands.Build, " ")
 	cmd := exec.Command(parts[0], parts[1:]...)
 	cmd.Dir = module.Location
@@ -83,7 +83,7 @@ func buildModule(module *files.Module) error {
 	return streamCommand(cmd)
 }
 
-func testModule(module *files.Module) error {
+func testModule(module *files.ModuleFile) error {
 	parts := strings.Split(module.Commands.Test, " ")
 	cmd := exec.Command(parts[0], parts[1:]...)
 	cmd.Dir = module.Location

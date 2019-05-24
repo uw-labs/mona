@@ -12,9 +12,9 @@ const (
 )
 
 type (
-	// The Module type represents the data held in the "module.yml" file in each module
+	// The ModuleFile type represents the data held in the "module.yml" file in each module
 	// directory
-	Module struct {
+	ModuleFile struct {
 		Name     string `yaml:"name"` // The name of the module
 		Commands struct {
 			Build string `yaml:"build"` // Commands for building the module
@@ -36,7 +36,7 @@ func NewModuleFile(name, location string) error {
 	}
 
 	defer file.Close()
-	mod := Module{
+	mod := ModuleFile{
 		Name: name,
 	}
 
@@ -45,7 +45,7 @@ func NewModuleFile(name, location string) error {
 
 // LoadModuleFile attempts to load a "module.yml" file into memory from
 // the given location
-func LoadModuleFile(location string) (*Module, error) {
+func LoadModuleFile(location string) (*ModuleFile, error) {
 	configLocation := filepath.Join(location, moduleFileName)
 	file, err := os.Open(configLocation)
 
@@ -55,7 +55,7 @@ func LoadModuleFile(location string) (*Module, error) {
 
 	defer file.Close()
 
-	var out Module
+	var out ModuleFile
 
 	if err := yaml.NewDecoder(file).Decode(&out); err != nil {
 		return nil, err
@@ -67,7 +67,7 @@ func LoadModuleFile(location string) (*Module, error) {
 
 // UpdateModuleFile replaces the contents of "module.yml" at the given
 // location with the module data provided.
-func UpdateModuleFile(location string, module *Module) error {
+func UpdateModuleFile(location string, module *ModuleFile) error {
 	location = filepath.Join(location, moduleFileName)
 	file, err := os.Create(location)
 
