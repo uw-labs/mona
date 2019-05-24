@@ -1,6 +1,7 @@
 package files
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -10,6 +11,12 @@ import (
 
 const (
 	lockFileName = "mona.lock"
+)
+
+var (
+	// ErrNoLock is the error returned when no lock file is present in the current
+	// working directory.
+	ErrNoLock = errors.New(`no "mona.lock" file in current wd`)
 )
 
 type (
@@ -57,6 +64,10 @@ func UpdateLockFile(lock *Lock) error {
 // memory.
 func LoadLockFile() (*Lock, error) {
 	file, err := os.Open(lockFileName)
+
+	if os.IsNotExist(err) {
+		return nil, ErrNoLock
+	}
 
 	if err != nil {
 		return nil, err

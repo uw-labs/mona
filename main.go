@@ -1,10 +1,11 @@
 package main
 
 import (
-	"github.com/davidsbond/mona/cmd"
+	"fmt"
 	"os"
 	"sort"
 
+	"github.com/davidsbond/mona/cmd"
 	"github.com/urfave/cli"
 )
 
@@ -22,6 +23,6 @@ func main() {
 	sort.Sort(cli.CommandsByName(app.Commands))
 
 	if err := app.Run(os.Args); err != nil {
-		panic(err)
+		fmt.Println(err.Error())
 	}
 }

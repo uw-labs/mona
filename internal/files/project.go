@@ -3,6 +3,7 @@ package files
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"gopkg.in/yaml.v2"
 )
@@ -59,6 +60,14 @@ func LoadProjectFile() (*Project, error) {
 
 // AddModule writes a new module to the "mona.yml" file.
 func (p *Project) AddModule(name, location string) error {
+	for _, mod := range p.Modules {
+		parts := strings.Split(mod, " ")
+
+		if parts[0] == name && parts[1] == location {
+			return fmt.Errorf("module %s in %s already exists", name, location)
+		}
+	}
+
 	p.Modules = append(p.Modules, fmt.Sprintf("%s %s", name, location))
 
 	file, err := os.Create(projectFileName)
