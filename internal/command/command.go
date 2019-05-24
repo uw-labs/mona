@@ -50,7 +50,7 @@ func streamOutputs(outputs ...io.ReadCloser) {
 			defer o.Close()
 
 			scanner := bufio.NewScanner(o)
-			scanner.Split(bufio.ScanWords)
+			scanner.Split(bufio.ScanLines)
 
 			for scanner.Scan() {
 				m := scanner.Text()
