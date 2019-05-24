@@ -63,3 +63,17 @@ func LoadModuleFile(location string) (*Module, error) {
 
 	return &out, nil
 }
+
+// UpdateModuleFile replaces the contents of "module.yml" at the given
+// location with the module data provided.
+func UpdateModuleFile(location string, module *Module) error {
+	location = filepath.Join(location, moduleFileName)
+	file, err := os.Create(location)
+
+	if err != nil {
+		return err
+	}
+
+	defer file.Close()
+	return yaml.NewEncoder(file).Encode(module)
+}
