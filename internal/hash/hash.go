@@ -21,7 +21,7 @@ func Generate(location string, excludes ...string) (string, error) {
 		}
 
 		for _, exclude := range excludes {
-			ok, err := filepath.Match(path, exclude)
+			ok, err := filepath.Match(exclude, info.Name())
 
 			if err != nil {
 				return err
