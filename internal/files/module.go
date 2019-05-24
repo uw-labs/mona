@@ -46,8 +46,8 @@ func NewModuleFile(name, location string) error {
 // LoadModuleFile attempts to load a "module.yml" file into memory from
 // the given location
 func LoadModuleFile(location string) (*Module, error) {
-	location = filepath.Join(location, moduleFileName)
-	file, err := os.Open(location)
+	configLocation := filepath.Join(location, moduleFileName)
+	file, err := os.Open(configLocation)
 
 	if err != nil {
 		return nil, err
@@ -61,6 +61,7 @@ func LoadModuleFile(location string) (*Module, error) {
 		return nil, err
 	}
 
+	out.Location = location
 	return &out, nil
 }
 

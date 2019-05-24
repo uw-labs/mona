@@ -6,6 +6,9 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"os/exec"
+	"strings"
+
 	"github.com/davidsbond/mona/internal/files"
 	"github.com/davidsbond/mona/internal/hash"
 )
@@ -55,4 +58,38 @@ func streamOutputs(outputs ...io.ReadCloser) {
 			}
 		}(output)
 	}
+}
+
+func buildModule(module *files.Module) error {
+	parts := strings.Split(module.Commands.Build, " ")
+	cmd := exec.Command(parts[0], parts[1:]...)
+	cmd.Dir = module.Location
+
+	return streamCommand(cmd)
+}
+
+func streamCommand(cmd *exec.Cmd) error {
+	stdout, err := cmd.StdoutPipe()
+
+	if err != nil {
+		return err
+	}
+
+	stderr, err := cmd.StderrPipe()
+
+	if err != nil {
+		return err
+	}
+
+	streamOutputs(stdout, stderr)
+
+	if err := cmd.Start(); err != nil {
+		return err
+	}
+
+	if err := cmd.Wait(); err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -3,8 +3,6 @@ package command
 import (
 	"github.com/davidsbond/mona/internal/files"
 	"github.com/davidsbond/mona/internal/hash"
-	"os/exec"
-	"strings"
 )
 
 // Build will execute the build commands for all modules where changes
@@ -18,29 +16,7 @@ func Build() error {
 
 	newHashes := make(map[string]string)
 	for _, module := range changed {
-		parts := strings.Split(module.Commands.Build, " ")
-		cmd := exec.Command(parts[0], parts[1:]...)
-		cmd.Dir = module.Location
-
-		stdout, err := cmd.StdoutPipe()
-
-		if err != nil {
-			return err
-		}
-
-		stderr, err := cmd.StderrPipe()
-
-		if err != nil {
-			return err
-		}
-
-		streamOutputs(stdout, stderr)
-
-		if err := cmd.Start(); err != nil {
-			return err
-		}
-
-		if err := cmd.Wait(); err != nil {
+		if err := buildModule(module); err != nil {
 			return err
 		}
 
