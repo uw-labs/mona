@@ -1,0 +1,41 @@
+package cmd
+
+import (
+	"errors"
+	"github.com/davidsbond/mona/internal/command"
+	"path/filepath"
+
+	"github.com/urfave/cli"
+)
+
+// AddModule generates a cli command that creates new mona modules within a project.
+func AddModule() cli.Command {
+	return cli.Command{
+		Name:      "add-module",
+		Usage:     "Initializes a new module at the provided path",
+		ArgsUsage: "<location>",
+		Flags: []cli.Flag{
+			cli.StringFlag{
+				Name:  "name",
+				Usage: "The name of the module, defaults to base of the module directory",
+			},
+		},
+		// Before the command is called, check if the name provided is blank. If so, set it
+		// to the base of the given location argument.
+		Before: func(ctx *cli.Context) error {
+			dir := ctx.Args().First()
+
+			if dir == "" {
+				return errors.New("Argument 'location' is required")
+			}
+
+			return ctx.Set("name", filepath.Base(dir))
+		},
+		Action: func(ctx *cli.Context) error {
+			location := ctx.Args().First()
+			name := ctx.String("name")
+
+			return command.AddModule(name, location)
+		},
+	}
+}
