@@ -5,10 +5,10 @@ import (
 	"github.com/davidsbond/mona/internal/hash"
 )
 
-// Build will execute the build commands for all modules where changes
+// Test attempts to run the test command for all modules where changes
 // are detected.
-func Build() error {
-	changed, err := getChangedModules(changeTypeBuild)
+func Test() error {
+	changed, err := getChangedModules(changeTypeTest)
 
 	if err != nil {
 		return err
@@ -16,7 +16,7 @@ func Build() error {
 
 	newHashes := make(map[string]string)
 	for _, module := range changed {
-		if err := buildModule(module); err != nil {
+		if err := testModule(module); err != nil {
 			return err
 		}
 
@@ -37,7 +37,7 @@ func Build() error {
 
 	for i, lockInfo := range lock.Modules {
 		if hash, ok := newHashes[lockInfo.Name+lockInfo.Location]; ok {
-			lock.Modules[i].BuildHash = hash
+			lock.Modules[i].TestHash = hash
 		}
 	}
 

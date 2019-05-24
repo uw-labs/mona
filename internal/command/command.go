@@ -13,7 +13,16 @@ import (
 	"github.com/davidsbond/mona/internal/hash"
 )
 
-func getChangedModules() ([]*files.Module, error) {
+type (
+	changeType int
+)
+
+const (
+	changeTypeBuild changeType = 0
+	changeTypeTest  changeType = 1
+)
+
+func getChangedModules(change changeType) ([]*files.Module, error) {
 	lock, err := files.LoadLockFile()
 
 	if err != nil {
@@ -34,7 +43,15 @@ func getChangedModules() ([]*files.Module, error) {
 			return nil, err
 		}
 
-		if lockInfo.BuildHash != newHash {
+		diff := false
+		switch change {
+		case changeTypeBuild:
+			diff = lockInfo.BuildHash != newHash
+		case changeTypeTest:
+			diff = lockInfo.TestHash != newHash
+		}
+
+		if diff {
 			out = append(out, module)
 		}
 	}
@@ -60,6 +77,14 @@ func streamOutputs(outputs ...io.ReadCloser) {
 
 func buildModule(module *files.Module) error {
 	parts := strings.Split(module.Commands.Build, " ")
+	cmd := exec.Command(parts[0], parts[1:]...)
+	cmd.Dir = module.Location
+
+	return streamCommand(cmd)
+}
+
+func testModule(module *files.Module) error {
+	parts := strings.Split(module.Commands.Test, " ")
 	cmd := exec.Command(parts[0], parts[1:]...)
 	cmd.Dir = module.Location
 

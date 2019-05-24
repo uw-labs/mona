@@ -38,7 +38,7 @@ func TestBuild(t *testing.T) {
 				assert.FileExists(t, exp)
 			}
 
-			diff, err := command.Diff()
+			diff, _, err := command.Diff()
 
 			if err != nil {
 				assert.Fail(t, err.Error())

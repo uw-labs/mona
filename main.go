@@ -17,6 +17,7 @@ func main() {
 		cmd.AddModule(),
 		cmd.Diff(),
 		cmd.Build(),
+		cmd.Test(),
 	}
 
 	sort.Sort(cli.FlagsByName(app.Flags))

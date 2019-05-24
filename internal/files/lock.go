@@ -32,6 +32,7 @@ type (
 		Name      string `yaml:"name"`
 		Location  string `yaml:"location"`
 		BuildHash string `yaml:"build"`
+		TestHash  string `yaml:"test"`
 	}
 )
 

@@ -15,16 +15,30 @@ func Diff() cli.Command {
 		Name:  "diff",
 		Usage: "Outputs all modules where changes are detected",
 		Action: func(ctx *cli.Context) error {
-			names, err := command.Diff()
+			build, test, err := command.Diff()
 
 			if err != nil {
 				return err
 			}
 
-			for _, name := range names {
-				if _, err := fmt.Println(name); err != nil {
-					return err
+			if len(build) > 0 {
+				fmt.Println("Modules to be built:")
+				for _, name := range build {
+					if _, err := fmt.Println(name); err != nil {
+						return err
+					}
 				}
+				fmt.Println()
+			}
+
+			if len(test) > 0 {
+				fmt.Println("Modules to be tested:")
+				for _, name := range test {
+					if _, err := fmt.Println(name); err != nil {
+						return err
+					}
+				}
+				fmt.Println()
 			}
 
 			return nil
