@@ -6,9 +6,25 @@
 
 Mona is a command-line tool for managing monorepos and is intended for use in CI pipelines. Each application/library in your monorepo is tracked in a `mona.yml` file as a module. In turn, each module has a `module.yml` file that specifies commands for testing/building. Changes to these modules are tracked in a `mona.lock` file which should be cached and shared amongst your builds.
 
+A typical project structure may look like this:
+
+```bash
+.
+├── src
+│   ├── api
+│   │   ├── main.go
+│   │   └── module.yml
+│   └── ui
+│       ├── main.go
+│       └── module.yml
+├── mona.lock
+└── mona.yml
+
+```
+
 ## Getting Started
 
-Below are steps on how to install mona and set up your first mona project
+Below are steps on how to install mona and set up your first mona project.
 
 ### Installation
 
