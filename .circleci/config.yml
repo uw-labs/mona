@@ -4,12 +4,10 @@ jobs:
   build:
     docker:
       - image: circleci/golang
-        auth:
-          username: $DOCKER_HUB_USER
-          password: $DOCKER_HUB_PASS
     steps:
       - checkout
       - setup_remote_docker
+      - run: docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASS
       - run: make docker
       - store_artifacts:
           path: dist
