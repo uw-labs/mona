@@ -3,15 +3,15 @@ package cmd
 import (
 	"errors"
 	"path/filepath"
+	"sort"
 
 	"github.com/davidsbond/mona/internal/command"
-
 	"github.com/urfave/cli"
 )
 
 // AddModule generates a cli command that creates new mona modules within a project.
 func AddModule() cli.Command {
-	return cli.Command{
+	cmd := cli.Command{
 		Name:      "add-module",
 		Usage:     "Initializes a new module at the provided path",
 		ArgsUsage: "<location>",
@@ -43,4 +43,7 @@ func AddModule() cli.Command {
 			return command.AddModule(name, location)
 		},
 	}
+
+	sort.Sort(cli.FlagsByName(cmd.Flags))
+	return cmd
 }

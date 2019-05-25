@@ -12,6 +12,10 @@ import (
 func main() {
 	app := cli.NewApp()
 	app.Usage = "A monorepo management tool"
+	app.Author = "David Bond"
+	app.Email = "davidsbond93@gmail.com"
+	app.Copyright = "2019 David Bond"
+
 	app.Commands = []cli.Command{
 		cmd.Init(),
 		cmd.AddModule(),

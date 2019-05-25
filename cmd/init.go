@@ -1,10 +1,11 @@
 package cmd
 
 import (
-	"github.com/davidsbond/mona/internal/command"
 	"os"
 	"path/filepath"
+	"sort"
 
+	"github.com/davidsbond/mona/internal/command"
 	"github.com/urfave/cli"
 )
 
@@ -14,7 +15,7 @@ const (
 
 // Init generates a cli command for initializing new mona projects.
 func Init() cli.Command {
-	return cli.Command{
+	cmd := cli.Command{
 		Name:  "init",
 		Usage: "Initializes a new mona project in the current working directory",
 		Flags: []cli.Flag{
@@ -50,4 +51,7 @@ func Init() cli.Command {
 			return command.Init(name, version)
 		},
 	}
+
+	sort.Sort(cli.FlagsByName(cmd.Flags))
+	return cmd
 }
