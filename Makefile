@@ -13,5 +13,5 @@ test:
 lint:
 	golangci-lint run
 
-docker:
+docker: build
 	docker build -t ${IMAGE_NAME}:${VERSION} -t ${IMAGE_NAME}:latest .
