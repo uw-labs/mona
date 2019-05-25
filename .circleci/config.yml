@@ -9,10 +9,10 @@ jobs:
           password: $DOCKER_HUB_PASS
     steps:
       - checkout
+      - setup_remote_docker
       - run: make docker
       - store_artifacts:
           path: dist
-      - setup_remote_docker
       - run: make docker-push
 
   lint:
