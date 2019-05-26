@@ -20,6 +20,7 @@ type (
 const (
 	changeTypeBuild changeType = 0
 	changeTypeTest  changeType = 1
+	changeTypeLint  changeType = 2
 )
 
 func getChangedModules(change changeType) ([]*files.ModuleFile, error) {
@@ -49,6 +50,8 @@ func getChangedModules(change changeType) ([]*files.ModuleFile, error) {
 			diff = lockInfo.BuildHash != newHash
 		case changeTypeTest:
 			diff = lockInfo.TestHash != newHash
+		case changeTypeLint:
+			diff = lockInfo.LintHash != newHash
 		}
 
 		if diff {
@@ -77,6 +80,14 @@ func streamOutputs(outputs ...io.ReadCloser) {
 
 func buildModule(module *files.ModuleFile) error {
 	parts := strings.Split(module.Commands.Build, " ")
+	cmd := exec.Command(parts[0], parts[1:]...)
+	cmd.Dir = module.Location
+
+	return streamCommand(cmd)
+}
+
+func lintModule(module *files.ModuleFile) error {
+	parts := strings.Split(module.Commands.Lint, " ")
 	cmd := exec.Command(parts[0], parts[1:]...)
 	cmd.Dir = module.Location
 
