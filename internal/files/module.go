@@ -2,6 +2,7 @@ package files
 
 import (
 	"os"
+	"path"
 	"path/filepath"
 
 	"gopkg.in/yaml.v2"
@@ -15,13 +16,14 @@ type (
 	// The ModuleFile type represents the data held in the "module.yml" file in each module
 	// directory
 	ModuleFile struct {
-		Name     string `yaml:"name"` // The name of the module
-		Commands struct {
+		Name      string   `yaml:"name"`                // The name of the module
+		Exclude   []string `yaml:"exclude,omitempty"`   // File matchers to exclude files from hash generation.
+		Artefacts []string `yaml:"artefacts,omitempty"` // Location of any artefacts that should be collected
+		Location  string   `yaml:"-"`                   // The location of the module, not included in the module file but initialized externally for ease
+		Commands  struct {
 			Build string `yaml:"build"` // Commands for building the module
 			Test  string `yaml:"test"`  // Commands for testing the module
 		} `yaml:"commands"` // Commands that can be executed against the module
-		Exclude  []string `yaml:"exclude,omitempty"`
-		Location string   `yaml:"-"` // The location of the module, not included in the module file but initialized externally for ease
 	}
 )
 
@@ -77,4 +79,27 @@ func UpdateModuleFile(location string, module *ModuleFile) error {
 
 	defer file.Close()
 	return yaml.NewEncoder(file).Encode(module)
+}
+
+// CollectArtefacts attempts to move all files specified in the module to the provided
+// output directory. Files are stored in a folder named after the module.
+func (m *ModuleFile) CollectArtefacts(outputDir string) error {
+	if err := os.Mkdir(outputDir, 0777); err != nil && !os.IsExist(err) {
+		return err
+	}
+
+	for _, artefactName := range m.Artefacts {
+		if err := os.MkdirAll(path.Join(outputDir, m.Name), 0777); err != nil {
+			return err
+		}
+
+		dest := path.Join(outputDir, m.Name, artefactName)
+		src := path.Join(m.Location, artefactName)
+
+		if err := os.Rename(src, dest); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
