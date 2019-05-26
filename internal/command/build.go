@@ -15,5 +15,21 @@ func buildModule(module *files.ModuleFile) error {
 		return nil
 	}
 
-	return streamCommand(module.Commands.Build, module.Location)
+	if err := streamCommand(module.Commands.Build, module.Location); err != nil {
+		return err
+	}
+
+	if len(module.Artefacts) > 0 {
+		project, err := files.LoadProjectFile()
+
+		if err != nil {
+			return err
+		}
+
+		if err := module.CollectArtefacts(project.Artefacts); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

@@ -37,15 +37,6 @@ func TestBuild(t *testing.T) {
 			for _, exp := range tc.ExpectedArtefacts {
 				assert.FileExists(t, exp)
 			}
-
-			diff, _, err := command.Diff()
-
-			if err != nil {
-				assert.Fail(t, err.Error())
-				return
-			}
-
-			assert.Empty(t, diff)
 		})
 	}
 }
