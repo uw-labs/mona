@@ -8,6 +8,12 @@ import (
 // Build will execute the build commands for all modules where changes
 // are detected.
 func Build() error {
+	project, err := files.LoadProjectFile()
+
+	if err != nil {
+		return err
+	}
+
 	changed, err := getChangedModules(changeTypeBuild)
 
 	if err != nil {
@@ -27,6 +33,13 @@ func Build() error {
 		}
 
 		newHashes[module.Name+module.Location] = newHash
+
+		if len(module.Artefacts) > 0 {
+			if err := module.CollectArtefacts(project.Artefacts); err != nil {
+				return err
+			}
+		}
+
 	}
 
 	lock, err := files.LoadLockFile()
