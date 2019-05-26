@@ -112,3 +112,53 @@ func streamCommand(cmd *exec.Cmd) error {
 
 	return cmd.Wait()
 }
+
+func rangeChangedModules(change changeType, updateHashes bool, fn func(*files.ModuleFile) error) error {
+	changed, err := getChangedModules(change)
+
+	if err != nil {
+		return err
+	}
+
+	newHashes := make(map[string]string)
+	for _, module := range changed {
+		if err := fn(module); err != nil {
+			return err
+		}
+
+		if !updateHashes {
+			continue
+		}
+
+		newHash, err := hash.Generate(module.Location, module.Exclude...)
+
+		if err != nil {
+			return err
+		}
+
+		newHashes[module.Name+module.Location] = newHash
+	}
+
+	if !updateHashes {
+		return nil
+	}
+
+	lock, err := files.LoadLockFile()
+
+	if err != nil {
+		return err
+	}
+
+	for i, lockInfo := range lock.Modules {
+		if hash, ok := newHashes[lockInfo.Name+lockInfo.Location]; ok {
+			switch change {
+			case changeTypeBuild:
+				lock.Modules[i].BuildHash = hash
+			case changeTypeTest:
+				lock.Modules[i].TestHash = hash
+			}
+		}
+	}
+
+	return files.UpdateLockFile(lock)
+}
