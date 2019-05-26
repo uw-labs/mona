@@ -15,9 +15,10 @@ const (
 type (
 	// The ProjectFile type represents the structure of the "mona.yml" file.
 	ProjectFile struct {
-		Name    string   `yaml:"name"`              // The name of the project
-		Version string   `yaml:"version"`           // The mona version used to create the project
-		Modules []string `yaml:"modules,omitempty"` // The modules used within the project.
+		Name      string   `yaml:"name"`                // The name of the project
+		Version   string   `yaml:"version"`             // The mona version used to create the project
+		Modules   []string `yaml:"modules,omitempty"`   // The modules used within the project.
+		Artefacts string   `yaml:"artefacts,omitempty"` // The location for artefacts to be stored
 	}
 )
 
