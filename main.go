@@ -22,6 +22,7 @@ func main() {
 		cmd.Diff(),
 		cmd.Build(),
 		cmd.Test(),
+		cmd.Lint(),
 	}
 
 	sort.Sort(cli.FlagsByName(app.Flags))

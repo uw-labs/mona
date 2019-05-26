@@ -79,6 +79,10 @@ func streamOutputs(outputs ...io.ReadCloser) {
 }
 
 func buildModule(module *files.ModuleFile) error {
+	if module.Commands.Build == "" {
+		return nil
+	}
+
 	parts := strings.Split(module.Commands.Build, " ")
 	cmd := exec.Command(parts[0], parts[1:]...)
 	cmd.Dir = module.Location
@@ -87,6 +91,10 @@ func buildModule(module *files.ModuleFile) error {
 }
 
 func lintModule(module *files.ModuleFile) error {
+	if module.Commands.Lint == "" {
+		return nil
+	}
+
 	parts := strings.Split(module.Commands.Lint, " ")
 	cmd := exec.Command(parts[0], parts[1:]...)
 	cmd.Dir = module.Location
@@ -95,6 +103,10 @@ func lintModule(module *files.ModuleFile) error {
 }
 
 func testModule(module *files.ModuleFile) error {
+	if module.Commands.Test == "" {
+		return nil
+	}
+
 	parts := strings.Split(module.Commands.Test, " ")
 	cmd := exec.Command(parts[0], parts[1:]...)
 	cmd.Dir = module.Location
