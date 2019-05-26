@@ -22,13 +22,13 @@ func Build() error {
 
 	newHashes := make(map[string]string)
 	for _, module := range changed {
-		if err := buildModule(module); err != nil {
-			return err
-		}
-
 		newHash, err := hash.Generate(module.Location, module.Exclude...)
 
 		if err != nil {
+			return err
+		}
+
+		if err := buildModule(module); err != nil {
 			return err
 		}
 

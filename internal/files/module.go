@@ -84,15 +84,11 @@ func UpdateModuleFile(location string, module *ModuleFile) error {
 // CollectArtefacts attempts to move all files specified in the module to the provided
 // output directory. Files are stored in a folder named after the module.
 func (m *ModuleFile) CollectArtefacts(outputDir string) error {
-	if err := os.MkdirAll(outputDir, 0777); err != nil {
+	if err := os.MkdirAll(path.Join(outputDir, m.Name), 0777); err != nil {
 		return err
 	}
 
 	for _, artefactName := range m.Artefacts {
-		if err := os.MkdirAll(path.Join(outputDir, m.Name), 0777); err != nil {
-			return err
-		}
-
 		dest := path.Join(outputDir, m.Name, artefactName)
 		src := path.Join(m.Location, artefactName)
 
