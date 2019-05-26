@@ -78,43 +78,11 @@ func streamOutputs(outputs ...io.ReadCloser) {
 	}
 }
 
-func buildModule(module *files.ModuleFile) error {
-	if module.Commands.Build == "" {
-		return nil
-	}
-
-	parts := strings.Split(module.Commands.Build, " ")
+func streamCommand(command, wd string) error {
+	parts := strings.Split(command, " ")
 	cmd := exec.Command(parts[0], parts[1:]...)
-	cmd.Dir = module.Location
+	cmd.Dir = wd
 
-	return streamCommand(cmd)
-}
-
-func lintModule(module *files.ModuleFile) error {
-	if module.Commands.Lint == "" {
-		return nil
-	}
-
-	parts := strings.Split(module.Commands.Lint, " ")
-	cmd := exec.Command(parts[0], parts[1:]...)
-	cmd.Dir = module.Location
-
-	return streamCommand(cmd)
-}
-
-func testModule(module *files.ModuleFile) error {
-	if module.Commands.Test == "" {
-		return nil
-	}
-
-	parts := strings.Split(module.Commands.Test, " ")
-	cmd := exec.Command(parts[0], parts[1:]...)
-	cmd.Dir = module.Location
-
-	return streamCommand(cmd)
-}
-
-func streamCommand(cmd *exec.Cmd) error {
 	stdout, err := cmd.StdoutPipe()
 
 	if err != nil {
