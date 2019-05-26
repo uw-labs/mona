@@ -17,8 +17,9 @@ type (
 	ModuleFile struct {
 		Name     string `yaml:"name"` // The name of the module
 		Commands struct {
-			Build string `yaml:"build"` // Commands for building the module
-			Test  string `yaml:"test"`  // Commands for testing the module
+			Build string `yaml:"build"` // Command for building the module
+			Test  string `yaml:"test"`  // Command for testing the module
+			Lint  string `yaml:"lint"`  // Command for linting the module
 		} `yaml:"commands"` // Commands that can be executed against the module
 		Exclude  []string `yaml:"exclude,omitempty"`
 		Location string   `yaml:"-"` // The location of the module, not included in the module file but initialized externally for ease

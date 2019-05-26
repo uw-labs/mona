@@ -33,6 +33,7 @@ type (
 		Location  string `yaml:"location"`
 		BuildHash string `yaml:"build"`
 		TestHash  string `yaml:"test"`
+		LintHash  string `yaml:"lint"`
 	}
 )
 
