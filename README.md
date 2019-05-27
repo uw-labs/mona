@@ -57,10 +57,13 @@ Within your new module, you'll find a `module.yml` file with several keys:
 ```yaml
 name: module
 commands:
-  build: ""     # Command to run to build the module
-  test: ""      # Command to run to test the module
-exclude:       # File patterns to ignore
+  build: "make build"     # Command to run to build the module
+  test: "make test"       # Command to run to test the module
+  lint: "make lint"       # Command to run to lint the module
+exclude:                  # File patterns to ignore
   - "*.txt"
+artefacts:                # Build artefacts to move
+  - "dist/mybinary"
 ```
 
 In here you can specify how to build/test your module. Note that this must be a single line command, so it is recommended to pass responsibility for building/testing to a `Makefile` or other script runner.
@@ -74,14 +77,38 @@ Mona generates hashes to determine if code within respective modules has changed
 ```bash
 mona diff
 
-# Output:
-# Modules to be built:
-# module
-
-# Modules to be tested:
-# module
+> Modules to be built:
+> module
+>
+> Modules to be tested:
+> module
 ```
 
-### Building/Testing modules
+### Building/Testing/Linting modules
 
-You can build/test your modified modules using the `mona build` and `mona test` commands. Build and test hashes are stored seperately so mona will know if a built module has also been tested and vice-versa. Any subsequent output to `stdin` or `stderr` will be written to the console and mona will stop executing if your test/build commands return an error exit code.
+You can build, test & lint your modified modules using the `mona build`, `mona test` & `mona lint` commands. Individual hashes are stored seperately so mona will know if a module has been built, but not linted or testec etc. Any subsequent output to `stdin` or `stderr` will be written to the console and mona will stop executing if your commands return an error exit code.
+
+### Storing build artefacts
+
+In the `mona.yml` file, you can use the `artefacts` key to specify a directory that all artefacts for each module built will be stored. In each `module.yml` file, you can specify file matchers that will cause those files to be moved to the directory specified in `mona.yml`
+
+```yaml
+# mona.yml
+name: example
+version: v1
+modules:
+- app-01 apps/app-01
+- app-02 apps/app-02
+artefacts: "dist"
+```
+
+```yaml
+# module.yml
+name: app-01
+commands:
+  build: "make build"
+  test: "make test"
+  lint: "make lint"
+artefacts:
+  - "app-01"
+```
