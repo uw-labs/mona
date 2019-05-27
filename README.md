@@ -4,7 +4,7 @@
 [![CircleCI](https://circleci.com/gh/davidsbond/mona/tree/master.svg?style=shield)](https://circleci.com/gh/davidsbond/mona/tree/master)
 [![Go Report Card](https://goreportcard.com/badge/github.com/davidsbond/mona)](https://goreportcard.com/report/github.com/davidsbond/mona)
 
-Mona is a command-line tool for managing monorepos and is intended for use in CI pipelines. Each application/library in your monorepo is tracked in a `mona.yml` file as a module. In turn, each module has a `module.yml` file that specifies commands for testing/building. Changes to these modules are tracked in a `mona.lock` file which should be cached and shared amongst your builds.
+Mona is a command-line tool for managing monorepos and is intended for use in CI pipelines. Each independent part of your repository is considered a module than can be built, tested or linted. Each module has a respective `module.yml` file with information on commands to run, artifacts to store and files to exclude when generating hashes. The `mona.yml` file is used at the root of the project.
 
 A typical project structure may look like this:
 
@@ -96,9 +96,6 @@ In the `mona.yml` file, you can use the `artefacts` key to specify a directory t
 # mona.yml
 name: example
 version: v1
-modules:
-- app-01 apps/app-01
-- app-02 apps/app-02
 artefacts: "dist"
 ```
 
