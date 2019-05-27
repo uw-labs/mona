@@ -1,5 +1,5 @@
-// Package hash contains methods for generating hashes
-package hash
+// Package hashdir contains methods for generating hashes of directories
+package hashdir
 
 import (
 	"crypto/md5"

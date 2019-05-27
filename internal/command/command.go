@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/davidsbond/mona/internal/files"
-	"github.com/davidsbond/mona/internal/hash"
+	"github.com/davidsbond/mona/pkg/hashdir"
 )
 
 type (
@@ -48,7 +48,7 @@ func getChangedModules(dir string, change changeType) ([]*files.ModuleFile, erro
 		}
 
 		// Generate a new hash for the module directory
-		newHash, err := hash.Generate(modInfo.Location, modInfo.Exclude...)
+		newHash, err := hashdir.Generate(modInfo.Location, modInfo.Exclude...)
 
 		if err != nil {
 			return nil, err
@@ -137,7 +137,7 @@ func rangeChangedModules(dir string, change changeType, updateHashes bool, fn fu
 			continue
 		}
 
-		newHash, err := hash.Generate(module.Location, module.Exclude...)
+		newHash, err := hashdir.Generate(module.Location, module.Exclude...)
 
 		if err != nil {
 			return err
