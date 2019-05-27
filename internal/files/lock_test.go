@@ -164,7 +164,7 @@ func TestLock_AddModule(t *testing.T) {
 				return
 			}
 
-			if err := lock.AddModule(tc.ModuleName, tc.ModuleLocation, tc.ModuleHash); err != nil {
+			if err := lock.AddModule(tc.ModuleName); err != nil {
 				assert.Fail(t, err.Error())
 			}
 

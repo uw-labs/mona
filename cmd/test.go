@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"os"
+
 	"github.com/davidsbond/mona/internal/command"
 	"github.com/urfave/cli"
 )
@@ -11,7 +13,13 @@ func Test() cli.Command {
 		Name:  "test",
 		Usage: "Runs tests for all modules that have been created/changed since the last test run",
 		Action: func(ctx *cli.Context) error {
-			return command.Test()
+			wd, err := os.Getwd()
+
+			if err != nil {
+				return err
+			}
+
+			return command.Test(wd)
 		},
 	}
 }

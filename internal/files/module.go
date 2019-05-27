@@ -1,15 +1,23 @@
 package files
 
 import (
+	"errors"
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 
 	"gopkg.in/yaml.v2"
 )
 
 const (
 	moduleFileName = "module.yml"
+)
+
+var (
+	// ErrNoModule is the error returned when a module for a requested directory
+	// does not exist.
+	ErrNoModule = errors.New("could not find module.yml at the specified location")
 )
 
 type (
@@ -46,11 +54,42 @@ func NewModuleFile(name, location string) error {
 	return yaml.NewEncoder(file).Encode(mod)
 }
 
+func FindModules(dir string) (out []*ModuleFile, err error) {
+	err = filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if info.IsDir() {
+			return nil
+		}
+
+		if info.Name() != moduleFileName {
+			return nil
+		}
+
+		module, err := LoadModuleFile(strings.TrimSuffix(path, moduleFileName))
+
+		if err != nil {
+			return err
+		}
+
+		out = append(out, module)
+		return nil
+	})
+
+	return
+}
+
 // LoadModuleFile attempts to load a "module.yml" file into memory from
 // the given location
 func LoadModuleFile(location string) (*ModuleFile, error) {
 	configLocation := filepath.Join(location, moduleFileName)
 	file, err := os.Open(configLocation)
+
+	if os.IsNotExist(err) {
+		return nil, ErrNoModule
+	}
 
 	if err != nil {
 		return nil, err

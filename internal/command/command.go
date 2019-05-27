@@ -23,7 +23,13 @@ const (
 	changeTypeLint  changeType = 2
 )
 
-func getChangedModules(change changeType) ([]*files.ModuleFile, error) {
+func getChangedModules(dir string, change changeType) ([]*files.ModuleFile, error) {
+	modules, err := files.FindModules(dir)
+
+	if err != nil {
+		return nil, err
+	}
+
 	lock, err := files.LoadLockFile()
 
 	if err != nil {
@@ -31,19 +37,24 @@ func getChangedModules(change changeType) ([]*files.ModuleFile, error) {
 	}
 
 	var out []*files.ModuleFile
-	for _, lockInfo := range lock.Modules {
-		module, err := files.LoadModuleFile(lockInfo.Location)
+	for _, modInfo := range modules {
+		lockInfo, ok := lock.Modules[modInfo.Name]
+
+		if !ok {
+			// If the module isn't present in the lock file, it's probably
+			// new and needs adding to the lock file.
+			out = append(out, modInfo)
+			continue
+		}
+
+		// Generate a new hash for the module directory
+		newHash, err := hash.Generate(modInfo.Location, modInfo.Exclude...)
 
 		if err != nil {
 			return nil, err
 		}
 
-		newHash, err := hash.Generate(lockInfo.Location, module.Exclude...)
-
-		if err != nil {
-			return nil, err
-		}
-
+		// Check if we need to build/lint/test
 		diff := false
 		switch change {
 		case changeTypeBuild:
@@ -55,7 +66,7 @@ func getChangedModules(change changeType) ([]*files.ModuleFile, error) {
 		}
 
 		if diff {
-			out = append(out, module)
+			out = append(out, modInfo)
 		}
 	}
 
@@ -104,14 +115,19 @@ func streamCommand(command, wd string) error {
 	return cmd.Wait()
 }
 
-func rangeChangedModules(change changeType, updateHashes bool, fn func(*files.ModuleFile) error) error {
-	changed, err := getChangedModules(change)
+func rangeChangedModules(dir string, change changeType, updateHashes bool, fn func(*files.ModuleFile) error) error {
+	changed, err := getChangedModules(dir, change)
 
 	if err != nil {
 		return err
 	}
 
-	newHashes := make(map[string]string)
+	lock, err := files.LoadLockFile()
+
+	if err != nil {
+		return err
+	}
+
 	for _, module := range changed {
 		if err := fn(module); err != nil {
 			return err
@@ -127,28 +143,25 @@ func rangeChangedModules(change changeType, updateHashes bool, fn func(*files.Mo
 			return err
 		}
 
-		newHashes[module.Name+module.Location] = newHash
-	}
+		lockInfo, modInLock := lock.Modules[module.Name]
 
-	if !updateHashes {
-		return nil
-	}
-
-	lock, err := files.LoadLockFile()
-
-	if err != nil {
-		return err
-	}
-
-	for i, lockInfo := range lock.Modules {
-		if hash, ok := newHashes[lockInfo.Name+lockInfo.Location]; ok {
-			switch change {
-			case changeTypeBuild:
-				lock.Modules[i].BuildHash = hash
-			case changeTypeTest:
-				lock.Modules[i].TestHash = hash
+		if !modInLock {
+			if err := lock.AddModule(module.Name); err != nil {
+				return err
 			}
+
+			lockInfo = lock.Modules[module.Name]
 		}
+
+		switch change {
+		case changeTypeBuild:
+			lockInfo.BuildHash = newHash
+		case changeTypeTest:
+			lockInfo.TestHash = newHash
+		case changeTypeLint:
+			lockInfo.LintHash = newHash
+		}
+
 	}
 
 	return files.UpdateLockFile(lock)

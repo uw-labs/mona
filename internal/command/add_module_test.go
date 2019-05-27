@@ -27,7 +27,7 @@ func TestAddModule(t *testing.T) {
 			defer deleteProjectFiles(t)
 			defer deleteModuleFile(t, tc.ModuleLocation)
 
-			if err := command.AddModule(tc.ModuleName, tc.ModuleLocation); err != nil {
+			if err := command.AddModule(".", tc.ModuleName, tc.ModuleLocation); err != nil {
 				assert.Fail(t, err.Error())
 				return
 			}

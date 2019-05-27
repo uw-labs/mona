@@ -1,9 +1,7 @@
 package files
 
 import (
-	"fmt"
 	"os"
-	"strings"
 
 	"gopkg.in/yaml.v2"
 )
@@ -15,10 +13,9 @@ const (
 type (
 	// The ProjectFile type represents the structure of the "mona.yml" file.
 	ProjectFile struct {
-		Name      string   `yaml:"name"`                // The name of the project
-		Version   string   `yaml:"version"`             // The mona version used to create the project
-		Modules   []string `yaml:"modules,omitempty"`   // The modules used within the project.
-		Artefacts string   `yaml:"artefacts,omitempty"` // The location for artefacts to be stored
+		Name      string `yaml:"name"`                // The name of the project
+		Version   string `yaml:"version"`             // The mona version used to create the project
+		Artefacts string `yaml:"artefacts,omitempty"` // The location for artefacts to be stored
 	}
 )
 
@@ -57,26 +54,4 @@ func LoadProjectFile() (*ProjectFile, error) {
 	}
 
 	return &out, nil
-}
-
-// AddModule writes a new module to the "mona.yml" file.
-func (p *ProjectFile) AddModule(name, location string) error {
-	for _, mod := range p.Modules {
-		parts := strings.Split(mod, " ")
-
-		if parts[0] == name && parts[1] == location {
-			return fmt.Errorf("module %s in %s already exists", name, location)
-		}
-	}
-
-	p.Modules = append(p.Modules, fmt.Sprintf("%s %s", name, location))
-
-	file, err := os.Create(projectFileName)
-
-	if err != nil {
-		return err
-	}
-
-	defer file.Close()
-	return yaml.NewEncoder(file).Encode(p)
 }

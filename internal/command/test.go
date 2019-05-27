@@ -9,8 +9,8 @@ import (
 
 // Test attempts to run the test command for all modules where changes
 // are detected.
-func Test() error {
-	return rangeChangedModules(changeTypeTest, true, testModule)
+func Test(wd string) error {
+	return rangeChangedModules(wd, changeTypeTest, true, testModule)
 }
 
 func testModule(module *files.ModuleFile) error {

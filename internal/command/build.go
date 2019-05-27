@@ -6,8 +6,8 @@ import (
 
 // Build will execute the build commands for all modules where changes
 // are detected.
-func Build() error {
-	return rangeChangedModules(changeTypeBuild, true, buildModule)
+func Build(wd string) error {
+	return rangeChangedModules(wd, changeTypeBuild, true, buildModule)
 }
 
 func buildModule(module *files.ModuleFile) error {

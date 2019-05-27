@@ -54,7 +54,7 @@ func setupModules(t *testing.T, locations ...string) {
 			assert.Fail(t, err.Error())
 		}
 
-		if err := command.AddModule(filepath.Base(location), location); err != nil {
+		if err := command.AddModule(".", filepath.Base(location), location); err != nil {
 			assert.Fail(t, err.Error())
 		}
 	}

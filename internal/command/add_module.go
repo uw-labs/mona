@@ -1,29 +1,30 @@
 package command
 
-import "github.com/davidsbond/mona/internal/files"
+import (
+	"fmt"
 
-// AddModule creates a new "module.yaml" file in the specified directory and adds it to the project
-// and lock files.
-func AddModule(name, location string) error {
-	if err := files.NewModuleFile(name, location); err != nil {
-		return err
-	}
+	"github.com/davidsbond/mona/internal/files"
+)
 
-	pj, err := files.LoadProjectFile()
-
-	if err != nil {
-		return err
-	}
-
-	if err := pj.AddModule(name, location); err != nil {
-		return err
-	}
-
-	lock, err := files.LoadLockFile()
+// AddModule creates a new "module.yaml" file in the specified directory
+func AddModule(wd, name, location string) error {
+	modules, err := files.FindModules(wd)
 
 	if err != nil {
 		return err
 	}
 
-	return lock.AddModule(name, location, "")
+	for _, module := range modules {
+		if name == module.Name {
+			return fmt.Errorf("A module named '%s' already exists at %s", module.Name, module.Location)
+		}
+	}
+
+	if _, err := files.LoadModuleFile(location); err == files.ErrNoModule {
+		return files.NewModuleFile(name, location)
+	} else if err != nil {
+		return err
+	}
+
+	return fmt.Errorf("A module already exists in directory %s", location)
 }

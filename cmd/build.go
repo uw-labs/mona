@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"os"
+
 	"github.com/davidsbond/mona/internal/command"
 
 	"github.com/urfave/cli"
@@ -13,7 +15,13 @@ func Build() cli.Command {
 		Name:  "build",
 		Usage: "Builds any modified modules within the project",
 		Action: func(ctx *cli.Context) error {
-			return command.Build()
+			wd, err := os.Getwd()
+
+			if err != nil {
+				return err
+			}
+
+			return command.Build(wd)
 		},
 	}
 }

@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/davidsbond/mona/internal/command"
 
@@ -15,7 +16,13 @@ func Diff() cli.Command {
 		Name:  "diff",
 		Usage: "Outputs all modules where changes are detected",
 		Action: func(ctx *cli.Context) error {
-			build, test, err := command.Diff()
+			wd, err := os.Getwd()
+
+			if err != nil {
+				return err
+			}
+
+			build, test, lint, err := command.Diff(wd)
 
 			if err != nil {
 				return err
@@ -34,6 +41,16 @@ func Diff() cli.Command {
 			if len(test) > 0 {
 				fmt.Println("Modules to be tested:")
 				for _, name := range test {
+					if _, err := fmt.Println(name); err != nil {
+						return err
+					}
+				}
+				fmt.Println()
+			}
+
+			if len(lint) > 0 {
+				fmt.Println("Modules to be linted:")
+				for _, name := range lint {
 					if _, err := fmt.Println(name); err != nil {
 						return err
 					}

@@ -1,17 +1,23 @@
 package command
 
 // Diff outputs the names of all modules where changes are detected.
-func Diff() ([]string, []string, error) {
-	build, err := getChangedModules(changeTypeBuild)
+func Diff(wd string) ([]string, []string, []string, error) {
+	build, err := getChangedModules(wd, changeTypeBuild)
 
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
-	test, err := getChangedModules(changeTypeTest)
+	test, err := getChangedModules(wd, changeTypeTest)
 
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
+	}
+
+	lint, err := getChangedModules(wd, changeTypeLint)
+
+	if err != nil {
+		return nil, nil, nil, err
 	}
 
 	var buildNames []string
@@ -24,5 +30,10 @@ func Diff() ([]string, []string, error) {
 		testNames = append(testNames, module.Name)
 	}
 
-	return buildNames, testNames, nil
+	var lintNames []string
+	for _, module := range lint {
+		lintNames = append(lintNames, module.Name)
+	}
+
+	return buildNames, testNames, lintNames, nil
 }

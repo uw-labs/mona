@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"errors"
+	"os"
 	"path/filepath"
 	"sort"
 
@@ -37,10 +38,16 @@ func AddModule() cli.Command {
 			return ctx.Set("name", filepath.Base(dir))
 		},
 		Action: func(ctx *cli.Context) error {
+			wd, err := os.Getwd()
+
+			if err != nil {
+				return err
+			}
+
 			location := ctx.Args().First()
 			name := ctx.String("name")
 
-			return command.AddModule(name, location)
+			return command.AddModule(wd, name, location)
 		},
 	}
 

@@ -28,7 +28,7 @@ func TestDiff(t *testing.T) {
 			defer deleteProjectFiles(t)
 			defer deleteModuleFiles(t, tc.ModuleDirs...)
 
-			build, test, err := command.Diff()
+			build, test, lint, err := command.Diff(".")
 
 			if err != nil {
 				assert.Fail(t, err.Error())
@@ -38,6 +38,7 @@ func TestDiff(t *testing.T) {
 			for _, exp := range tc.ExpectedDiffs {
 				assert.Contains(t, build, exp)
 				assert.Contains(t, test, exp)
+				assert.Contains(t, lint, exp)
 			}
 		})
 	}
