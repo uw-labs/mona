@@ -1,6 +1,7 @@
 package files
 
 import (
+	"errors"
 	"os"
 
 	"gopkg.in/yaml.v2"
@@ -8,6 +9,12 @@ import (
 
 const (
 	projectFileName = "mona.yml"
+)
+
+var (
+	// ErrNoProject is the error returned when a project file is not
+	// found in the current directory
+	ErrNoProject = errors.New("no mona.yml file found in directory")
 )
 
 type (
@@ -40,6 +47,10 @@ func NewProjectFile(name, version string) error {
 // LoadProjectFile attempts to read a "mona.yml" file into memory.
 func LoadProjectFile() (*ProjectFile, error) {
 	file, err := os.Open(projectFileName)
+
+	if os.IsNotExist(err) {
+		return nil, ErrNoProject
+	}
 
 	if err != nil {
 		return nil, err
