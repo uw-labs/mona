@@ -30,20 +30,6 @@ jobs:
           paths:
             - release
 
-  upload:
-    docker:
-    - image: circleci/golang
-    steps:
-      - checkout
-      - restore_cache:
-          keys: 
-            - '{{ .Environment.CIRCLE_SHA1 }}'
-      - run: go get github.com/aktau/github-release
-      # Create GitHub release
-      - run: github-release release --tag ${CIRCLE_TAG} --repo mona --user ${CIRCLE_USERNAME}
-      # Upload files
-      - run: github-release upload --tag ${CIRCLE_TAG} --repo mona --user ${CIRCLE_USERNAME} --file release/*
-
   lint:
     docker:
       - image: golangci/golangci-lint
@@ -93,12 +79,3 @@ workflows:
             branches:
               only:
                 - master
-
-      - upload:
-          filters:
-            tags:
-              only: /.*/
-            branches:
-              ignore: /.*/
-          requires:
-            - build
