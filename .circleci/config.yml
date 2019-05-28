@@ -23,14 +23,24 @@ jobs:
           paths:
             - /tmp/go/cache
             - /go/pkg/mod
+      - save_cache:
+          key: '{{ .Environment.CIRCLE_SHA1 }}'
+          paths:
+            - release
 
   upload:
     docker:
     - image: circleci/golang
     steps:
       - checkout
-      - run: go get -u github.com/tcnksm/ghrs
-      - run: ghr v${CIRCLE_TAG} release/${CIRCLE_TAG} -r mona -u ${CIRCLE_USERNAME}
+      - restore_cache:
+          keys: 
+            - '{{ .Environment.CIRCLE_SHA1 }}'
+      - run: go get github.com/aktau/github-release
+      # Create GitHub release
+      - run: github-release release --tag ${CIRCLE_TAG} --repo mona --user ${CIRCLE_USERNAME}
+      # Upload files
+      - run: github-release upload --tag ${CIRCLE_TAG} --repo mona --user ${CIRCLE_USERNAME} --file release/*
 
   lint:
     docker:
