@@ -12,14 +12,14 @@ jobs:
       - setup_remote_docker
       - restore_cache:
           keys:
-            - {{ checksum "go.sum" }}
+            - '{{ checksum "go.sum" }}'
       - run: echo "$DOCKER_HUB_PASS" | docker login --username $DOCKER_HUB_USER --password-stdin
       - run: make docker
       - store_artifacts:
           path: dist
       - run: make docker-push
       - save_cache:
-          key: {{ checksum "go.sum" }}
+          key: '{{ checksum "go.sum" }}'
           paths:
             - /tmp/go/cache
             - /go/pkg/mod
@@ -49,10 +49,10 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - {{ checksum "go.sum" }}
+            - '{{ checksum "go.sum" }}'
       - run: make test
       - save_cache:
-          key: {{ checksum "go.sum" }}
+          key: '{{ checksum "go.sum" }}'
           paths:
             - /tmp/go/cache
             - /go/pkg/mod
