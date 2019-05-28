@@ -11,8 +11,8 @@ jobs:
       - checkout
       - setup_remote_docker
       - restore_cache:
-         keys:
-           - {{ checksum "go.sum" }}
+          keys:
+            - {{ checksum "go.sum" }}
       - run: echo "$DOCKER_HUB_PASS" | docker login --username $DOCKER_HUB_USER --password-stdin
       - run: make docker
       - store_artifacts:
@@ -48,8 +48,8 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-         keys:
-           - {{ checksum "go.sum" }}
+          keys:
+            - {{ checksum "go.sum" }}
       - run: make test
       - save_cache:
           key: {{ checksum "go.sum" }}
@@ -81,10 +81,10 @@ workflows:
                 - master
 
       - upload:
-          requires:
-            - build
           filters:
             tags:
               only: /.*/
             branches:
               ignore: /.*/
+          requires:
+            - build
