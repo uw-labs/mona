@@ -24,13 +24,13 @@ jobs:
             - /tmp/go/cache
             - /go/pkg/mod
 
-    release:
-      docker:
-      - image: circleci/golang
-      steps:
-        - checkout
-        - run: go get -u github.com/tcnksm/ghrs
-        - run: ghr v${CIRCLE_TAG} release/${CIRCLE_TAG} -r mona -u ${CIRCLE_USERNAME}
+  upload:
+    docker:
+    - image: circleci/golang
+    steps:
+      - checkout
+      - run: go get -u github.com/tcnksm/ghrs
+      - run: ghr v${CIRCLE_TAG} release/${CIRCLE_TAG} -r mona -u ${CIRCLE_USERNAME}
 
   lint:
     docker:
@@ -80,7 +80,7 @@ workflows:
               only:
                 - master
 
-      - release:
+      - upload:
           requires:
             - build
           filters:
