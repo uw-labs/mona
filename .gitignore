@@ -2,3 +2,4 @@
 .vscode/
 mona
 dist/
+*.tar.gz

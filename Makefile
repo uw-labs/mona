@@ -1,11 +1,15 @@
 VERSION := $(shell git describe --tags --dirty --always)
 LDFLAGS := -ldflags '-X "main.version=$(VERSION)" -s -w'
 IMAGE_NAME := davidsbond/mona
+GOOS := ${shell go env GOOS}
+GOARCH := ${shell go env GOARCH}
 
 build:
 	go build $(LDFLAGS) -o dist/mona
 	cp README.md dist/README.md
 	cp LICENSE dist/LICENSE
+	mkdir -p release/${VERSION}
+	tar -zcvf release/${VERSION}/mona_${VERSION}_${GOOS}_${GOARCH}.tar.gz dist 
 
 test:
 	go test -v ./...

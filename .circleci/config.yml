@@ -4,14 +4,33 @@ jobs:
   build:
     docker:
       - image: circleci/golang
+    environment:
+      CGO_ENABLED: "0"
+      GOCACHE: "/tmp/go/cache"
     steps:
       - checkout
       - setup_remote_docker
+      - restore_cache:
+         keys:
+           - {{ checksum "go.sum" }}
       - run: echo "$DOCKER_HUB_PASS" | docker login --username $DOCKER_HUB_USER --password-stdin
       - run: make docker
       - store_artifacts:
           path: dist
       - run: make docker-push
+      - save_cache:
+          key: {{ checksum "go.sum" }}
+          paths:
+            - /tmp/go/cache
+            - /go/pkg/mod
+
+    release:
+      docker:
+      - image: circleci/golang
+      steps:
+        - checkout
+        - run: go get -u github.com/tcnksm/ghrs
+        - run: ghr v${CIRCLE_TAG} release/${CIRCLE_TAG} -r mona -u ${CIRCLE_USERNAME}
 
   lint:
     docker:
@@ -23,9 +42,20 @@ jobs:
   test:
     docker:
       - image: circleci/golang
+    environment:
+      CGO_ENABLED: "0"
+      GOCACHE: "/tmp/go/cache"
     steps:
       - checkout
+      - restore_cache:
+         keys:
+           - {{ checksum "go.sum" }}
       - run: make test
+      - save_cache:
+          key: {{ checksum "go.sum" }}
+          paths:
+            - /tmp/go/cache
+            - /go/pkg/mod
 
 workflows:
   version: 2
@@ -49,3 +79,12 @@ workflows:
             branches:
               only:
                 - master
+
+      - release:
+          requires:
+            - build
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore: /.*/
