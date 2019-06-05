@@ -22,9 +22,8 @@ var (
 type (
 	// The ProjectFile type represents the structure of the "mona.yml" file.
 	ProjectFile struct {
-		Name      string `yaml:"name"`                // The name of the project
-		Version   string `yaml:"version"`             // The mona version used to create the project
-		Artefacts string `yaml:"artefacts,omitempty"` // The location for artefacts to be stored
+		Name    string `yaml:"name"`    // The name of the project
+		Version string `yaml:"version"` // The mona version used to create the project
 	}
 )
 
