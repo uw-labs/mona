@@ -147,7 +147,7 @@ func rangeChangedModules(dir string, change changeType, fn rangeFn, updateHashes
 		lockInfo, modInLock := lock.Modules[module.Name]
 
 		if !modInLock {
-			if err := lock.AddModule(module.Name); err != nil {
+			if err := files.AddModule(lock, dir, module.Name); err != nil {
 				return err
 			}
 

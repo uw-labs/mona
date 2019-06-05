@@ -10,6 +10,7 @@ import (
 
 const (
 	lockFileName = "mona.lock"
+	lockFilePerm = 644
 )
 
 var (
@@ -58,7 +59,10 @@ func NewLockFile(name, version string) error {
 // UpdateLockFile overwrites the current "mona.lock" file in the given working
 // directory with the data provided.
 func UpdateLockFile(wd string, lock *LockFile) error {
-	file, err := os.Create(filepath.Join(wd, lockFileName))
+	file, err := os.OpenFile(
+		filepath.Join(wd, lockFileName),
+		os.O_WRONLY,
+		lockFilePerm)
 
 	if err != nil {
 		return err
@@ -71,7 +75,10 @@ func UpdateLockFile(wd string, lock *LockFile) error {
 // LoadLockFile attempts to load a lock file into memory from the provided
 // working directory.
 func LoadLockFile(wd string) (*LockFile, error) {
-	file, err := os.Open(filepath.Join(wd, lockFileName))
+	file, err := os.OpenFile(
+		filepath.Join(wd, lockFileName),
+		os.O_RDONLY,
+		lockFilePerm)
 
 	if os.IsNotExist(err) {
 		return nil, ErrNoLock
@@ -96,12 +103,11 @@ func LoadLockFile(wd string) (*LockFile, error) {
 	return &out, nil
 }
 
-// AddModule adds a new module entry to the lock file using the provided name,
-// location and hash. The "mona.lock" file is then updated with the new values.
-func (l *LockFile) AddModule(name string) error {
+// AddModule adds a new module entry to the lock file in the provided working directory.
+func AddModule(l *LockFile, wd, name string) error {
 	l.Modules[name] = &ModuleVersion{}
 
-	file, err := os.Create(lockFileName)
+	file, err := os.OpenFile(filepath.Join(wd, lockFileName), os.O_WRONLY, lockFilePerm)
 
 	if err != nil {
 		return err

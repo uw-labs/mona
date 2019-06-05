@@ -128,7 +128,7 @@ func TestLoadLockFile(t *testing.T) {
 	}
 }
 
-func TestLock_AddModule(t *testing.T) {
+func TestAddModule(t *testing.T) {
 	tt := []struct {
 		Name           string
 		ProjectName    string
@@ -164,7 +164,7 @@ func TestLock_AddModule(t *testing.T) {
 				return
 			}
 
-			if err := lock.AddModule(tc.ModuleName); err != nil {
+			if err := files.AddModule(lock, ".", tc.ModuleName); err != nil {
 				assert.Fail(t, err.Error())
 			}
 
