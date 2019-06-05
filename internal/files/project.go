@@ -11,6 +11,7 @@ import (
 
 const (
 	projectFileName = "mona.yml"
+	projectFilePerm = 0777
 )
 
 var (
@@ -48,7 +49,10 @@ func NewProjectFile(name, version string) error {
 // LoadProjectFile attempts to read a "mona.yml" file into memory from the provided
 // working directory
 func LoadProjectFile(wd string) (*ProjectFile, error) {
-	file, err := os.Open(filepath.Join(wd, projectFileName))
+	file, err := os.OpenFile(
+		filepath.Join(wd, projectFileName),
+		os.O_RDONLY,
+		projectFilePerm)
 
 	if os.IsNotExist(err) {
 		return nil, ErrNoProject

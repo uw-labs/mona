@@ -64,6 +64,10 @@ func UpdateLockFile(wd string, lock *LockFile) error {
 		os.O_WRONLY,
 		lockFilePerm)
 
+	if os.IsNotExist(err) {
+		return ErrNoLock
+	}
+
 	if err != nil {
 		return err
 	}
@@ -107,12 +111,5 @@ func LoadLockFile(wd string) (*LockFile, error) {
 func AddModule(l *LockFile, wd, name string) error {
 	l.Modules[name] = &ModuleVersion{}
 
-	file, err := os.OpenFile(filepath.Join(wd, lockFileName), os.O_WRONLY, lockFilePerm)
-
-	if err != nil {
-		return err
-	}
-
-	defer file.Close()
-	return yaml.NewEncoder(file).Encode(l)
+	return UpdateLockFile(wd, l)
 }

@@ -118,6 +118,10 @@ func UpdateModuleFile(location string, module *ModuleFile) error {
 		os.O_WRONLY,
 		moduleFilePerm)
 
+	if os.IsNotExist(err) {
+		return ErrNoModule
+	}
+
 	if err != nil {
 		return err
 	}
