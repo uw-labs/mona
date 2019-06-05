@@ -20,8 +20,9 @@ func WriteList(out io.Writer, title string, items []string) error {
 		builder.WriteString("- ")
 		builder.WriteString(item)
 		builder.WriteRune('\n')
-		builder.WriteRune('\n')
 	}
+
+	builder.WriteRune('\n')
 
 	_, err := io.Copy(out, builder)
 	return err
