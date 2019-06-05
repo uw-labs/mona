@@ -55,10 +55,10 @@ workflows:
       - test
       - lint
       - build:
+          requires:
+            - test
+            - lint
           filters:
-            requires:
-              - test
-              - lint
             tags:
               only: /.*/
             branches:
