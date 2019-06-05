@@ -29,6 +29,8 @@ func main() {
 	sort.Sort(cli.CommandsByName(app.Commands))
 
 	if err := app.Run(os.Args); err != nil {
-		output.WriteError(os.Stdout, err)
+		if err = output.WriteError(os.Stdout, err); err != nil {
+			panic(err)
+		}
 	}
 }

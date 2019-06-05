@@ -42,7 +42,7 @@ func NewModuleFile(name, location string) error {
 	location = filepath.Join(location, moduleFileName)
 	file, err := os.Create(location)
 
-	if os.IsNotExist(err); err != nil {
+	if os.IsNotExist(err) {
 		return fmt.Errorf("directory %s does not exist", location)
 	}
 
