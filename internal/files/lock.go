@@ -10,7 +10,7 @@ import (
 
 const (
 	lockFileName = "mona.lock"
-	lockFilePerm = 644
+	lockFilePerm = 0644
 )
 
 var (

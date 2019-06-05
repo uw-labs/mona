@@ -11,6 +11,7 @@ import (
 
 const (
 	moduleFileName = "module.yml"
+	moduleFilePerm = 0777
 )
 
 var (
@@ -84,8 +85,10 @@ func FindModules(dir string) (out []*ModuleFile, err error) {
 // LoadModuleFile attempts to load a "module.yml" file into memory from
 // the given location
 func LoadModuleFile(location string) (*ModuleFile, error) {
-	configLocation := filepath.Join(location, moduleFileName)
-	file, err := os.Open(configLocation)
+	file, err := os.OpenFile(
+		filepath.Join(location, moduleFileName),
+		os.O_RDONLY,
+		moduleFilePerm)
 
 	if os.IsNotExist(err) {
 		return nil, ErrNoModule
@@ -110,8 +113,10 @@ func LoadModuleFile(location string) (*ModuleFile, error) {
 // UpdateModuleFile replaces the contents of "module.yml" at the given
 // location with the module data provided.
 func UpdateModuleFile(location string, module *ModuleFile) error {
-	location = filepath.Join(location, moduleFileName)
-	file, err := os.Create(location)
+	file, err := os.OpenFile(
+		filepath.Join(location, moduleFileName),
+		os.O_WRONLY,
+		moduleFilePerm)
 
 	if err != nil {
 		return err
