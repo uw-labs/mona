@@ -2,10 +2,8 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/davidsbond/mona/internal/command"
-
 	"github.com/urfave/cli"
 )
 
@@ -15,13 +13,7 @@ func Diff() cli.Command {
 	return cli.Command{
 		Name:  "diff",
 		Usage: "Outputs all modules where changes are detected",
-		Action: func(ctx *cli.Context) error {
-			wd, err := os.Getwd()
-
-			if err != nil {
-				return err
-			}
-
+		Action: withProjectDirectory(func(ctx *cli.Context, wd string) error {
 			build, test, lint, err := command.Diff(wd)
 
 			if err != nil {
@@ -59,6 +51,6 @@ func Diff() cli.Command {
 			}
 
 			return nil
-		},
+		}),
 	}
 }

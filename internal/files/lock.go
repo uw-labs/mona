@@ -3,6 +3,7 @@ package files
 import (
 	"errors"
 	"os"
+	"path/filepath"
 
 	"gopkg.in/yaml.v2"
 )
@@ -67,10 +68,10 @@ func UpdateLockFile(lock *LockFile) error {
 	return yaml.NewEncoder(file).Encode(lock)
 }
 
-// LoadLockFile reads the "mona.lock" file from the project root into
-// memory.
-func LoadLockFile() (*LockFile, error) {
-	file, err := os.Open(lockFileName)
+// LoadLockFile attempts to load a lock file into memory from the provided
+// working directory.
+func LoadLockFile(wd string) (*LockFile, error) {
+	file, err := os.Open(filepath.Join(wd, lockFileName))
 
 	if os.IsNotExist(err) {
 		return nil, ErrNoLock

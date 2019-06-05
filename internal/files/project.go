@@ -3,6 +3,8 @@ package files
 import (
 	"errors"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"gopkg.in/yaml.v2"
 )
@@ -65,4 +67,27 @@ func LoadProjectFile() (*ProjectFile, error) {
 	}
 
 	return &out, nil
+}
+
+// GetProjectRoot attempts to locate the root of the mona project based on the provided
+// working directory. The provided path is traversed in reverse and each directory is
+// checked for the existence of a mona.yml file.
+func GetProjectRoot(wd string) (string, error) {
+	sep := string(os.PathSeparator)
+	parts := append(strings.SplitAfter(wd, sep), sep)
+
+	for i := len(parts) - 1; i >= 0; i-- {
+		dir := filepath.Join(parts[:i]...)
+		file := filepath.Join(dir, projectFileName)
+
+		if _, err := os.Stat(file); err == nil {
+			return dir, nil
+		} else if os.IsNotExist(err) {
+			continue
+		} else {
+			return "", err
+		}
+	}
+
+	return "", ErrNoProject
 }

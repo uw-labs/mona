@@ -30,7 +30,7 @@ func getChangedModules(dir string, change changeType) ([]*files.ModuleFile, erro
 		return nil, err
 	}
 
-	lock, err := files.LoadLockFile()
+	lock, err := files.LoadLockFile(dir)
 
 	if err != nil {
 		return nil, err
@@ -118,11 +118,11 @@ func streamCommand(command, wd string) error {
 func rangeChangedModules(dir string, change changeType, updateHashes bool, fn func(*files.ModuleFile) error) error {
 	changed, err := getChangedModules(dir, change)
 
-	if err != nil {
+	if err != nil || len(changed) == 0 {
 		return err
 	}
 
-	lock, err := files.LoadLockFile()
+	lock, err := files.LoadLockFile(dir)
 
 	if err != nil {
 		return err

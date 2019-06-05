@@ -43,7 +43,7 @@ func TestInit(t *testing.T) {
 			assert.Equal(t, tc.ProjectName, proj.Name)
 			assert.Equal(t, tc.ProjectVersion, proj.Version)
 
-			lock, err := files.LoadLockFile()
+			lock, err := files.LoadLockFile(".")
 
 			if err != nil {
 				assert.Fail(t, err.Error())

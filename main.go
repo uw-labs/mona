@@ -1,13 +1,11 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"sort"
 
 	"github.com/davidsbond/mona/cmd"
-	"github.com/davidsbond/mona/internal/files"
 	"github.com/urfave/cli"
 )
 
@@ -25,20 +23,6 @@ func main() {
 		cmd.Build(),
 		cmd.Test(),
 		cmd.Lint(),
-	}
-
-	// Try to load the project file before every command to ensure we're
-	// in a valid project directory
-	app.Before = func(ctx *cli.Context) error {
-		if _, err := files.LoadProjectFile(); err == files.ErrNoProject {
-			app.CustomAppHelpTemplate = "No mona.yml file in current directory"
-			return errors.New("")
-		} else if err != nil {
-			app.CustomAppHelpTemplate = err.Error()
-			return errors.New("")
-		}
-
-		return nil
 	}
 
 	sort.Sort(cli.FlagsByName(app.Flags))

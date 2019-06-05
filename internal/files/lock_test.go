@@ -30,7 +30,7 @@ func TestNewLockFile(t *testing.T) {
 			defer deleteLockFile(t)
 			assert.FileExists(t, "mona.lock")
 
-			lock, err := files.LoadLockFile()
+			lock, err := files.LoadLockFile(".")
 
 			if err != nil {
 				assert.Fail(t, err.Error())
@@ -78,7 +78,7 @@ func TestUpdateLockFile(t *testing.T) {
 				return
 			}
 
-			lock, err := files.LoadLockFile()
+			lock, err := files.LoadLockFile(".")
 
 			if err != nil {
 				assert.Fail(t, err.Error())
@@ -115,7 +115,7 @@ func TestLoadLockFile(t *testing.T) {
 			defer deleteLockFile(t)
 			assert.FileExists(t, "mona.lock")
 
-			lock, err := files.LoadLockFile()
+			lock, err := files.LoadLockFile(".")
 
 			if err != nil {
 				assert.Fail(t, err.Error())
@@ -157,7 +157,7 @@ func TestLock_AddModule(t *testing.T) {
 			defer deleteLockFile(t)
 			assert.FileExists(t, "mona.lock")
 
-			lock, err := files.LoadLockFile()
+			lock, err := files.LoadLockFile(".")
 
 			if err != nil {
 				assert.Fail(t, err.Error())
@@ -168,7 +168,7 @@ func TestLock_AddModule(t *testing.T) {
 				assert.Fail(t, err.Error())
 			}
 
-			newLock, err := files.LoadLockFile()
+			newLock, err := files.LoadLockFile(".")
 
 			if err != nil {
 				assert.Fail(t, err.Error())
