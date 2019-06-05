@@ -3,11 +3,23 @@ package main
 import (
 	"os"
 	"sort"
+	"strconv"
+	"time"
 
 	"github.com/davidsbond/mona/cmd"
 	"github.com/davidsbond/mona/internal/output"
 	"github.com/urfave/cli"
 )
+
+var (
+	version     string
+	compiled    string
+	compileTime int64
+)
+
+func init() {
+	compileTime, _ = strconv.ParseInt(compiled, 10, 64)
+}
 
 func main() {
 	app := cli.NewApp()
@@ -15,6 +27,8 @@ func main() {
 	app.Author = "David Bond"
 	app.Email = "davidsbond93@gmail.com"
 	app.Copyright = "2019 David Bond"
+	app.Version = version
+	app.Compiled = time.Unix(compileTime, 0)
 
 	app.Commands = []cli.Command{
 		cmd.Init(),

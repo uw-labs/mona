@@ -1,5 +1,7 @@
 VERSION := $(shell git describe --tags --dirty --always)
-LDFLAGS := -ldflags '-X "main.version=$(VERSION)" -s -w'
+COMPILED := $(shell date +%s)
+
+LDFLAGS := -ldflags "-X main.version=$(VERSION) -X main.compiled=$(COMPILED) -s -w"
 IMAGE_NAME := davidsbond/mona
 GOOS := ${shell go env GOOS}
 GOARCH := ${shell go env GOARCH}
