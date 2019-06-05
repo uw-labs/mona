@@ -10,6 +10,8 @@ import (
 )
 
 type (
+	// The ActionFunc type is a method that takes a CLI context and the
+	// current project directory as an argument and returns a single error.
 	ActionFunc func(ctx *cli.Context, pd string) error
 )
 

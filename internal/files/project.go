@@ -17,7 +17,7 @@ const (
 var (
 	// ErrNoProject is the error returned when a project file is not
 	// found in the current directory
-	ErrNoProject = errors.New("no mona.yml file found in directory")
+	ErrNoProject = errors.New("failed to find project file in current path")
 )
 
 type (

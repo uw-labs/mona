@@ -1,7 +1,9 @@
 package cmd
 
 import (
-	"fmt"
+	"os"
+
+	"github.com/davidsbond/mona/internal/output"
 
 	"github.com/davidsbond/mona/internal/command"
 	"github.com/urfave/cli"
@@ -20,34 +22,16 @@ func Diff() cli.Command {
 				return err
 			}
 
-			if len(build) > 0 {
-				fmt.Println("Modules to be built:")
-				for _, name := range build {
-					if _, err := fmt.Println(name); err != nil {
-						return err
-					}
-				}
-				fmt.Println()
+			if err := output.WriteList(os.Stdout, "Modules to be built:", build); err != nil {
+				return err
 			}
 
-			if len(test) > 0 {
-				fmt.Println("Modules to be tested:")
-				for _, name := range test {
-					if _, err := fmt.Println(name); err != nil {
-						return err
-					}
-				}
-				fmt.Println()
+			if err := output.WriteList(os.Stdout, "Modules to be tested:", test); err != nil {
+				return err
 			}
 
-			if len(lint) > 0 {
-				fmt.Println("Modules to be linted:")
-				for _, name := range lint {
-					if _, err := fmt.Println(name); err != nil {
-						return err
-					}
-				}
-				fmt.Println()
+			if err := output.WriteList(os.Stdout, "Modules to be linted:", lint); err != nil {
+				return err
 			}
 
 			return nil
