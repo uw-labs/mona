@@ -30,7 +30,7 @@ func TestNewProjectFile(t *testing.T) {
 			defer deleteProjectFile(t)
 
 			assert.FileExists(t, "mona.yml")
-			proj, err := files.LoadProjectFile()
+			proj, err := files.LoadProjectFile(".")
 
 			if err != nil {
 				assert.Fail(t, err.Error())
@@ -66,7 +66,7 @@ func TestLoadProjectFile(t *testing.T) {
 			defer deleteProjectFile(t)
 			assert.FileExists(t, "mona.yml")
 
-			proj, err := files.LoadProjectFile()
+			proj, err := files.LoadProjectFile(".")
 
 			if err != nil {
 				assert.Fail(t, err.Error())

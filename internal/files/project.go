@@ -46,9 +46,10 @@ func NewProjectFile(name, version string) error {
 	return yaml.NewEncoder(file).Encode(pj)
 }
 
-// LoadProjectFile attempts to read a "mona.yml" file into memory.
-func LoadProjectFile() (*ProjectFile, error) {
-	file, err := os.Open(projectFileName)
+// LoadProjectFile attempts to read a "mona.yml" file into memory from the provided
+// working directory
+func LoadProjectFile(wd string) (*ProjectFile, error) {
+	file, err := os.Open(filepath.Join(wd, projectFileName))
 
 	if os.IsNotExist(err) {
 		return nil, ErrNoProject

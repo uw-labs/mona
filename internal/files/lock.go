@@ -36,8 +36,8 @@ type (
 	}
 )
 
-// NewLockFile creates a new "mona.lock" file at the project root using the provided name
-// and version
+// NewLockFile creates a new "mona.lock" file in the current working directory using the
+// provided name and version
 func NewLockFile(name, version string) error {
 	file, err := os.Create(lockFileName)
 
@@ -55,10 +55,10 @@ func NewLockFile(name, version string) error {
 	return yaml.NewEncoder(file).Encode(lock)
 }
 
-// UpdateLockFile overwrites the current "mona.lock" file at the project root with
-// the data provided.
-func UpdateLockFile(lock *LockFile) error {
-	file, err := os.Create(lockFileName)
+// UpdateLockFile overwrites the current "mona.lock" file in the given working
+// directory with the data provided.
+func UpdateLockFile(wd string, lock *LockFile) error {
+	file, err := os.Create(filepath.Join(wd, lockFileName))
 
 	if err != nil {
 		return err

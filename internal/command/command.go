@@ -15,6 +15,7 @@ import (
 
 type (
 	changeType int
+	rangeFn    func(string, *files.ModuleFile) error
 )
 
 const (
@@ -115,7 +116,7 @@ func streamCommand(command, wd string) error {
 	return cmd.Wait()
 }
 
-func rangeChangedModules(dir string, change changeType, updateHashes bool, fn func(*files.ModuleFile) error) error {
+func rangeChangedModules(dir string, change changeType, fn rangeFn, updateHashes bool) error {
 	changed, err := getChangedModules(dir, change)
 
 	if err != nil || len(changed) == 0 {
@@ -129,7 +130,7 @@ func rangeChangedModules(dir string, change changeType, updateHashes bool, fn fu
 	}
 
 	for _, module := range changed {
-		if err := fn(module); err != nil {
+		if err := fn(dir, module); err != nil {
 			return err
 		}
 
@@ -164,5 +165,5 @@ func rangeChangedModules(dir string, change changeType, updateHashes bool, fn fu
 
 	}
 
-	return files.UpdateLockFile(lock)
+	return files.UpdateLockFile(dir, lock)
 }

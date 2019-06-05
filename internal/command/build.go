@@ -7,10 +7,10 @@ import (
 // Build will execute the build commands for all modules where changes
 // are detected.
 func Build(wd string) error {
-	return rangeChangedModules(wd, changeTypeBuild, true, buildModule)
+	return rangeChangedModules(wd, changeTypeBuild, buildModule, true)
 }
 
-func buildModule(module *files.ModuleFile) error {
+func buildModule(wd string, module *files.ModuleFile) error {
 	if module.Commands.Build == "" {
 		return nil
 	}
@@ -20,7 +20,7 @@ func buildModule(module *files.ModuleFile) error {
 	}
 
 	if len(module.Artefacts) > 0 {
-		project, err := files.LoadProjectFile()
+		project, err := files.LoadProjectFile(wd)
 
 		if err != nil {
 			return err

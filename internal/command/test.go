@@ -10,10 +10,10 @@ import (
 // Test attempts to run the test command for all modules where changes
 // are detected.
 func Test(wd string) error {
-	return rangeChangedModules(wd, changeTypeTest, true, testModule)
+	return rangeChangedModules(wd, changeTypeTest, testModule, true)
 }
 
-func testModule(module *files.ModuleFile) error {
+func testModule(wd string, module *files.ModuleFile) error {
 	if module.Commands.Test == "" {
 		return nil
 	}
