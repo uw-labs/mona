@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"errors"
-	"os"
 	"path/filepath"
 	"sort"
 
@@ -28,7 +27,7 @@ func AddModule() cli.Command {
 			dir := ctx.Args().First()
 
 			if dir == "" {
-				return errors.New("Argument 'location' is required")
+				return errors.New("argument 'location' is required")
 			}
 
 			if ctx.String("name") != "" {
@@ -37,18 +36,9 @@ func AddModule() cli.Command {
 
 			return ctx.Set("name", filepath.Base(dir))
 		},
-		Action: func(ctx *cli.Context) error {
-			wd, err := os.Getwd()
-
-			if err != nil {
-				return err
-			}
-
-			location := ctx.Args().First()
-			name := ctx.String("name")
-
-			return command.AddModule(wd, name, location)
-		},
+		Action: withProjectDirectory(func(ctx *cli.Context, wd string) error {
+			return command.AddModule(wd, ctx.String("name"), ctx.Args().First())
+		}),
 	}
 
 	sort.Sort(cli.FlagsByName(cmd.Flags))

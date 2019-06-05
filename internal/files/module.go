@@ -2,6 +2,7 @@ package files
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -40,6 +41,10 @@ type (
 func NewModuleFile(name, location string) error {
 	location = filepath.Join(location, moduleFileName)
 	file, err := os.Create(location)
+
+	if os.IsNotExist(err); err != nil {
+		return fmt.Errorf("directory %s does not exist", location)
+	}
 
 	if err != nil {
 		return err
