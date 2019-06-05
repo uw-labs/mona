@@ -8,8 +8,6 @@ build:
 	go build $(LDFLAGS) -o dist/mona
 	cp README.md dist/README.md
 	cp LICENSE dist/LICENSE
-	mkdir -p release/${VERSION}
-	tar -zcvf release/${VERSION}/mona_${VERSION}_${GOOS}_${GOARCH}.tar.gz dist 
 
 test:
 	go test -v ./...
@@ -17,7 +15,7 @@ test:
 lint:
 	golangci-lint run
 
-docker: build
+docker-build: build
 	docker build -t ${IMAGE_NAME}:${VERSION} -t ${IMAGE_NAME}:latest .
 
 docker-push:

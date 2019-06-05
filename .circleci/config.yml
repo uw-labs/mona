@@ -14,11 +14,7 @@ jobs:
           keys:
             - '{{ checksum "go.sum" }}'
       - run: echo "$DOCKER_HUB_PASS" | docker login --username $DOCKER_HUB_USER --password-stdin
-      - run: make docker
-      - store_artifacts:
-          path: dist
-      - store_artifacts:
-          path: release
+      - run: make docker-build
       - run: make docker-push
       - save_cache:
           key: '{{ checksum "go.sum" }}'
