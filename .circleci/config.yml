@@ -21,10 +21,6 @@ jobs:
           paths:
             - /tmp/go/cache
             - /go/pkg/mod
-      - save_cache:
-          key: '{{ .Environment.CIRCLE_SHA1 }}'
-          paths:
-            - release
 
   lint:
     docker:
@@ -53,23 +49,16 @@ jobs:
 
 workflows:
   version: 2
-  feature:
-    jobs:
-      - test:
-          filters:
-            branches:
-              only:
-                - /feature\/.*/
-      - lint:
-          filters:
-            branches:
-              only:
-                - /feature\/.*/
 
   master:
     jobs:
+      - test
+      - lint
       - build:
           filters:
+            requires:
+              - test
+              - lint
             tags:
               only: /.*/
             branches:
