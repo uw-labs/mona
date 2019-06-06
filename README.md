@@ -31,12 +31,15 @@ Below are steps on how to install mona and set up your first mona project.
 You can download the latest version of mona from the [releases](https://github.com/davidsbond/mona/releases) and place it anywhere
 in your `$PATH`.
 
-Alternatively, you can download and compile the source code using `go get`
+Alternatively, you can download and compile the source code using `go get` and `make`
 
 ```bash
-go get github.com/davidsbond/mona
-go install github.com/davidsbond/mona
+$ go get -u github.com/davidsbond/mona
+$ cd $GOPATH/src/github.com/davidsbond/mona
+$ make build
 ```
+
+This will generate a `dist` directory in the source folder containing the compiled binary with the `README.md` and `LICENSE` files. These can be placed anywhere in your `$PATH`
 
 ### Creating a project
 
@@ -73,15 +76,21 @@ You can also provide file patterns to ignore from hash generation using the `exc
 Mona generates hashes to determine if code within respective modules has changed. You can list what has changed using the `mona diff` command:
 
 ```bash
-mona diff
+$ mona diff
 
-> Modules to be built:
-> module
->
-> Modules to be tested:
-> module
+Modules to be built:
+- module-1
+- module-2
+
+Modules to be tested:
+- module-1
+- module-2
+
+Modules to be linted:
+- module-1
+- module-2
 ```
 
 ### Building/Testing/Linting modules
 
-You can build, test & lint your modified modules using the `mona build`, `mona test` & `mona lint` commands. Individual hashes are stored seperately so mona will know if a module has been built, but not linted or testec etc. Any subsequent output to `stdin` or `stderr` will be written to the console and mona will stop executing if your commands return an error exit code.
+You can build, test & lint your modified modules using the `mona build`, `mona test` & `mona lint` commands. Individual hashes are stored separately so mona will know if a module has been built, but not linted or tested etc. Any subsequent output to `stdin` or `stderr` will be written to the console and mona will stop executing if your commands return an error exit code.
