@@ -94,3 +94,7 @@ Modules to be linted:
 ### Building/Testing/Linting modules
 
 You can build, test & lint your modified modules using the `mona build`, `mona test` & `mona lint` commands. Individual hashes are stored separately so mona will know if a module has been built, but not linted or tested etc. Any subsequent output to `stdin` or `stderr` will be written to the console and mona will stop executing if your commands return an error exit code.
+
+### Roadmap
+
+Currently, mona is **not production ready**. The project is missing quite a few tests and has not been battle tested. That being said, attempts to use this tool are welcome and all feedback is appreciated. You can see the [contributing guide](CONTRIBUTING.md) for more information.
