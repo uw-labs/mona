@@ -9,6 +9,8 @@ import (
 	"os/exec"
 	"strings"
 
+	"github.com/davidsbond/mona/internal/config"
+
 	"github.com/davidsbond/mona/internal/files"
 	"github.com/davidsbond/mona/pkg/hashdir"
 )
@@ -50,7 +52,7 @@ func getChangedModules(pj *files.ProjectFile, change changeType) ([]*files.Modul
 
 		// Generate a new hash for the module directory
 		exclude := append(pj.Exclude, modInfo.Exclude...)
-		newHash, err := hashdir.Generate(modInfo.Location, exclude...)
+		newHash, err := hashdir.Generate(modInfo.Location, config.Parallelism, exclude...)
 
 		if err != nil {
 			return nil, err
@@ -138,7 +140,7 @@ func rangeChangedModules(pj *files.ProjectFile, change changeType, fn rangeFn, u
 		}
 
 		exclude := append(pj.Exclude, module.Exclude...)
-		newHash, err := hashdir.Generate(module.Location, exclude...)
+		newHash, err := hashdir.Generate(module.Location, config.Parallelism, exclude...)
 
 		if err != nil {
 			return err
