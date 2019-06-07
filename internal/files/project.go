@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/hashicorp/go-multierror"
+
 	"gopkg.in/yaml.v2"
 )
 
@@ -37,13 +39,15 @@ func NewProjectFile(name, version string) error {
 		return err
 	}
 
-	defer file.Close()
 	pj := ProjectFile{
 		Name:    name,
 		Version: version,
 	}
 
-	return yaml.NewEncoder(file).Encode(pj)
+	return multierror.Append(
+		yaml.NewEncoder(file).Encode(pj),
+		file.Close()).
+		ErrorOrNil()
 }
 
 // LoadProjectFile attempts to read a "mona.yml" file into memory from the provided
@@ -62,15 +66,13 @@ func LoadProjectFile(wd string) (*ProjectFile, error) {
 		return nil, err
 	}
 
-	defer file.Close()
-
 	var out ProjectFile
 
 	if err := yaml.NewDecoder(file).Decode(&out); err != nil {
 		return nil, err
 	}
 
-	return &out, nil
+	return &out, file.Close()
 }
 
 // GetProjectRoot attempts to locate the root of the mona project based on the provided

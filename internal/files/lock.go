@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/hashicorp/go-multierror"
 	"gopkg.in/yaml.v2"
 )
 
@@ -46,14 +47,16 @@ func NewLockFile(name, version string) error {
 		return err
 	}
 
-	defer file.Close()
 	lock := LockFile{
 		Name:    name,
 		Version: version,
 		Modules: make(map[string]*ModuleVersion),
 	}
 
-	return yaml.NewEncoder(file).Encode(lock)
+	return multierror.Append(
+		yaml.NewEncoder(file).Encode(lock),
+		file.Close()).
+		ErrorOrNil()
 }
 
 // UpdateLockFile overwrites the current "mona.lock" file in the given working
@@ -72,8 +75,10 @@ func UpdateLockFile(wd string, lock *LockFile) error {
 		return err
 	}
 
-	defer file.Close()
-	return yaml.NewEncoder(file).Encode(lock)
+	return multierror.Append(
+		yaml.NewEncoder(file).Encode(lock),
+		file.Close()).
+		ErrorOrNil()
 }
 
 // LoadLockFile attempts to load a lock file into memory from the provided
@@ -92,8 +97,6 @@ func LoadLockFile(wd string) (*LockFile, error) {
 		return nil, err
 	}
 
-	defer file.Close()
-
 	var out LockFile
 
 	if err := yaml.NewDecoder(file).Decode(&out); err != nil {
@@ -104,7 +107,7 @@ func LoadLockFile(wd string) (*LockFile, error) {
 		out.Modules = make(map[string]*ModuleVersion)
 	}
 
-	return &out, nil
+	return &out, file.Close()
 }
 
 // AddModule adds a new module entry to the lock file in the provided working directory.

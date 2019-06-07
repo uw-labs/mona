@@ -13,7 +13,7 @@ func Test(wd string) error {
 	return rangeChangedModules(wd, changeTypeTest, testModule, true)
 }
 
-func testModule(wd string, module *files.ModuleFile) error {
+func testModule(module *files.ModuleFile) error {
 	if module.Commands.Test == "" {
 		return nil
 	}

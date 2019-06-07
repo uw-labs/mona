@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/hashicorp/go-multierror"
+
 	"gopkg.in/yaml.v2"
 )
 
@@ -50,12 +52,14 @@ func NewModuleFile(name, location string) error {
 		return err
 	}
 
-	defer file.Close()
 	mod := ModuleFile{
 		Name: name,
 	}
 
-	return yaml.NewEncoder(file).Encode(mod)
+	return multierror.Append(
+		yaml.NewEncoder(file).Encode(mod),
+		file.Close()).
+		ErrorOrNil()
 }
 
 // FindModules attempts to find all "module.yml" files in subdirectories of the given
@@ -81,7 +85,7 @@ func FindModules(dir string) (out []*ModuleFile, err error) {
 		}
 
 		out = append(out, module)
-		return nil
+		return filepath.SkipDir
 	})
 
 	return
@@ -103,8 +107,6 @@ func LoadModuleFile(location string) (*ModuleFile, error) {
 		return nil, err
 	}
 
-	defer file.Close()
-
 	var out ModuleFile
 
 	if err := yaml.NewDecoder(file).Decode(&out); err != nil {
@@ -112,7 +114,7 @@ func LoadModuleFile(location string) (*ModuleFile, error) {
 	}
 
 	out.Location = location
-	return &out, nil
+	return &out, file.Close()
 }
 
 // UpdateModuleFile replaces the contents of "module.yml" at the given
@@ -131,6 +133,8 @@ func UpdateModuleFile(location string, module *ModuleFile) error {
 		return err
 	}
 
-	defer file.Close()
-	return yaml.NewEncoder(file).Encode(module)
+	return multierror.Append(
+		yaml.NewEncoder(file).Encode(module),
+		file.Close()).
+		ErrorOrNil()
 }

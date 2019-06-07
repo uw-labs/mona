@@ -10,7 +10,7 @@ func Lint() cli.Command {
 	return cli.Command{
 		Name:  "lint",
 		Usage: "Lints any new/modified modules",
-		Action: withProjectDirectory(func(Ctx *cli.Context, wd string) error {
+		Action: withProjectDirectory(func(ctx *cli.Context, wd string) error {
 			return command.Lint(wd)
 		}),
 	}

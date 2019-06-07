@@ -10,7 +10,7 @@ func Build(wd string) error {
 	return rangeChangedModules(wd, changeTypeBuild, buildModule, true)
 }
 
-func buildModule(wd string, module *files.ModuleFile) error {
+func buildModule(module *files.ModuleFile) error {
 	if module.Commands.Build == "" {
 		return nil
 	}

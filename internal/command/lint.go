@@ -10,7 +10,7 @@ func Lint(wd string) error {
 	return rangeChangedModules(wd, changeTypeLint, lintModule, true)
 }
 
-func lintModule(wd string, module *files.ModuleFile) error {
+func lintModule(module *files.ModuleFile) error {
 	if module.Commands.Lint == "" {
 		return nil
 	}

@@ -15,7 +15,7 @@ import (
 
 type (
 	changeType int
-	rangeFn    func(string, *files.ModuleFile) error
+	rangeFn    func(*files.ModuleFile) error
 )
 
 const (
@@ -130,7 +130,7 @@ func rangeChangedModules(dir string, change changeType, fn rangeFn, updateHashes
 	}
 
 	for _, module := range changed {
-		if err := fn(dir, module); err != nil {
+		if err := fn(module); err != nil {
 			return err
 		}
 

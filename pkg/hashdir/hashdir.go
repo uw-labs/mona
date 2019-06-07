@@ -11,7 +11,7 @@ import (
 
 // Generate creates a new hash for a given path. The path is walked and a hash is
 // created based on all files found in the path. If a file matches one specified in
-// the 'exludes' parameter it is not used to generate the hash.
+// the 'excludes' parameter it is not used to generate the hash.
 func Generate(location string, excludes ...string) (string, error) {
 	hash := md5.New()
 
@@ -42,12 +42,11 @@ func Generate(location string, excludes ...string) (string, error) {
 			return err
 		}
 
-		defer file.Close()
 		if _, err := io.Copy(hash, file); err != nil {
 			return err
 		}
 
-		return nil
+		return file.Close()
 	})
 
 	if err != nil {
