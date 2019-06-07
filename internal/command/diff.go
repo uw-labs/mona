@@ -1,20 +1,22 @@
 package command
 
+import "github.com/davidsbond/mona/internal/files"
+
 // Diff outputs the names of all modules where changes are detected.
-func Diff(wd string) ([]string, []string, []string, error) {
-	build, err := getChangedModules(wd, changeTypeBuild)
+func Diff(pj *files.ProjectFile) ([]string, []string, []string, error) {
+	build, err := getChangedModules(pj, changeTypeBuild)
 
 	if err != nil {
 		return nil, nil, nil, err
 	}
 
-	test, err := getChangedModules(wd, changeTypeTest)
+	test, err := getChangedModules(pj, changeTypeTest)
 
 	if err != nil {
 		return nil, nil, nil, err
 	}
 
-	lint, err := getChangedModules(wd, changeTypeLint)
+	lint, err := getChangedModules(pj, changeTypeLint)
 
 	if err != nil {
 		return nil, nil, nil, err

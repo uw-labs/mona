@@ -22,14 +22,14 @@ func TestBuild(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.Name, func(t *testing.T) {
-			setupProject(t)
-			setupModules(t, tc.ModuleDirs...)
+			pj := setupProject(t)
+			setupModules(t, pj, tc.ModuleDirs...)
 			setupModuleCode(t, tc.ModuleDirs...)
 
 			defer deleteModuleFiles(t, tc.ModuleDirs...)
 			defer deleteProjectFiles(t)
 
-			if err := command.Build("."); err != nil {
+			if err := command.Build(pj); err != nil {
 				assert.Fail(t, err.Error())
 				return
 			}

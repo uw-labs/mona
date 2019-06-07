@@ -22,13 +22,13 @@ func TestDiff(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.Name, func(t *testing.T) {
-			setupProject(t)
-			setupModules(t, tc.ModuleDirs...)
+			pj := setupProject(t)
+			setupModules(t, pj, tc.ModuleDirs...)
 
 			defer deleteProjectFiles(t)
 			defer deleteModuleFiles(t, tc.ModuleDirs...)
 
-			build, test, lint, err := command.Diff(".")
+			build, test, lint, err := command.Diff(pj)
 
 			if err != nil {
 				assert.Fail(t, err.Error())

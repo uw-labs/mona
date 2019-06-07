@@ -25,8 +25,10 @@ var (
 type (
 	// The ProjectFile type represents the structure of the "mona.yml" file.
 	ProjectFile struct {
-		Name    string `yaml:"name"`    // The name of the project
-		Version string `yaml:"version"` // The mona version used to create the project
+		Name     string   `yaml:"name"`              // The name of the project
+		Version  string   `yaml:"version"`           // The mona version used to create the project
+		Exclude  []string `yaml:"exclude,omitempty"` // Global file patterns to ignore during hash generation
+		Location string   `yaml:"-"`                 // The root project directory, not set in the yaml file but set on load for convenience
 	}
 )
 
@@ -72,6 +74,7 @@ func LoadProjectFile(wd string) (*ProjectFile, error) {
 		return nil, err
 	}
 
+	out.Location = wd
 	return &out, file.Close()
 }
 

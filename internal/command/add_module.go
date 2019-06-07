@@ -8,8 +8,8 @@ import (
 )
 
 // AddModule creates a new "module.yaml" file in the specified directory
-func AddModule(wd, name, location string) error {
-	modules, err := files.FindModules(wd)
+func AddModule(pj *files.ProjectFile, name, location string) error {
+	modules, err := files.FindModules(pj.Location)
 
 	if err != nil {
 		return err
@@ -21,7 +21,7 @@ func AddModule(wd, name, location string) error {
 		}
 	}
 
-	location = filepath.Join(wd, location)
+	location = filepath.Join(pj.Location, location)
 
 	if _, err := files.LoadModuleFile(location); err == files.ErrNoModule {
 		return files.NewModuleFile(name, location)

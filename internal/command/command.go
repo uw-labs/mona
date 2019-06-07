@@ -24,14 +24,14 @@ const (
 	changeTypeLint  changeType = 2
 )
 
-func getChangedModules(dir string, change changeType) ([]*files.ModuleFile, error) {
-	modules, err := files.FindModules(dir)
+func getChangedModules(pj *files.ProjectFile, change changeType) ([]*files.ModuleFile, error) {
+	modules, err := files.FindModules(pj.Location)
 
 	if err != nil {
 		return nil, err
 	}
 
-	lock, err := files.LoadLockFile(dir)
+	lock, err := files.LoadLockFile(pj.Location)
 
 	if err != nil {
 		return nil, err
@@ -49,7 +49,8 @@ func getChangedModules(dir string, change changeType) ([]*files.ModuleFile, erro
 		}
 
 		// Generate a new hash for the module directory
-		newHash, err := hashdir.Generate(modInfo.Location, modInfo.Exclude...)
+		exclude := append(pj.Exclude, modInfo.Exclude...)
+		newHash, err := hashdir.Generate(modInfo.Location, exclude...)
 
 		if err != nil {
 			return nil, err
@@ -74,19 +75,17 @@ func getChangedModules(dir string, change changeType) ([]*files.ModuleFile, erro
 	return out, nil
 }
 
-func streamOutputs(outputs ...io.ReadCloser) {
+func streamOutputs(outputs ...io.Reader) {
 	for _, output := range outputs {
-		go func(o io.ReadCloser) {
-			defer o.Close()
-
-			scanner := bufio.NewScanner(o)
+		go func() {
+			scanner := bufio.NewScanner(output)
 			scanner.Split(bufio.ScanLines)
 
 			for scanner.Scan() {
 				m := scanner.Text()
 				fmt.Println(m)
 			}
-		}(output)
+		}()
 	}
 }
 
@@ -116,14 +115,14 @@ func streamCommand(command, wd string) error {
 	return cmd.Wait()
 }
 
-func rangeChangedModules(dir string, change changeType, fn rangeFn, updateHashes bool) error {
-	changed, err := getChangedModules(dir, change)
+func rangeChangedModules(pj *files.ProjectFile, change changeType, fn rangeFn, updateHashes bool) error {
+	changed, err := getChangedModules(pj, change)
 
 	if err != nil || len(changed) == 0 {
 		return err
 	}
 
-	lock, err := files.LoadLockFile(dir)
+	lock, err := files.LoadLockFile(pj.Location)
 
 	if err != nil {
 		return err
@@ -138,7 +137,8 @@ func rangeChangedModules(dir string, change changeType, fn rangeFn, updateHashes
 			continue
 		}
 
-		newHash, err := hashdir.Generate(module.Location, module.Exclude...)
+		exclude := append(pj.Exclude, module.Exclude...)
+		newHash, err := hashdir.Generate(module.Location, exclude...)
 
 		if err != nil {
 			return err
@@ -147,7 +147,7 @@ func rangeChangedModules(dir string, change changeType, fn rangeFn, updateHashes
 		lockInfo, modInLock := lock.Modules[module.Name]
 
 		if !modInLock {
-			if err := files.AddModule(lock, dir, module.Name); err != nil {
+			if err := files.AddModule(lock, pj.Location, module.Name); err != nil {
 				return err
 			}
 
@@ -165,5 +165,5 @@ func rangeChangedModules(dir string, change changeType, fn rangeFn, updateHashes
 
 	}
 
-	return files.UpdateLockFile(dir, lock)
+	return files.UpdateLockFile(pj.Location, lock)
 }

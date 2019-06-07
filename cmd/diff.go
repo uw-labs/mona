@@ -3,6 +3,8 @@ package cmd
 import (
 	"os"
 
+	"github.com/davidsbond/mona/internal/files"
+
 	"github.com/davidsbond/mona/internal/output"
 
 	"github.com/davidsbond/mona/internal/command"
@@ -15,8 +17,8 @@ func Diff() cli.Command {
 	return cli.Command{
 		Name:  "diff",
 		Usage: "Outputs all modules where changes are detected",
-		Action: withProjectDirectory(func(ctx *cli.Context, wd string) error {
-			build, test, lint, err := command.Diff(wd)
+		Action: withProject(func(ctx *cli.Context, pj *files.ProjectFile) error {
+			build, test, lint, err := command.Diff(pj)
 
 			if err != nil {
 				return err

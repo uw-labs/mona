@@ -5,6 +5,8 @@ import (
 	"path/filepath"
 	"sort"
 
+	"github.com/davidsbond/mona/internal/files"
+
 	"github.com/davidsbond/mona/internal/command"
 	"github.com/urfave/cli"
 )
@@ -36,8 +38,8 @@ func AddModule() cli.Command {
 
 			return ctx.Set("name", filepath.Base(dir))
 		},
-		Action: withProjectDirectory(func(ctx *cli.Context, wd string) error {
-			return command.AddModule(wd, ctx.String("name"), ctx.Args().First())
+		Action: withProject(func(ctx *cli.Context, pj *files.ProjectFile) error {
+			return command.AddModule(pj, ctx.String("name"), ctx.Args().First())
 		}),
 	}
 

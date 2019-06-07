@@ -23,11 +23,11 @@ func TestAddModule(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.Name, func(t *testing.T) {
-			setupProject(t)
+			pj := setupProject(t)
 			defer deleteProjectFiles(t)
 			defer deleteModuleFile(t, tc.ModuleLocation)
 
-			if err := command.AddModule(".", tc.ModuleName, tc.ModuleLocation); err != nil {
+			if err := command.AddModule(pj, tc.ModuleName, tc.ModuleLocation); err != nil {
 				assert.Fail(t, err.Error())
 				return
 			}

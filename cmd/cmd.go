@@ -11,11 +11,11 @@ import (
 
 type (
 	// The ActionFunc type is a method that takes a CLI context and the
-	// current project directory as an argument and returns a single error.
-	ActionFunc func(ctx *cli.Context, pd string) error
+	// current project as an argument and returns a single error.
+	ActionFunc func(ctx *cli.Context, p *files.ProjectFile) error
 )
 
-func withProjectDirectory(fn ActionFunc) cli.ActionFunc {
+func withProject(fn ActionFunc) cli.ActionFunc {
 	return func(ctx *cli.Context) error {
 		wd, err := os.Getwd()
 
@@ -29,6 +29,12 @@ func withProjectDirectory(fn ActionFunc) cli.ActionFunc {
 			return err
 		}
 
-		return fn(ctx, root)
+		project, err := files.LoadProjectFile(root)
+
+		if err != nil {
+			return err
+		}
+
+		return fn(ctx, project)
 	}
 }

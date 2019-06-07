@@ -42,19 +42,27 @@ func deleteModuleFiles(t *testing.T, locations ...string) {
 	}
 }
 
-func setupProject(t *testing.T) {
+func setupProject(t *testing.T) *files.ProjectFile {
 	if err := command.Init("test", "v1"); err != nil {
 		assert.Fail(t, err.Error())
 	}
+
+	pj, err := files.LoadProjectFile(".")
+
+	if err != nil {
+		assert.Fail(t, err.Error())
+	}
+
+	return pj
 }
 
-func setupModules(t *testing.T, locations ...string) {
+func setupModules(t *testing.T, pj *files.ProjectFile, locations ...string) {
 	for _, location := range locations {
 		if err := os.MkdirAll(location, 0777); err != nil {
 			assert.Fail(t, err.Error())
 		}
 
-		if err := command.AddModule(".", filepath.Base(location), location); err != nil {
+		if err := command.AddModule(pj, filepath.Base(location), location); err != nil {
 			assert.Fail(t, err.Error())
 		}
 	}
