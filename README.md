@@ -3,7 +3,7 @@
 [![GoDoc](https://godoc.org/github.com/davidsbond/mona?status.svg)](http://godoc.org/github.com/davidsbond/mona)
 [![CircleCI](https://circleci.com/gh/davidsbond/mona/tree/master.svg?style=shield)](https://circleci.com/gh/davidsbond/mona/tree/master)
 [![Go Report Card](https://goreportcard.com/badge/github.com/davidsbond/mona)](https://goreportcard.com/report/github.com/davidsbond/mona)
-![Docker Pulls](https://img.shields.io/docker/pulls/davidsbond/mona.svg)
+[![Docker Pulls](https://img.shields.io/docker/pulls/davidsbond/mona.svg)](https://hub.docker.com/r/davidsbond/mona)
 
 Mona is a command-line tool for managing monorepos and is intended for use in CI pipelines. Each independent part of your repository is considered a module than can be built, tested or linted. Each module has a respective `module.yml` file with information on commands to run, artifacts to store and files to exclude when generating hashes. The `mona.yml` file is used at the root of the project. Module changes are stored in a `mona.lock` file that should be shared across your builds to ensure they're treated incrementally.
 
@@ -60,7 +60,7 @@ exclude:      # File patterns to ignore across all modules
 Each application/library in your monorepo is represented as a mona module. You can add these to your project by using the `mona add-module` command like so:
 
 ```bash
-mona add-module path/to/module
+$ mona add-module path/to/module
 ```
 
 Within your new module, you'll find a `module.yml` file with several keys:
