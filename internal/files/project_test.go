@@ -9,20 +9,18 @@ import (
 
 func TestNewProjectFile(t *testing.T) {
 	tt := []struct {
-		Name           string
-		ProjectName    string
-		ProjectVersion string
+		Name        string
+		ProjectName string
 	}{
 		{
-			Name:           "It should create a project file",
-			ProjectName:    "test",
-			ProjectVersion: "v1",
+			Name:        "It should create a project file",
+			ProjectName: "test",
 		},
 	}
 
 	for _, tc := range tt {
 		t.Run(tc.Name, func(t *testing.T) {
-			if err := files.NewProjectFile(tc.ProjectName, tc.ProjectVersion); err != nil {
+			if err := files.NewProjectFile(tc.ProjectName); err != nil {
 				assert.Fail(t, err.Error())
 				return
 			}
@@ -38,27 +36,24 @@ func TestNewProjectFile(t *testing.T) {
 			}
 
 			assert.Equal(t, tc.ProjectName, proj.Name)
-			assert.Equal(t, tc.ProjectVersion, proj.Version)
 		})
 	}
 }
 
 func TestLoadProjectFile(t *testing.T) {
 	tt := []struct {
-		Name           string
-		ProjectName    string
-		ProjectVersion string
+		Name        string
+		ProjectName string
 	}{
 		{
-			Name:           "It should create a project file",
-			ProjectName:    "test",
-			ProjectVersion: "v1",
+			Name:        "It should create a project file",
+			ProjectName: "test",
 		},
 	}
 
 	for _, tc := range tt {
 		t.Run(tc.Name, func(t *testing.T) {
-			if err := files.NewProjectFile(tc.ProjectName, tc.ProjectVersion); err != nil {
+			if err := files.NewProjectFile(tc.ProjectName); err != nil {
 				assert.Fail(t, err.Error())
 				return
 			}
@@ -74,19 +69,6 @@ func TestLoadProjectFile(t *testing.T) {
 			}
 
 			assert.Equal(t, tc.ProjectName, proj.Name)
-			assert.Equal(t, tc.ProjectVersion, proj.Version)
-		})
-	}
-}
-
-func TestProject_AddModule(t *testing.T) {
-	tt := []struct {
-		Name string
-	}{}
-
-	for _, tc := range tt {
-		t.Run(tc.Name, func(t *testing.T) {
-
 		})
 	}
 }

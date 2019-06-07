@@ -25,7 +25,6 @@ type (
 	// version and the last build hashes used for each module
 	LockFile struct {
 		Name    string                    `yaml:"name"`
-		Version string                    `yaml:"version"`
 		Modules map[string]*ModuleVersion `yaml:"modules,omitempty"`
 	}
 
@@ -39,8 +38,8 @@ type (
 )
 
 // NewLockFile creates a new "mona.lock" file in the current working directory using the
-// provided name and version
-func NewLockFile(name, version string) error {
+// provided name.
+func NewLockFile(name string) error {
 	file, err := os.Create(lockFileName)
 
 	if err != nil {
@@ -49,7 +48,6 @@ func NewLockFile(name, version string) error {
 
 	lock := LockFile{
 		Name:    name,
-		Version: version,
 		Modules: make(map[string]*ModuleVersion),
 	}
 

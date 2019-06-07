@@ -26,15 +26,14 @@ type (
 	// The ProjectFile type represents the structure of the "mona.yml" file.
 	ProjectFile struct {
 		Name     string   `yaml:"name"`              // The name of the project
-		Version  string   `yaml:"version"`           // The mona version used to create the project
 		Exclude  []string `yaml:"exclude,omitempty"` // Global file patterns to ignore during hash generation
 		Location string   `yaml:"-"`                 // The root project directory, not set in the yaml file but set on load for convenience
 	}
 )
 
 // NewProjectFile creates a new "mona.yml" file in the current working directory with the given
-// name and version.
-func NewProjectFile(name, version string) error {
+// name.
+func NewProjectFile(name string) error {
 	file, err := os.Create(projectFileName)
 
 	if err != nil {
@@ -42,8 +41,7 @@ func NewProjectFile(name, version string) error {
 	}
 
 	pj := ProjectFile{
-		Name:    name,
-		Version: version,
+		Name: name,
 	}
 
 	return multierror.Append(

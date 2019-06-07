@@ -9,21 +9,12 @@ import (
 	"github.com/urfave/cli"
 )
 
-const (
-	defaultVersion = "v1"
-)
-
 // Init generates a cli command for initializing new mona projects.
 func Init() cli.Command {
 	cmd := cli.Command{
 		Name:  "init",
 		Usage: "Initializes a new mona project in the current working directory",
 		Flags: []cli.Flag{
-			cli.StringFlag{
-				Name:  "version",
-				Usage: "The mona version used for this project",
-				Value: defaultVersion,
-			},
 			cli.StringFlag{
 				Name:  "name",
 				Usage: "The name of the mona project, defaults to base of current working directory",
@@ -46,9 +37,8 @@ func Init() cli.Command {
 		},
 		Action: func(ctx *cli.Context) error {
 			name := ctx.String("name")
-			version := ctx.String("version")
 
-			return command.Init(name, version)
+			return command.Init(name)
 		},
 	}
 

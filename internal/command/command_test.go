@@ -43,7 +43,7 @@ func deleteModuleFiles(t *testing.T, locations ...string) {
 }
 
 func setupProject(t *testing.T) *files.ProjectFile {
-	if err := command.Init("test", "v1"); err != nil {
+	if err := command.Init("test"); err != nil {
 		assert.Fail(t, err.Error())
 	}
 
@@ -86,7 +86,8 @@ func setupModuleCode(t *testing.T, locations ...string) {
 		mod, err := files.LoadModuleFile(location)
 
 		if err != nil {
-			assert.Fail(t, err.Error())
+			assert.FailNow(t, err.Error())
+			return
 		}
 
 		mod.Commands.Build = "go build"

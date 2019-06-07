@@ -9,20 +9,18 @@ import (
 
 func TestNewLockFile(t *testing.T) {
 	tt := []struct {
-		Name           string
-		ProjectName    string
-		ProjectVersion string
+		Name        string
+		ProjectName string
 	}{
 		{
-			Name:           "It should create a lock file",
-			ProjectName:    "test",
-			ProjectVersion: "v1",
+			Name:        "It should create a lock file",
+			ProjectName: "test",
 		},
 	}
 
 	for _, tc := range tt {
 		t.Run(tc.Name, func(t *testing.T) {
-			if err := files.NewLockFile(tc.ProjectName, tc.ProjectVersion); err != nil {
+			if err := files.NewLockFile(tc.ProjectName); err != nil {
 				assert.Fail(t, err.Error())
 				return
 			}
@@ -38,31 +36,26 @@ func TestNewLockFile(t *testing.T) {
 			}
 
 			assert.Equal(t, tc.ProjectName, lock.Name)
-			assert.Equal(t, tc.ProjectVersion, lock.Version)
 		})
 	}
 }
 
 func TestUpdateLockFile(t *testing.T) {
 	tt := []struct {
-		Name              string
-		ProjectName       string
-		ProjectVersion    string
-		NewProjectName    string
-		NewProjectVersion string
+		Name           string
+		ProjectName    string
+		NewProjectName string
 	}{
 		{
-			Name:              "It should update a lock file",
-			ProjectName:       "test",
-			ProjectVersion:    "v1",
-			NewProjectName:    "test1",
-			NewProjectVersion: "v2",
+			Name:           "It should update a lock file",
+			ProjectName:    "test",
+			NewProjectName: "test1",
 		},
 	}
 
 	for _, tc := range tt {
 		t.Run(tc.Name, func(t *testing.T) {
-			if err := files.NewLockFile(tc.ProjectName, tc.ProjectVersion); err != nil {
+			if err := files.NewLockFile(tc.ProjectName); err != nil {
 				assert.Fail(t, err.Error())
 				return
 			}
@@ -71,8 +64,7 @@ func TestUpdateLockFile(t *testing.T) {
 			assert.FileExists(t, "mona.lock")
 
 			if err := files.UpdateLockFile(".", &files.LockFile{
-				Name:    tc.NewProjectName,
-				Version: tc.NewProjectVersion,
+				Name: tc.NewProjectName,
 			}); err != nil {
 				assert.Fail(t, err.Error())
 				return
@@ -86,7 +78,6 @@ func TestUpdateLockFile(t *testing.T) {
 			}
 
 			assert.Equal(t, tc.NewProjectName, lock.Name)
-			assert.Equal(t, tc.NewProjectVersion, lock.Version)
 		})
 	}
 
@@ -94,20 +85,18 @@ func TestUpdateLockFile(t *testing.T) {
 
 func TestLoadLockFile(t *testing.T) {
 	tt := []struct {
-		Name           string
-		ProjectName    string
-		ProjectVersion string
+		Name        string
+		ProjectName string
 	}{
 		{
-			Name:           "It should load a lock file",
-			ProjectName:    "test",
-			ProjectVersion: "v1",
+			Name:        "It should load a lock file",
+			ProjectName: "test",
 		},
 	}
 
 	for _, tc := range tt {
 		t.Run(tc.Name, func(t *testing.T) {
-			if err := files.NewLockFile(tc.ProjectName, tc.ProjectVersion); err != nil {
+			if err := files.NewLockFile(tc.ProjectName); err != nil {
 				assert.Fail(t, err.Error())
 				return
 			}
@@ -123,7 +112,6 @@ func TestLoadLockFile(t *testing.T) {
 			}
 
 			assert.Equal(t, tc.ProjectName, lock.Name)
-			assert.Equal(t, tc.ProjectVersion, lock.Version)
 		})
 	}
 }
@@ -132,7 +120,6 @@ func TestAddModule(t *testing.T) {
 	tt := []struct {
 		Name           string
 		ProjectName    string
-		ProjectVersion string
 		ModuleName     string
 		ModuleLocation string
 		ModuleHash     string
@@ -140,7 +127,6 @@ func TestAddModule(t *testing.T) {
 		{
 			Name:           "It should add a module to a lock file",
 			ProjectName:    "test",
-			ProjectVersion: "v1",
 			ModuleName:     "test",
 			ModuleLocation: "test",
 			ModuleHash:     "1234",
@@ -149,7 +135,7 @@ func TestAddModule(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.Name, func(t *testing.T) {
-			if err := files.NewLockFile(tc.ProjectName, tc.ProjectVersion); err != nil {
+			if err := files.NewLockFile(tc.ProjectName); err != nil {
 				assert.Fail(t, err.Error())
 				return
 			}

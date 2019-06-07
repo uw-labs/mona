@@ -10,14 +10,12 @@ import (
 
 func TestInit(t *testing.T) {
 	tt := []struct {
-		Name           string
-		ProjectName    string
-		ProjectVersion string
+		Name        string
+		ProjectName string
 	}{
 		{
-			Name:           "It should create a mona.yaml and mona.lock file",
-			ProjectName:    "test",
-			ProjectVersion: "test",
+			Name:        "It should create a mona.yaml and mona.lock file",
+			ProjectName: "test",
 		},
 	}
 
@@ -25,7 +23,7 @@ func TestInit(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			defer deleteProjectFiles(t)
 
-			if err := command.Init(tc.ProjectName, tc.ProjectVersion); err != nil {
+			if err := command.Init(tc.ProjectName); err != nil {
 				assert.Fail(t, err.Error())
 				return
 			}
@@ -41,7 +39,6 @@ func TestInit(t *testing.T) {
 			}
 
 			assert.Equal(t, tc.ProjectName, proj.Name)
-			assert.Equal(t, tc.ProjectVersion, proj.Version)
 
 			lock, err := files.LoadLockFile(".")
 
@@ -51,7 +48,6 @@ func TestInit(t *testing.T) {
 			}
 
 			assert.Equal(t, tc.ProjectName, lock.Name)
-			assert.Equal(t, tc.ProjectVersion, lock.Version)
 		})
 	}
 }
