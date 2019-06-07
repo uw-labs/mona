@@ -77,15 +77,15 @@ func getChangedModules(pj *files.ProjectFile, change changeType) ([]*files.Modul
 
 func streamOutputs(outputs ...io.Reader) {
 	for _, output := range outputs {
-		go func() {
-			scanner := bufio.NewScanner(output)
+		go func(o io.Reader) {
+			scanner := bufio.NewScanner(o)
 			scanner.Split(bufio.ScanLines)
 
 			for scanner.Scan() {
 				m := scanner.Text()
 				fmt.Println(m)
 			}
-		}()
+		}(output)
 	}
 }
 

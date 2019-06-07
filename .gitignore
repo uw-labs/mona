@@ -1,5 +1,13 @@
+# Development directories
 .example/
 .vscode/
-mona
+
+# Release artifacts
 dist/
 *.tar.gz
+
+# Mona files
+mona
+module.yml
+mona.yml
+mona.lock
