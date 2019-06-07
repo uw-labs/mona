@@ -46,7 +46,14 @@ This will generate a `dist` directory in the source folder containing the compil
 
 Navigate to your monorepo and run the `mona init` command. You will see a `mona.yml` and `mona.lock` file have been generated for you.
 
-The `mona.yml` file defines your project and locally keeps track of the modules you've added. The `mona.lock` file stores hashes of your module content so it knows when things need building/testing.
+The `mona.yml` file defines your project and is used to signify the root of the monorepo. It is also used to define global file matchers for hash generation:
+
+```yaml
+# mona.yml
+name: project # The name of the project
+exclude:      # File patterns to ignore across all modules
+  - "*.exe"
+```
 
 ### Adding modules
 
@@ -59,6 +66,7 @@ mona add-module path/to/module
 Within your new module, you'll find a `module.yml` file with several keys:
 
 ```yaml
+# module.yml
 name: module
 commands:
   build: "make build"     # Command to run to build the module
