@@ -9,8 +9,6 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/davidsbond/mona/internal/config"
-
 	"github.com/davidsbond/mona/internal/files"
 	"github.com/davidsbond/mona/pkg/hashdir"
 )
@@ -18,6 +16,12 @@ import (
 type (
 	changeType int
 	rangeFn    func(*files.ModuleFile) error
+
+	rangeOptions struct {
+		updateHashes bool
+		parallelism  int
+		changeType   changeType
+	}
 )
 
 const (
@@ -26,8 +30,8 @@ const (
 	changeTypeLint  changeType = 2
 )
 
-func getChangedModules(pj *files.ProjectFile, change changeType) ([]*files.ModuleFile, error) {
-	modules, err := files.FindModules(pj.Location)
+func getChangedModules(pj *files.ProjectFile, change changeType, parallelism int) ([]*files.ModuleFile, error) {
+	modules, err := files.FindModules(pj.Location, parallelism)
 
 	if err != nil {
 		return nil, err
@@ -52,7 +56,7 @@ func getChangedModules(pj *files.ProjectFile, change changeType) ([]*files.Modul
 
 		// Generate a new hash for the module directory
 		exclude := append(pj.Exclude, modInfo.Exclude...)
-		newHash, err := hashdir.Generate(modInfo.Location, config.Parallelism, exclude...)
+		newHash, err := hashdir.Generate(modInfo.Location, parallelism, exclude...)
 
 		if err != nil {
 			return nil, err
@@ -117,8 +121,8 @@ func streamCommand(command, wd string) error {
 	return cmd.Wait()
 }
 
-func rangeChangedModules(pj *files.ProjectFile, change changeType, fn rangeFn, updateHashes bool) error {
-	changed, err := getChangedModules(pj, change)
+func rangeChangedModules(pj *files.ProjectFile, fn rangeFn, opts rangeOptions) error {
+	changed, err := getChangedModules(pj, opts.changeType, opts.parallelism)
 
 	if err != nil || len(changed) == 0 {
 		return err
@@ -135,12 +139,12 @@ func rangeChangedModules(pj *files.ProjectFile, change changeType, fn rangeFn, u
 			return err
 		}
 
-		if !updateHashes {
+		if !opts.updateHashes {
 			continue
 		}
 
 		exclude := append(pj.Exclude, module.Exclude...)
-		newHash, err := hashdir.Generate(module.Location, config.Parallelism, exclude...)
+		newHash, err := hashdir.Generate(module.Location, opts.parallelism, exclude...)
 
 		if err != nil {
 			return err
@@ -156,7 +160,7 @@ func rangeChangedModules(pj *files.ProjectFile, change changeType, fn rangeFn, u
 			lockInfo = lock.Modules[module.Name]
 		}
 
-		switch change {
+		switch opts.changeType {
 		case changeTypeBuild:
 			lockInfo.BuildHash = newHash
 		case changeTypeTest:

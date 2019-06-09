@@ -62,7 +62,7 @@ func setupModules(t *testing.T, pj *files.ProjectFile, locations ...string) {
 			assert.Fail(t, err.Error())
 		}
 
-		if err := command.AddModule(pj, filepath.Base(location), location); err != nil {
+		if err := command.AddModule(pj, filepath.Base(location), location, 1); err != nil {
 			assert.Fail(t, err.Error())
 		}
 	}

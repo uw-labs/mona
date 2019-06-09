@@ -29,7 +29,7 @@ func TestBuild(t *testing.T) {
 			defer deleteModuleFiles(t, tc.ModuleDirs...)
 			defer deleteProjectFiles(t)
 
-			if err := command.Build(pj); err != nil {
+			if err := command.Build(pj, 1); err != nil {
 				assert.Fail(t, err.Error())
 				return
 			}

@@ -6,8 +6,12 @@ import (
 
 // Lint iterates over all new/modified modules and executes their lint command. Once complete,
 // the lint hash is updated in the lock file.
-func Lint(pj *files.ProjectFile) error {
-	return rangeChangedModules(pj, changeTypeLint, lintModule, true)
+func Lint(pj *files.ProjectFile, parallelism int) error {
+	return rangeChangedModules(pj, lintModule, rangeOptions{
+		changeType:   changeTypeLint,
+		updateHashes: true,
+		parallelism:  parallelism,
+	})
 }
 
 func lintModule(module *files.ModuleFile) error {
