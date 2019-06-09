@@ -20,7 +20,7 @@ func TestNewLockFile(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.Name, func(t *testing.T) {
-			if err := files.NewLockFile(tc.ProjectName); err != nil {
+			if err := files.NewLockFile(".", tc.ProjectName); err != nil {
 				assert.Fail(t, err.Error())
 				return
 			}
@@ -55,7 +55,7 @@ func TestUpdateLockFile(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.Name, func(t *testing.T) {
-			if err := files.NewLockFile(tc.ProjectName); err != nil {
+			if err := files.NewLockFile(".", tc.ProjectName); err != nil {
 				assert.Fail(t, err.Error())
 				return
 			}
@@ -96,7 +96,7 @@ func TestLoadLockFile(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.Name, func(t *testing.T) {
-			if err := files.NewLockFile(tc.ProjectName); err != nil {
+			if err := files.NewLockFile(".", tc.ProjectName); err != nil {
 				assert.Fail(t, err.Error())
 				return
 			}
@@ -135,7 +135,7 @@ func TestAddModule(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.Name, func(t *testing.T) {
-			if err := files.NewLockFile(tc.ProjectName); err != nil {
+			if err := files.NewLockFile(".", tc.ProjectName); err != nil {
 				assert.Fail(t, err.Error())
 				return
 			}

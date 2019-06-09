@@ -39,8 +39,9 @@ type (
 
 // NewLockFile creates a new "mona.lock" file in the current working directory using the
 // provided name.
-func NewLockFile(name string) error {
-	file, err := os.Create(lockFileName)
+func NewLockFile(dir string, name string) error {
+	location := filepath.Join(dir, lockFileName)
+	file, err := os.Create(location)
 
 	if err != nil {
 		return err

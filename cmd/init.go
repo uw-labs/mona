@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"os"
 	"path/filepath"
 	"sort"
 
@@ -27,18 +26,14 @@ func Init() cli.Command {
 				return nil
 			}
 
-			wd, err := os.Getwd()
-
-			if err != nil {
-				return err
-			}
-
-			return ctx.Set("name", filepath.Base(wd))
+			name := filepath.Base(ctx.GlobalString("wd"))
+			return ctx.Set("name", name)
 		},
 		Action: func(ctx *cli.Context) error {
 			name := ctx.String("name")
+			wd := ctx.GlobalString("wd")
 
-			return command.Init(name)
+			return command.Init(wd, name)
 		},
 	}
 

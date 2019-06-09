@@ -31,10 +31,11 @@ type (
 	}
 )
 
-// NewProjectFile creates a new "mona.yml" file in the current working directory with the given
+// NewProjectFile creates a new "mona.yml" file in the provided directory with the given
 // name.
-func NewProjectFile(name string) error {
-	file, err := os.Create(projectFileName)
+func NewProjectFile(dir string, name string) error {
+	location := filepath.Join(dir, projectFileName)
+	file, err := os.Create(location)
 
 	if err != nil {
 		return err

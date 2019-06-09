@@ -20,7 +20,7 @@ func TestNewProjectFile(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.Name, func(t *testing.T) {
-			if err := files.NewProjectFile(tc.ProjectName); err != nil {
+			if err := files.NewProjectFile(".", tc.ProjectName); err != nil {
 				assert.Fail(t, err.Error())
 				return
 			}
@@ -53,7 +53,7 @@ func TestLoadProjectFile(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.Name, func(t *testing.T) {
-			if err := files.NewProjectFile(tc.ProjectName); err != nil {
+			if err := files.NewProjectFile(".", tc.ProjectName); err != nil {
 				assert.Fail(t, err.Error())
 				return
 			}

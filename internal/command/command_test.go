@@ -43,7 +43,7 @@ func deleteModuleFiles(t *testing.T, locations ...string) {
 }
 
 func setupProject(t *testing.T) *files.ProjectFile {
-	if err := command.Init("test"); err != nil {
+	if err := command.Init(".", "test"); err != nil {
 		assert.Fail(t, err.Error())
 	}
 

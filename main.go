@@ -39,6 +39,24 @@ func main() {
 		cmd.Lint(),
 	}
 
+	app.Flags = []cli.Flag{
+		cli.StringFlag{
+			Name:   "wd",
+			Hidden: true,
+			Usage:  "Flag that contains the current working directory",
+		},
+	}
+
+	app.Before = func(ctx *cli.Context) error {
+		wd, err := os.Getwd()
+
+		if err != nil {
+			return err
+		}
+
+		return ctx.Set("wd", wd)
+	}
+
 	sort.Sort(cli.FlagsByName(app.Flags))
 	sort.Sort(cli.CommandsByName(app.Commands))
 

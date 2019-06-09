@@ -23,7 +23,7 @@ func TestInit(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			defer deleteProjectFiles(t)
 
-			if err := command.Init(tc.ProjectName); err != nil {
+			if err := command.Init(".", tc.ProjectName); err != nil {
 				assert.Fail(t, err.Error())
 				return
 			}

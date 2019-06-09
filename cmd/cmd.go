@@ -3,8 +3,6 @@
 package cmd
 
 import (
-	"os"
-
 	"github.com/davidsbond/mona/internal/files"
 	"github.com/urfave/cli"
 )
@@ -17,11 +15,7 @@ type (
 
 func withProject(fn ActionFunc) cli.ActionFunc {
 	return func(ctx *cli.Context) error {
-		wd, err := os.Getwd()
-
-		if err != nil {
-			return err
-		}
+		wd := ctx.GlobalString("wd")
 
 		root, err := files.GetProjectRoot(wd)
 
