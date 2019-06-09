@@ -11,16 +11,14 @@ import (
 
 func TestGenerate(t *testing.T) {
 	tt := []struct {
-		Name        string
-		Directory   string
-		Parallelism int
-		Expected    string
+		Name      string
+		Directory string
+		Expected  string
 	}{
 		{
-			Name:        "It should generate a base64 hash of a directory",
-			Directory:   "./testdir",
-			Parallelism: 1,
-			Expected:    "XrY7u+Ae7tCTyyK7j1rNww==",
+			Name:      "It should generate a base64 hash of a directory",
+			Directory: "./testdir",
+			Expected:  "XrY7u+Ae7tCTyyK7j1rNww==",
 		},
 	}
 
@@ -29,7 +27,7 @@ func TestGenerate(t *testing.T) {
 			setup(t)
 			defer teardown(t)
 
-			hash, err := hashdir.Generate(tc.Directory, tc.Parallelism)
+			hash, err := hashdir.Generate(tc.Directory)
 
 			if err != nil {
 				assert.Fail(t, err.Error())

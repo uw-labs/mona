@@ -56,7 +56,7 @@ func getChangedModules(pj *files.ProjectFile, change changeType, parallelism int
 
 		// Generate a new hash for the module directory
 		exclude := append(pj.Exclude, modInfo.Exclude...)
-		newHash, err := hashdir.Generate(modInfo.Location, parallelism, exclude...)
+		newHash, err := hashdir.Generate(modInfo.Location, exclude...)
 
 		if err != nil {
 			return nil, err
@@ -144,7 +144,7 @@ func rangeChangedModules(pj *files.ProjectFile, fn rangeFn, opts rangeOptions) e
 		}
 
 		exclude := append(pj.Exclude, module.Exclude...)
-		newHash, err := hashdir.Generate(module.Location, opts.parallelism, exclude...)
+		newHash, err := hashdir.Generate(module.Location, exclude...)
 
 		if err != nil {
 			return err
