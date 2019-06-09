@@ -2,6 +2,7 @@ package files_test
 
 import (
 	"os"
+	"runtime"
 	"testing"
 
 	"github.com/davidsbond/mona/internal/files"
@@ -48,7 +49,61 @@ func TestLoadModuleFile(t *testing.T) {
 }
 
 func TestFindModules(t *testing.T) {
+	tt := []struct {
+		Name        string
+		Modules     map[string]string
+		Parallelism int
+	}{
+		{
+			Name: "It should find all modules",
+			Modules: map[string]string{
+				"1": "./testdir/1",
+				"2": "./testdir/2",
+				"3": "./testdir/3",
+			},
+			Parallelism: runtime.NumCPU(),
+		},
+	}
 
+	for _, tc := range tt {
+		t.Run(tc.Name, func(t *testing.T) {
+			for name, location := range tc.Modules {
+				if err := os.MkdirAll(location, os.ModePerm); err != nil {
+					assert.Fail(t, err.Error())
+					return
+				}
+
+				if err := files.NewModuleFile(name, location); err != nil {
+					assert.Fail(t, err.Error())
+					return
+				}
+			}
+
+			modules, err := files.FindModules("./testdir", tc.Parallelism)
+
+			if err != nil {
+				assert.Fail(t, err.Error())
+				return
+			}
+
+			assert.Len(t, modules, len(tc.Modules))
+
+			for name, location := range tc.Modules {
+				mod, err := files.LoadModuleFile(location)
+
+				if err != nil {
+					assert.Fail(t, err.Error())
+					return
+				}
+
+				assert.Equal(t, name, mod.Name)
+			}
+
+			if err := os.RemoveAll("./testdir"); err != nil {
+				assert.Fail(t, err.Error())
+			}
+		})
+	}
 }
 
 func TestNewModuleFile(t *testing.T) {

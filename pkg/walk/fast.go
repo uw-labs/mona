@@ -22,6 +22,11 @@ type (
 // directory. The maximum number of goroutines to use is specified by the 'concurrency' parameter.
 // In larger repos, it may be beneficial to increase this limit.
 func Fast(root string, walkFn filepath.WalkFunc, concurrency int) error {
+	// Ensure a sensible value is set
+	if concurrency <= 0 {
+		concurrency = 1
+	}
+
 	var filesGroup sync.WaitGroup
 	var skip []string
 
