@@ -106,7 +106,7 @@ You can build, test & lint your modified modules using the `mona build`, `mona t
 
 ### Performance
 
-At certain sizes, the application may become slow to generate hashes and scan the file system. To mitigate this, the `mona` command has a global flag `--parallelism` that can be used to increase the number of goroutines used to traverse the monorepo. By default it is set to `10`. If you notice things slowing down on large repositories, you can increase this value to generally improve performance.
+At certain sizes, the application may become slow to generate hashes and scan the file system. To mitigate this, some commands have a `--parallelism` flag that can be used to increase the number of goroutines used to traverse the monorepo. By default it is set to the value of `runtime.NumCPU()`. If you notice things slowing down on large repositories, you can increase this value to generally improve performance.
 
 ### Roadmap
 
