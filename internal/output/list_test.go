@@ -2,25 +2,26 @@ package output_test
 
 import (
 	"bytes"
-	"errors"
 	"testing"
 
 	"github.com/davidsbond/mona/internal/output"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestWriteError(t *testing.T) {
+func TestWriteList(t *testing.T) {
 	t.Parallel()
 
 	tt := []struct {
 		Name     string
-		Error    error
+		Title    string
+		Items    []string
 		Expected string
 	}{
 		{
-			Name:     "It should format error messages",
-			Error:    errors.New("a test error"),
-			Expected: "A test error\n",
+			Name:     "It should format a list of items",
+			Title:    "A test list",
+			Items:    []string{"1", "2", "3"},
+			Expected: "A test list\n- 1\n- 2\n- 3\n\n",
 		},
 	}
 
@@ -28,7 +29,7 @@ func TestWriteError(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			buff := bytes.NewBuffer([]byte{})
 
-			if err := output.WriteError(buff, tc.Error); err != nil {
+			if err := output.WriteList(buff, tc.Title, tc.Items); err != nil {
 				assert.Fail(t, err.Error())
 				return
 			}
