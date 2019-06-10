@@ -1,6 +1,7 @@
 # Build information
 VERSION := $(shell git describe --tags --dirty --always)
 COMPILED := $(shell date +%s)
+INSTALL_DIR := $(shell go env GOPATH)/bin
 
 # Flags to pass to go build
 LDFLAGS := -ldflags "-X main.version=$(VERSION) -X main.compiled=$(COMPILED) -s -w"
@@ -32,3 +33,6 @@ docker-build: build
 docker-push:
 	docker push ${IMAGE_NAME}:${VERSION}
 	docker push ${IMAGE_NAME}:latest
+
+install: build
+	sudo cp dist/mona $(INSTALL_DIR)/mona
