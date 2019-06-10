@@ -9,6 +9,8 @@ import (
 	"os/exec"
 	"strings"
 
+	"github.com/hashicorp/go-multierror"
+
 	"github.com/davidsbond/mona/internal/files"
 	"github.com/davidsbond/mona/pkg/hashdir"
 )
@@ -134,9 +136,11 @@ func rangeChangedModules(pj *files.ProjectFile, fn rangeFn, opts rangeOptions) e
 		return err
 	}
 
+	var errs []error
 	for _, module := range changed {
 		if err := fn(module); err != nil {
-			return err
+			errs = append(errs, fmt.Errorf("module %s: %s", module.Name, err.Error()))
+			continue
 		}
 
 		if !opts.updateHashes {
@@ -174,5 +178,5 @@ func rangeChangedModules(pj *files.ProjectFile, fn rangeFn, opts rangeOptions) e
 		}
 	}
 
-	return nil
+	return multierror.Append(nil, errs...).ErrorOrNil()
 }
