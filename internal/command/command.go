@@ -169,7 +169,10 @@ func rangeChangedModules(pj *files.ProjectFile, fn rangeFn, opts rangeOptions) e
 			lockInfo.LintHash = newHash
 		}
 
+		if err := files.UpdateLockFile(pj.Location, lock); err != nil {
+			return err
+		}
 	}
 
-	return files.UpdateLockFile(pj.Location, lock)
+	return nil
 }

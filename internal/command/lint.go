@@ -1,7 +1,10 @@
 package command
 
 import (
+	"os"
+
 	"github.com/davidsbond/mona/internal/files"
+	"github.com/davidsbond/mona/internal/output"
 )
 
 // Lint iterates over all new/modified modules and executes their lint command. Once complete,
@@ -15,6 +18,10 @@ func Lint(pj *files.ProjectFile, parallelism int) error {
 }
 
 func lintModule(module *files.ModuleFile) error {
+	if err := output.Writef(os.Stdout, "Linting module %s", module.Name); err != nil {
+		return err
+	}
+
 	if module.Commands.Lint == "" {
 		return nil
 	}
