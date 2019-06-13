@@ -104,10 +104,6 @@ Modules to be linted:
 
 You can build, test & lint your modified modules using the `mona build`, `mona test` & `mona lint` commands. Individual hashes are stored separately so mona will know if a module has been built, but not linted or tested etc. Any subsequent output to `stdin` or `stderr` will be written to the console and mona will stop executing if your commands return an error exit code.
 
-### Performance
-
-At certain sizes, the application may become slow to generate hashes and scan the file system. To mitigate this, some commands have a `--parallelism` flag that can be used to increase the number of goroutines used to traverse the monorepo. By default it is set to the value of `runtime.NumCPU()`. If you notice things slowing down on large repositories, you can increase this value to generally improve performance.
-
 ### Roadmap
 
 Currently, mona is **not production ready**. The project is missing quite a few tests and has not been battle tested. That being said, attempts to use this tool are welcome and all feedback is appreciated. You can see the [contributing guide](CONTRIBUTING.md) for more information.
