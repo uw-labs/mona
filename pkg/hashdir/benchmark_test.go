@@ -32,6 +32,7 @@ func BenchmarkGenerate(b *testing.B) {
 	}
 
 	b.StopTimer()
+	fmt.Printf("generated %v hashes\n", len(hashes))
 	if err := os.RemoveAll("./bench"); err != nil {
 		assert.Fail(b, err.Error())
 	}
