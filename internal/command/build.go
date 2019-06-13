@@ -9,11 +9,8 @@ import (
 
 // Build will execute the build commands for all modules where changes
 // are detected.
-func Build(pj *files.ProjectFile, parallelism int) error {
-	return rangeChangedModules(pj, buildModule, rangeOptions{
-		parallelism: parallelism,
-		changeType:  changeTypeBuild,
-	})
+func Build(pj *files.ProjectFile) error {
+	return rangeChangedModules(pj, buildModule, changeTypeBuild)
 }
 
 func buildModule(module *files.ModuleFile) error {

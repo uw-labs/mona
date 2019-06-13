@@ -2,7 +2,6 @@ package files_test
 
 import (
 	"os"
-	"runtime"
 	"testing"
 
 	"github.com/davidsbond/mona/internal/files"
@@ -50,9 +49,8 @@ func TestLoadModuleFile(t *testing.T) {
 
 func TestFindModules(t *testing.T) {
 	tt := []struct {
-		Name        string
-		Modules     map[string]string
-		Parallelism int
+		Name    string
+		Modules map[string]string
 	}{
 		{
 			Name: "It should find all modules",
@@ -61,7 +59,6 @@ func TestFindModules(t *testing.T) {
 				"2": "./testdir/2",
 				"3": "./testdir/3",
 			},
-			Parallelism: runtime.NumCPU(),
 		},
 	}
 
@@ -79,7 +76,7 @@ func TestFindModules(t *testing.T) {
 				}
 			}
 
-			modules, err := files.FindModules("./testdir", tc.Parallelism)
+			modules, err := files.FindModules("./testdir")
 
 			if err != nil {
 				assert.Fail(t, err.Error())

@@ -8,10 +8,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/davidsbond/mona/pkg/walk"
-
 	"github.com/hashicorp/go-multierror"
-
+	"github.com/iafan/cwalk"
 	"gopkg.in/yaml.v2"
 )
 
@@ -67,9 +65,9 @@ func NewModuleFile(name, location string) error {
 
 // FindModules attempts to find all "module.yml" files in subdirectories of the given
 // path and load them into memory.
-func FindModules(dir string, parallelism int) (out []*ModuleFile, err error) {
+func FindModules(dir string) (out []*ModuleFile, err error) {
 	var mux sync.Mutex
-	err = walk.Fast(dir, func(path string, info os.FileInfo, err error) error {
+	err = cwalk.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -93,7 +91,7 @@ func FindModules(dir string, parallelism int) (out []*ModuleFile, err error) {
 		out = append(out, module)
 
 		return filepath.SkipDir
-	}, parallelism)
+	})
 
 	return
 }

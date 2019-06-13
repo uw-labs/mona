@@ -3,7 +3,6 @@ package cmd
 import (
 	"errors"
 	"path/filepath"
-	"runtime"
 	"sort"
 
 	"github.com/davidsbond/mona/internal/files"
@@ -22,11 +21,6 @@ func AddModule() cli.Command {
 			cli.StringFlag{
 				Name:  "name",
 				Usage: "The name of the module, defaults to base of the module directory",
-			},
-			cli.IntFlag{
-				Name:  "parallelism",
-				Usage: "Determines the number of threads to use to generate the diff",
-				Value: runtime.NumCPU(),
 			},
 		},
 		// Before the command is called, check if the name provided is blank. If so, set it
@@ -48,8 +42,7 @@ func AddModule() cli.Command {
 			return command.AddModule(
 				pj,
 				ctx.String("name"),
-				ctx.Args().First(),
-				ctx.Int("parallelism"))
+				ctx.Args().First())
 		}),
 	}
 

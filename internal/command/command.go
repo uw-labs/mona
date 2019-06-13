@@ -18,11 +18,6 @@ import (
 type (
 	changeType int
 	rangeFn    func(*files.ModuleFile) error
-
-	rangeOptions struct {
-		parallelism int
-		changeType  changeType
-	}
 )
 
 const (
@@ -31,8 +26,8 @@ const (
 	changeTypeLint  changeType = 2
 )
 
-func getChangedModules(pj *files.ProjectFile, change changeType, parallelism int) ([]*files.ModuleFile, error) {
-	modules, err := files.FindModules(pj.Location, parallelism)
+func getChangedModules(pj *files.ProjectFile, change changeType) ([]*files.ModuleFile, error) {
+	modules, err := files.FindModules(pj.Location)
 
 	if err != nil {
 		return nil, err
@@ -122,8 +117,8 @@ func streamCommand(command, wd string) error {
 	return cmd.Wait()
 }
 
-func rangeChangedModules(pj *files.ProjectFile, fn rangeFn, opts rangeOptions) error {
-	changed, err := getChangedModules(pj, opts.changeType, opts.parallelism)
+func rangeChangedModules(pj *files.ProjectFile, fn rangeFn, ct changeType) error {
+	changed, err := getChangedModules(pj, ct)
 
 	if err != nil || len(changed) == 0 {
 		return err
@@ -159,7 +154,7 @@ func rangeChangedModules(pj *files.ProjectFile, fn rangeFn, opts rangeOptions) e
 			lockInfo = lock.Modules[module.Name]
 		}
 
-		switch opts.changeType {
+		switch ct {
 		case changeTypeBuild:
 			lockInfo.BuildHash = newHash
 		case changeTypeTest:
