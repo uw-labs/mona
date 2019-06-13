@@ -41,6 +41,7 @@ jobs:
           keys:
             - '{{ checksum "go.sum" }}'
       - run: make test
+      - run: make bench
       - save_cache:
           key: '{{ checksum "go.sum" }}'
           paths:

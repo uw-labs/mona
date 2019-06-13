@@ -18,7 +18,10 @@ build:
 
 # Runs all tests
 test:
-	CGO_ENABLED=1 go test -v ./... -bench=. -race
+	CGO_ENABLED=1 go test ./... -race
+
+bench:
+	CGO_ENABLED=1 go test ./... -bench=. -test.run=thisexpressionwontmatchanytest -race
 
 # Lints all go packages
 lint:
