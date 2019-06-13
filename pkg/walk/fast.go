@@ -68,7 +68,7 @@ func Fast(root string, walkFn filepath.WalkFunc, concurrency int) error {
 	go func() {
 		select {
 		case walkErr = <-errs:
-			stop <- true
+			close(stop)
 		case <-stop:
 			return
 		}
@@ -110,7 +110,7 @@ func Fast(root string, walkFn filepath.WalkFunc, concurrency int) error {
 
 	if walkErr == nil {
 		filesGroup.Wait()
-		stop <- true
+		close(stop)
 	}
 
 	return walkErr
