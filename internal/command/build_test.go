@@ -11,12 +11,12 @@ func TestBuild(t *testing.T) {
 	tt := []struct {
 		Name              string
 		ModuleDirs        []string
-		ExpectedArtefacts []string
+		ExpectedArtifacts []string
 	}{
 		{
 			Name:              "It should build all new modules",
 			ModuleDirs:        []string{"test/a", "test/b"},
-			ExpectedArtefacts: []string{"test/a/a", "test/b/b"},
+			ExpectedArtifacts: []string{"test/a/a", "test/b/b"},
 		},
 	}
 
@@ -34,7 +34,7 @@ func TestBuild(t *testing.T) {
 				return
 			}
 
-			for _, exp := range tc.ExpectedArtefacts {
+			for _, exp := range tc.ExpectedArtifacts {
 				assert.FileExists(t, exp)
 			}
 		})

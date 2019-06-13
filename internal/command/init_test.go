@@ -31,14 +31,14 @@ func TestInit(t *testing.T) {
 			assert.FileExists(t, "mona.yml")
 			assert.FileExists(t, "mona.lock")
 
-			proj, err := files.LoadProjectFile(".")
+			project, err := files.LoadProjectFile(".")
 
 			if err != nil {
 				assert.Fail(t, err.Error())
 				return
 			}
 
-			assert.Equal(t, tc.ProjectName, proj.Name)
+			assert.Equal(t, tc.ProjectName, project.Name)
 
 			lock, err := files.LoadLockFile(".")
 

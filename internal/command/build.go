@@ -11,9 +11,8 @@ import (
 // are detected.
 func Build(pj *files.ProjectFile, parallelism int) error {
 	return rangeChangedModules(pj, buildModule, rangeOptions{
-		updateHashes: true,
-		parallelism:  parallelism,
-		changeType:   changeTypeBuild,
+		parallelism: parallelism,
+		changeType:  changeTypeBuild,
 	})
 }
 

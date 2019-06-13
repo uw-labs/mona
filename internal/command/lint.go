@@ -11,9 +11,8 @@ import (
 // the lint hash is updated in the lock file.
 func Lint(pj *files.ProjectFile, parallelism int) error {
 	return rangeChangedModules(pj, lintModule, rangeOptions{
-		changeType:   changeTypeLint,
-		updateHashes: true,
-		parallelism:  parallelism,
+		changeType:  changeTypeLint,
+		parallelism: parallelism,
 	})
 }
 

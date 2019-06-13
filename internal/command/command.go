@@ -20,9 +20,8 @@ type (
 	rangeFn    func(*files.ModuleFile) error
 
 	rangeOptions struct {
-		updateHashes bool
-		parallelism  int
-		changeType   changeType
+		parallelism int
+		changeType  changeType
 	}
 )
 
@@ -140,10 +139,6 @@ func rangeChangedModules(pj *files.ProjectFile, fn rangeFn, opts rangeOptions) e
 	for _, module := range changed {
 		if err := fn(module); err != nil {
 			errs = append(errs, fmt.Errorf("module %s: %s", module.Name, err.Error()))
-			continue
-		}
-
-		if !opts.updateHashes {
 			continue
 		}
 
