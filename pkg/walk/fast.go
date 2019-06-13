@@ -28,6 +28,8 @@ func Fast(root string, walkFn filepath.WalkFunc, concurrency int) error {
 	}
 
 	var filesGroup sync.WaitGroup
+
+	var skipMux sync.Mutex
 	var skip []string
 
 	files := make(chan *walkArguments)
@@ -46,7 +48,9 @@ func Fast(root string, walkFn filepath.WalkFunc, concurrency int) error {
 					err := walkFn(file.path, file.info, file.err)
 
 					if err == filepath.SkipDir {
+						skipMux.Lock()
 						skip = append(skip, file.path)
+						skipMux.Unlock()
 					} else if err != nil {
 						errs <- err
 					}
@@ -80,11 +84,14 @@ func Fast(root string, walkFn filepath.WalkFunc, concurrency int) error {
 				close(files)
 				return errors.New("walker received interrupt signal")
 			default:
+				skipMux.Lock()
 				for _, d := range skip {
 					if strings.HasPrefix(p, d) {
+						skipMux.Unlock()
 						return nil
 					}
 				}
+				skipMux.Unlock()
 
 				filesGroup.Add(1)
 				files <- &walkArguments{path: p, info: info, err: err}

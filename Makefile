@@ -18,7 +18,7 @@ build:
 
 # Runs all tests
 test:
-	go test -v ./...
+	go test -v ./... -bench=. -race
 
 # Lints all go packages
 lint:
