@@ -7,6 +7,8 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+
+	"github.com/gobwas/glob"
 )
 
 // Generate creates a new hash for a given path. The path is walked and a hash is
@@ -14,6 +16,7 @@ import (
 // the 'excludes' parameter it is not used to generate the hash.
 func Generate(location string, excludes ...string) (string, error) {
 	hash := md5.New()
+	globs := make(map[string]glob.Glob)
 
 	err := filepath.Walk(location, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -21,13 +24,23 @@ func Generate(location string, excludes ...string) (string, error) {
 		}
 
 		for _, exclude := range excludes {
-			ok, err := filepath.Match(exclude, info.Name())
+			gl, ok := globs[exclude]
 
-			if err != nil {
-				return err
+			if !ok {
+				gl, err = glob.Compile(exclude, os.PathSeparator)
+
+				if err != nil {
+					return err
+				}
+
+				globs[exclude] = gl
 			}
 
-			if ok {
+			if gl.Match(info.Name()) || gl.Match(path) {
+				if info.IsDir() {
+					return filepath.SkipDir
+				}
+
 				return nil
 			}
 		}

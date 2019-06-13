@@ -66,11 +66,23 @@ func NewModuleFile(name, location string) error {
 // FindModules attempts to find all "module.yml" files in subdirectories of the given
 // path and load them into memory.
 func FindModules(dir string) (out []*ModuleFile, err error) {
-	var mux sync.Mutex
+	var moduleMux sync.Mutex
+	var skipMux sync.Mutex
+	var skip []string
+
 	err = cwalk.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
+
+		skipMux.Lock()
+		for _, s := range skip {
+			if strings.HasPrefix(path, s) {
+				skipMux.Unlock()
+				return filepath.SkipDir
+			}
+		}
+		skipMux.Unlock()
 
 		if info.IsDir() {
 			return nil
@@ -86,9 +98,15 @@ func FindModules(dir string) (out []*ModuleFile, err error) {
 			return err
 		}
 
-		mux.Lock()
-		defer mux.Unlock()
+		moduleMux.Lock()
 		out = append(out, module)
+		moduleMux.Unlock()
+
+		dir, _ := filepath.Split(path)
+
+		skipMux.Lock()
+		skip = append(skip, dir)
+		skipMux.Unlock()
 
 		return filepath.SkipDir
 	})
