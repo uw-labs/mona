@@ -1,10 +1,9 @@
 package command
 
 import (
-	"os"
+	"github.com/apex/log"
 
 	"github.com/davidsbond/mona/internal/files"
-	"github.com/davidsbond/mona/internal/output"
 )
 
 // Build will execute the build commands for all modules where changes
@@ -14,9 +13,7 @@ func Build(pj *files.ProjectFile) error {
 }
 
 func buildModule(module *files.ModuleFile) error {
-	if err := output.Writef(os.Stdout, "Building module %s", module.Name); err != nil {
-		return err
-	}
+	log.Infof("Building module %s at %s", module.Name, module.Location)
 
 	if module.Commands.Build == "" {
 		return nil

@@ -1,11 +1,9 @@
 package cmd
 
 import (
-	"os"
+	"github.com/apex/log"
 
 	"github.com/davidsbond/mona/internal/files"
-
-	"github.com/davidsbond/mona/internal/output"
 
 	"github.com/davidsbond/mona/internal/command"
 	"github.com/urfave/cli"
@@ -24,17 +22,9 @@ func Diff() cli.Command {
 				return err
 			}
 
-			if err := output.WriteList(os.Stdout, "Modules to be built:", build); err != nil {
-				return err
-			}
-
-			if err := output.WriteList(os.Stdout, "Modules to be tested:", test); err != nil {
-				return err
-			}
-
-			if err := output.WriteList(os.Stdout, "Modules to be linted:", lint); err != nil {
-				return err
-			}
+			log.Infof("%d module(s) to be built", len(build))
+			log.Infof("%d module(s) to be tested", len(test))
+			log.Infof("%d module(s) to be linted", len(lint))
 
 			return nil
 		}),

@@ -1,10 +1,9 @@
 package command
 
 import (
-	"os"
+	"github.com/apex/log"
 
 	"github.com/davidsbond/mona/internal/files"
-	"github.com/davidsbond/mona/internal/output"
 )
 
 // Test attempts to run the test command for all modules where changes
@@ -14,9 +13,7 @@ func Test(pj *files.ProjectFile) error {
 }
 
 func testModule(module *files.ModuleFile) error {
-	if err := output.Writef(os.Stdout, "Testing module %s", module.Name); err != nil {
-		return err
-	}
+	log.Infof("Testing module %s at %s", module.Name, module.Location)
 
 	if module.Commands.Test == "" {
 		return nil

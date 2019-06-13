@@ -9,6 +9,8 @@ import (
 	"os/exec"
 	"strings"
 
+	"github.com/apex/log"
+
 	"github.com/hashicorp/go-multierror"
 
 	"github.com/davidsbond/mona/internal/files"
@@ -147,6 +149,8 @@ func rangeChangedModules(pj *files.ProjectFile, fn rangeFn, ct changeType) error
 		lockInfo, modInLock := lock.Modules[module.Name]
 
 		if !modInLock {
+			log.Debugf("Detected new module %s at %s, adding to lock file", module.Name, module.Location)
+
 			if err := files.AddModule(lock, pj.Location, module.Name); err != nil {
 				return err
 			}

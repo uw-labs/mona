@@ -5,6 +5,8 @@ import (
 	"path/filepath"
 	"sort"
 
+	"github.com/apex/log"
+
 	"github.com/davidsbond/mona/internal/files"
 
 	"github.com/davidsbond/mona/internal/command"
@@ -39,10 +41,15 @@ func AddModule() cli.Command {
 			return ctx.Set("name", filepath.Base(dir))
 		},
 		Action: withProject(func(ctx *cli.Context, pj *files.ProjectFile) error {
-			return command.AddModule(
-				pj,
-				ctx.String("name"),
-				ctx.Args().First())
+			name := ctx.String("name")
+			dir := ctx.Args().First()
+
+			if err := command.AddModule(pj, name, dir); err != nil {
+				return err
+			}
+
+			log.Infof("Created new module %s at %s", name, dir)
+			return nil
 		}),
 	}
 

@@ -6,8 +6,9 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/apex/log"
+	apexcli "github.com/apex/log/handlers/cli"
 	"github.com/davidsbond/mona/cmd"
-	"github.com/davidsbond/mona/internal/output"
 	"github.com/urfave/cli"
 )
 
@@ -45,9 +46,23 @@ func main() {
 			Hidden: true,
 			Usage:  "Flag that contains the current working directory",
 		},
+		cli.BoolFlag{
+			Name:  "verbose",
+			Usage: "If set, enables verbose logging output",
+		},
 	}
 
 	app.Before = func(ctx *cli.Context) error {
+		log.SetHandler(apexcli.Default)
+
+		if ctx.Bool("verbose") {
+			log.SetLevel(log.DebugLevel)
+		} else {
+			log.SetLevel(log.InfoLevel)
+		}
+
+		log.Infof("%s v%s", app.Name, app.Version)
+
 		wd, err := os.Getwd()
 
 		if err != nil {
@@ -61,8 +76,6 @@ func main() {
 	sort.Sort(cli.CommandsByName(app.Commands))
 
 	if err := app.Run(os.Args); err != nil {
-		if err = output.WriteError(os.Stdout, err); err != nil {
-			panic(err)
-		}
+		log.Error(err.Error())
 	}
 }

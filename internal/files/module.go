@@ -8,6 +8,8 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/apex/log"
+
 	"github.com/hashicorp/go-multierror"
 	"github.com/iafan/cwalk"
 	"gopkg.in/yaml.v2"
@@ -66,6 +68,8 @@ func NewModuleFile(name, location string) error {
 // FindModules attempts to find all "module.yml" files in subdirectories of the given
 // path and load them into memory.
 func FindModules(dir string) (out []*ModuleFile, err error) {
+	log.Debugf("Searching for modules in %s", dir)
+
 	var moduleMux sync.Mutex
 	var skipMux sync.Mutex
 	var skip []string
@@ -97,6 +101,8 @@ func FindModules(dir string) (out []*ModuleFile, err error) {
 		if err != nil {
 			return err
 		}
+
+		log.Debugf("Found module %s at %s", module.Name, module.Location)
 
 		moduleMux.Lock()
 		out = append(out, module)

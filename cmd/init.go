@@ -4,6 +4,8 @@ import (
 	"path/filepath"
 	"sort"
 
+	"github.com/apex/log"
+
 	"github.com/davidsbond/mona/internal/command"
 	"github.com/urfave/cli"
 )
@@ -33,7 +35,12 @@ func Init() cli.Command {
 			name := ctx.String("name")
 			wd := ctx.GlobalString("wd")
 
-			return command.Init(wd, name)
+			if err := command.Init(wd, name); err != nil {
+				return err
+			}
+
+			log.Infof("Initialized new project at %s", wd)
+			return nil
 		},
 	}
 

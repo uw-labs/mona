@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/apex/log"
+
 	"github.com/hashicorp/go-multierror"
 
 	"gopkg.in/yaml.v2"
@@ -89,6 +91,7 @@ func GetProjectRoot(wd string) (string, error) {
 		file := filepath.Join(dir, projectFileName)
 
 		if _, err := os.Stat(file); err == nil {
+			log.Debugf("Found project file at %s", dir)
 			return dir, nil
 		} else if os.IsNotExist(err) {
 			continue
