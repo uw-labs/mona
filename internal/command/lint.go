@@ -1,8 +1,10 @@
 package command
 
 import (
-	"github.com/apex/log"
+	"context"
 
+	"github.com/apex/log"
+	"github.com/davidsbond/mona/internal/environment"
 	"github.com/davidsbond/mona/internal/files"
 )
 
@@ -24,9 +26,15 @@ func lintModule(module *files.ModuleFile) error {
 		return streamCommand(module.Commands.Lint.Run, module.Location)
 	}
 
-	return runInImage(
+	env, err := environment.NewDockerEnvironment(
 		module.Commands.Lint.Image,
-		module.Commands.Lint.Run,
 		module.Location,
 	)
+
+	if err != nil {
+		return err
+	}
+
+	ctx := context.Background()
+	return env.Execute(ctx, module.Commands.Lint.Run)
 }

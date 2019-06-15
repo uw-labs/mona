@@ -1,8 +1,10 @@
 package command
 
 import (
-	"github.com/apex/log"
+	"context"
 
+	"github.com/apex/log"
+	"github.com/davidsbond/mona/internal/environment"
 	"github.com/davidsbond/mona/internal/files"
 )
 
@@ -24,9 +26,15 @@ func buildModule(module *files.ModuleFile) error {
 		return streamCommand(module.Commands.Build.Run, module.Location)
 	}
 
-	return runInImage(
+	env, err := environment.NewDockerEnvironment(
 		module.Commands.Build.Image,
-		module.Commands.Build.Run,
 		module.Location,
 	)
+
+	if err != nil {
+		return err
+	}
+
+	ctx := context.Background()
+	return env.Execute(ctx, module.Commands.Build.Run)
 }
