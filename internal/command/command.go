@@ -4,17 +4,20 @@ package command
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"io"
 	"os/exec"
 	"strings"
 
 	"github.com/apex/log"
-
-	"github.com/hashicorp/go-multierror"
-
 	"github.com/davidsbond/mona/internal/files"
 	"github.com/davidsbond/mona/pkg/hashdir"
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/mount"
+	"github.com/docker/docker/client"
+	"github.com/hashicorp/go-multierror"
 )
 
 type (
@@ -79,9 +82,11 @@ func getChangedModules(pj *files.ProjectFile, change changeType) ([]*files.Modul
 	return out, nil
 }
 
-func streamOutputs(outputs ...io.Reader) {
+func streamOutputs(outputs ...io.ReadCloser) {
 	for _, output := range outputs {
-		go func(o io.Reader) {
+		go func(o io.ReadCloser) {
+			defer o.Close()
+
 			scanner := bufio.NewScanner(o)
 			scanner.Split(bufio.ScanLines)
 
@@ -173,4 +178,89 @@ func rangeChangedModules(pj *files.ProjectFile, fn rangeFn, ct changeType) error
 	}
 
 	return multierror.Append(nil, errs...).ErrorOrNil()
+}
+
+func runInImage(image, cmd, localDir string) error {
+	cli, err := client.NewEnvClient()
+
+	if err != nil {
+		return err
+	}
+
+	ctx := context.Background()
+
+	log.Debugf("Pulling image %s", image)
+	if _, err := cli.ImagePull(ctx, image, types.ImagePullOptions{}); err != nil {
+		return err
+	}
+
+	log.Debugf("Creating container for %s", image)
+	body, err := cli.ContainerCreate(ctx,
+		&container.Config{
+			Image:      image,
+			WorkingDir: "/module",
+			Cmd:        strings.Fields(cmd),
+		},
+		&container.HostConfig{
+			Mounts: []mount.Mount{
+				{
+					Type:   mount.TypeBind,
+					Source: localDir,
+					Target: "/module",
+				},
+			},
+		}, nil, "")
+
+	if err != nil {
+		return err
+	}
+
+	log.Debugf("Starting container %s", body.ID)
+	if err := cli.ContainerStart(ctx, body.ID, types.ContainerStartOptions{}); err != nil {
+		return err
+	}
+
+	log.Debugf("Creating exec configuration for container %s", body.ID)
+	resp, err := cli.ContainerExecCreate(ctx, body.ID, types.ExecConfig{
+		AttachStderr: true,
+		AttachStdout: true,
+		Cmd:          strings.Fields(cmd),
+	})
+
+	if err != nil {
+		return err
+	}
+
+	log.Debugf("Starting execution of command in container %s", body.ID)
+	if err := cli.ContainerExecStart(ctx, resp.ID, types.ExecStartCheck{}); err != nil {
+		return err
+	}
+
+	log.Debugf("Getting log stream for container %s", body.ID)
+	logs, err := cli.ContainerLogs(ctx, body.ID, types.ContainerLogsOptions{
+		ShowStderr: true,
+		ShowStdout: true,
+	})
+
+	if err != nil {
+		return err
+	}
+
+	log.Debugf("Waiting for container %s to exit", body.ID)
+	streamOutputs(logs)
+
+	if _, err := cli.ContainerWait(ctx, body.ID); err != nil {
+		return err
+	}
+
+	log.Debugf("Inspecting exec %s in container %s", resp.ID, body.ID)
+	inspect, err := cli.ContainerExecInspect(ctx, resp.ID)
+
+	if err != nil {
+		return err
+	}
+
+	log.Debugf("Exec %s exited with code %d in container %s", resp.ID, inspect.ExitCode, body.ID)
+
+	return nil
 }

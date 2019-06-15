@@ -90,7 +90,7 @@ func setupModuleCode(t *testing.T, locations ...string) {
 			return
 		}
 
-		mod.Commands.Build = "go build"
+		mod.Commands.Build.Run = "go build"
 
 		if err := files.UpdateModuleFile(location, mod); err != nil {
 			assert.Fail(t, err.Error())

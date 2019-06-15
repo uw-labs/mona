@@ -34,9 +34,18 @@ type (
 		Exclude  []string `yaml:"exclude,omitempty"` // File matchers to exclude files from hash generation.
 		Location string   `yaml:"-"`                 // The location of the module, not included in the module file but initialized externally for ease
 		Commands struct {
-			Build string `yaml:"build"` // Command for building the module
-			Test  string `yaml:"test"`  // Command for testing the module
-			Lint  string `yaml:"lint"`  // Command for linting the module
+			Build struct {
+				Run   string `yaml:"run"`   // The command to run
+				Image string `yaml:"image"` // The docker image to use
+			} `yaml:"build"` // Command for building the module
+			Test struct {
+				Run   string `yaml:"run"`   // The command to run
+				Image string `yaml:"image"` // The docker image to use
+			} `yaml:"test"` // Command for testing the module
+			Lint struct {
+				Run   string `yaml:"run"`   // The command to run
+				Image string `yaml:"image"` // The docker image to use
+			} `yaml:"lint"` // Command for linting the module
 		} `yaml:"commands"` // Commands that can be executed against the module
 	}
 )

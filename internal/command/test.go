@@ -15,9 +15,18 @@ func Test(pj *files.ProjectFile) error {
 func testModule(module *files.ModuleFile) error {
 	log.Infof("Testing module %s at %s", module.Name, module.Location)
 
-	if module.Commands.Test == "" {
+	if module.Commands.Test.Run == "" {
 		return nil
 	}
 
-	return streamCommand(module.Commands.Test, module.Location)
+	// Run command locally if no image is set
+	if module.Commands.Test.Image == "" {
+		return streamCommand(module.Commands.Test.Run, module.Location)
+	}
+
+	return runInImage(
+		module.Commands.Test.Image,
+		module.Commands.Test.Run,
+		module.Location,
+	)
 }

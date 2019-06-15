@@ -38,6 +38,7 @@ Alternatively, you can download and compile the source code using `go get` and `
 $ go get -u github.com/davidsbond/mona
 $ cd $GOPATH/src/github.com/davidsbond/mona
 $ make build
+>
 ```
 
 This will generate a `dist` directory in the source folder containing the compiled binary with the `README.md` and `LICENSE` files. These can be placed anywhere in your `$PATH`
@@ -60,7 +61,8 @@ exclude:      # File patterns to ignore across all modules
 Each application/library in your monorepo is represented as a mona module. You can add these to your project by using the `mona add-module` command like so:
 
 ```bash
-$ mona add-module path/to/module
+$ mona add-module apps/ui
+• Created new module ui at apps/ui
 ```
 
 Within your new module, you'll find a `module.yml` file with several keys:
@@ -69,10 +71,16 @@ Within your new module, you'll find a `module.yml` file with several keys:
 # module.yml
 name: module
 commands:
-  build: "make build"     # Command to run to build the module
-  test: "make test"       # Command to run to test the module
-  lint: "make lint"       # Command to run to lint the module
-exclude:                  # File patterns to ignore
+  build:
+    run: "make build"                      # Command to run to build the module
+    image: docker.io/library/golang:alpine # Image to execute the build command in
+  test:
+    run: "make build"                      # Command to run to test the module
+    image: docker.io/library/golang:alpine # Image to execute the test command in
+  lint:
+    run: "make build"                      # Command to run to lint the module
+    image: docker.io/library/golang:alpine # Image to execute the lint command in
+exclude:                                   # File patterns to ignore
   - "*.txt"
 ```
 
@@ -86,23 +94,18 @@ Mona generates hashes to determine if code within respective modules has changed
 
 ```bash
 $ mona diff
-
-Modules to be built:
-- module-1
-- module-2
-
-Modules to be tested:
-- module-1
-- module-2
-
-Modules to be linted:
-- module-1
-- module-2
+• 1 module(s) to be built  
+• 1 module(s) to be tested
+• 3 module(s) to be linted
 ```
 
 ### Building/Testing/Linting modules
 
-You can build, test & lint your modified modules using the `mona build`, `mona test` & `mona lint` commands. Individual hashes are stored separately so mona will know if a module has been built, but not linted or tested etc. Any subsequent output to `stdin` or `stderr` will be written to the console and mona will stop executing if your commands return an error exit code.
+You can build, test & lint your modified modules using the `mona build`, `mona test` & `mona lint` commands. Individual hashes are stored separately so mona will know if a module has been built, but not linted or tested etc.
+
+If you provide an image for one of these commands, the module will be mounted to a docker container of your choice and execute your command from that volume's location. If the `image` key is left blank, the commands are ran on the host machine.
+
+The volume is created with a [bind mount](https://docs.docker.com/storage/bind-mounts/) so any build artefacts will be available on the host machine
 
 ### Roadmap
 

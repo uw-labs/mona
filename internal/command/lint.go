@@ -15,9 +15,18 @@ func Lint(pj *files.ProjectFile) error {
 func lintModule(module *files.ModuleFile) error {
 	log.Infof("Linting module %s at %s", module.Name, module.Location)
 
-	if module.Commands.Lint == "" {
+	if module.Commands.Lint.Run == "" {
 		return nil
 	}
 
-	return streamCommand(module.Commands.Lint, module.Location)
+	// Run command locally if no image is specified
+	if module.Commands.Lint.Image == "" {
+		return streamCommand(module.Commands.Lint.Run, module.Location)
+	}
+
+	return runInImage(
+		module.Commands.Lint.Image,
+		module.Commands.Lint.Run,
+		module.Location,
+	)
 }

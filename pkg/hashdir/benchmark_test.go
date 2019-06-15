@@ -15,11 +15,10 @@ func BenchmarkGenerate(b *testing.B) {
 	b.StopTimer()
 	setupBenchmark(b, "./bench")
 
-	var hashes []string
 	for i := 0; i < b.N; i++ {
 		b.StartTimer()
 
-		hash, err := hashdir.Generate("./bench")
+		_, err := hashdir.Generate("./bench")
 
 		b.StopTimer()
 
@@ -27,12 +26,8 @@ func BenchmarkGenerate(b *testing.B) {
 			assert.FailNow(b, err.Error())
 			return
 		}
-
-		hashes = append(hashes, hash)
 	}
 
-	b.StopTimer()
-	fmt.Printf("generated %v hashes\n", len(hashes))
 	if err := os.RemoveAll("./bench"); err != nil {
 		assert.Fail(b, err.Error())
 	}

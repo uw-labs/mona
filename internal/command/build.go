@@ -15,9 +15,18 @@ func Build(pj *files.ProjectFile) error {
 func buildModule(module *files.ModuleFile) error {
 	log.Infof("Building module %s at %s", module.Name, module.Location)
 
-	if module.Commands.Build == "" {
+	if module.Commands.Build.Run == "" {
 		return nil
 	}
 
-	return streamCommand(module.Commands.Build, module.Location)
+	// Run command locally if no image is set
+	if module.Commands.Build.Image == "" {
+		return streamCommand(module.Commands.Build.Run, module.Location)
+	}
+
+	return runInImage(
+		module.Commands.Build.Image,
+		module.Commands.Build.Run,
+		module.Location,
+	)
 }
