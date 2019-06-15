@@ -43,6 +43,7 @@ func NewDockerEnvironment(image, volumeDir string) (Environment, error) {
 
 // Execute runs the provided command within the configured docker image
 func (d *Docker) Execute(ctx context.Context, command string) error {
+	log.Debugf("Executing command '%s' in image %s", command, d.image)
 	log.Debugf("Pulling image %s", d.image)
 
 	if _, err := d.cli.ImagePull(ctx, d.image, types.ImagePullOptions{}); err != nil {
@@ -52,14 +53,11 @@ func (d *Docker) Execute(ctx context.Context, command string) error {
 	log.Debugf("Creating container for %s", d.image)
 	body, err := d.cli.ContainerCreate(ctx,
 		&container.Config{
-			Image:        d.image,
-			WorkingDir:   "/module",
-			Cmd:          strings.Split(command, " "),
-			AttachStderr: true,
-			AttachStdout: true,
+			Image:      d.image,
+			WorkingDir: "/module",
+			Cmd:        strings.Split(command, " "),
 		},
 		&container.HostConfig{
-			AutoRemove: true,
 			Mounts: []mount.Mount{
 				{
 					Type:   mount.TypeBind,
@@ -86,7 +84,6 @@ func (d *Docker) Execute(ctx context.Context, command string) error {
 	logs, err := d.cli.ContainerLogs(ctx, body.ID, types.ContainerLogsOptions{
 		ShowStderr: true,
 		ShowStdout: true,
-		Follow:     true,
 	})
 
 	if err != nil {

@@ -27,7 +27,7 @@ func testModule(module *files.ModuleFile) error {
 	}
 
 	env, err := environment.NewDockerEnvironment(
-		module.Commands.Build.Image,
+		module.Commands.Test.Image,
 		module.Location,
 	)
 
@@ -36,5 +36,5 @@ func testModule(module *files.ModuleFile) error {
 	}
 
 	ctx := context.Background()
-	return env.Execute(ctx, module.Commands.Build.Run)
+	return env.Execute(ctx, module.Commands.Test.Run)
 }
