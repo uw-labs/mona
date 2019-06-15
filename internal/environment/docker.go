@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"io"
 	"strings"
 
 	"github.com/apex/log"
@@ -51,11 +52,14 @@ func (d *Docker) Execute(ctx context.Context, command string) error {
 	log.Debugf("Creating container for %s", d.image)
 	body, err := d.cli.ContainerCreate(ctx,
 		&container.Config{
-			Image:      d.image,
-			WorkingDir: "/module",
-			Cmd:        strings.Fields(command),
+			Image:        d.image,
+			WorkingDir:   "/module",
+			Cmd:          strings.Split(command, " "),
+			AttachStderr: true,
+			AttachStdout: true,
 		},
 		&container.HostConfig{
+			AutoRemove: true,
 			Mounts: []mount.Mount{
 				{
 					Type:   mount.TypeBind,
@@ -69,24 +73,12 @@ func (d *Docker) Execute(ctx context.Context, command string) error {
 		return err
 	}
 
+	for _, warning := range body.Warnings {
+		log.Warn(warning)
+	}
+
 	log.Debugf("Starting container %s", body.ID)
 	if err := d.cli.ContainerStart(ctx, body.ID, types.ContainerStartOptions{}); err != nil {
-		return err
-	}
-
-	log.Debugf("Creating exec configuration for container %s", body.ID)
-	resp, err := d.cli.ContainerExecCreate(ctx, body.ID, types.ExecConfig{
-		AttachStderr: true,
-		AttachStdout: true,
-		Cmd:          strings.Fields(command),
-	})
-
-	if err != nil {
-		return err
-	}
-
-	log.Debugf("Starting execution of command in container %s", body.ID)
-	if err := d.cli.ContainerExecStart(ctx, resp.ID, types.ExecStartCheck{}); err != nil {
 		return err
 	}
 
@@ -94,6 +86,7 @@ func (d *Docker) Execute(ctx context.Context, command string) error {
 	logs, err := d.cli.ContainerLogs(ctx, body.ID, types.ContainerLogsOptions{
 		ShowStderr: true,
 		ShowStdout: true,
+		Follow:     true,
 	})
 
 	if err != nil {
@@ -102,28 +95,21 @@ func (d *Docker) Execute(ctx context.Context, command string) error {
 
 	log.Debugf("Waiting for container %s to exit", body.ID)
 
-	go func() {
-		defer logs.Close()
-		scanner := bufio.NewScanner(logs)
+	go func(o io.ReadCloser) {
+		defer o.Close()
+
+		scanner := bufio.NewScanner(o)
 		scanner.Split(bufio.ScanLines)
 
 		for scanner.Scan() {
-			fmt.Println(scanner.Text())
+			m := scanner.Text()
+			fmt.Println(m)
 		}
-	}()
+	}(logs)
 
 	if _, err := d.cli.ContainerWait(ctx, body.ID); err != nil {
 		return err
 	}
-
-	log.Debugf("Inspecting exec %s in container %s", resp.ID, body.ID)
-	inspect, err := d.cli.ContainerExecInspect(ctx, resp.ID)
-
-	if err != nil {
-		return err
-	}
-
-	log.Debugf("Exec %s exited with code %d in container %s", resp.ID, inspect.ExitCode, body.ID)
 
 	return nil
 }
