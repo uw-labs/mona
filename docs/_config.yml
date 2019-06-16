@@ -6,7 +6,6 @@ baseurl: ""
 url: "https://davidsbond.github.io/mona"
 github_username:  davidsbond
 markdown: kramdown
-theme: modernist
 plugins:
   - jekyll-feed
   - jekyll-seo-tag
@@ -14,3 +13,4 @@ plugins:
 lang: en_EU
 # google_site_verification: L1oHAJLKearJEWfQdeRzKwAJa063P_2SuoqFv6vtUuc
 # google_analytics: UA-46697487-4            
+theme: jekyll-theme-modernist
