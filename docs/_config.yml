@@ -1,0 +1,16 @@
+title: Mona - A simple monorepo management tool
+email: davidsbond93@gmail.com
+author: David Bond
+description: "The Mona CLI documentation"
+baseurl: ""
+url: "https://davidsbond.github.io/mona"
+github_username:  davidsbond
+markdown: kramdown
+theme: modernist
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+  - jekyll-sitemap
+lang: en_EU
+# google_site_verification: L1oHAJLKearJEWfQdeRzKwAJa063P_2SuoqFv6vtUuc
+# google_analytics: UA-46697487-4            
