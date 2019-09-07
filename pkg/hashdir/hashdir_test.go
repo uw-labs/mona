@@ -16,7 +16,7 @@ func TestGenerate(t *testing.T) {
 		Expected  string
 	}{
 		{
-			Name:      "It should generate a base64 hash of a directory",
+			Name:      "It should generate a hash of a directory",
 			Directory: "./testdir",
 			Expected:  "XrY7u+Ae7tCTyyK7j1rNww==",
 		},
@@ -34,11 +34,7 @@ func TestGenerate(t *testing.T) {
 				return
 			}
 
-			assert.Equal(t, tc.Expected, hash)
-
-			if _, err := base64.StdEncoding.Decode(make([]byte, 1024), []byte(hash)); err != nil {
-				assert.Fail(t, err.Error())
-			}
+			assert.Equal(t, tc.Expected, base64.StdEncoding.EncodeToString(hash))
 		})
 	}
 }

@@ -4,14 +4,15 @@ import (
 	"context"
 
 	"github.com/apex/log"
+	"github.com/davidsbond/mona/internal/deps"
 	"github.com/davidsbond/mona/internal/environment"
 	"github.com/davidsbond/mona/internal/files"
 )
 
 // Lint iterates over all new/modified modules and executes their lint command. Once complete,
 // the lint hash is updated in the lock file.
-func Lint(pj *files.ProjectFile) error {
-	return rangeChangedModules(pj, lintModule, changeTypeLint)
+func Lint(mod deps.Module, pj *files.ProjectFile) error {
+	return rangeChangedModules(mod, pj, lintModule, changeTypeLint)
 }
 
 func lintModule(module *files.ModuleFile) error {

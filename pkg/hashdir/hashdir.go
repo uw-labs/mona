@@ -3,7 +3,6 @@ package hashdir
 
 import (
 	"crypto/md5"
-	"encoding/base64"
 	"io"
 	"os"
 	"path/filepath"
@@ -11,10 +10,10 @@ import (
 	"github.com/gobwas/glob"
 )
 
-// Generate creates a new hash for a given path. The path is walked and a hash is
+// GenerateString creates a new hash for a given path. The path is walked and a hash is
 // created based on all files found in the path. If a file matches one specified in
 // the 'excludes' parameter it is not used to generate the hash.
-func Generate(location string, excludes ...string) (string, error) {
+func Generate(location string, excludes ...string) ([]byte, error) {
 	hash := md5.New()
 	globs := make(map[string]glob.Glob)
 
@@ -63,8 +62,8 @@ func Generate(location string, excludes ...string) (string, error) {
 	})
 
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return base64.StdEncoding.EncodeToString(hash.Sum(nil)), nil
+	return hash.Sum(nil), nil
 }

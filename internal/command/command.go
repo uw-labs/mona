@@ -10,8 +10,9 @@ import (
 	"strings"
 
 	"github.com/apex/log"
+	"github.com/davidsbond/mona/internal/deps"
 	"github.com/davidsbond/mona/internal/files"
-	"github.com/davidsbond/mona/pkg/hashdir"
+	"github.com/davidsbond/mona/internal/hash"
 	"github.com/hashicorp/go-multierror"
 )
 
@@ -26,7 +27,7 @@ const (
 	changeTypeLint  changeType = 2
 )
 
-func getChangedModules(pj *files.ProjectFile, change changeType) ([]*files.ModuleFile, error) {
+func getChangedModules(mod deps.Module, pj *files.ProjectFile, change changeType) ([]*files.ModuleFile, error) {
 	modules, err := files.FindModules(pj.Location)
 
 	if err != nil {
@@ -50,26 +51,26 @@ func getChangedModules(pj *files.ProjectFile, change changeType) ([]*files.Modul
 			continue
 		}
 
-		// Generate a new hash for the module directory
+		// GenerateString a new hash for the module directory
 		exclude := append(pj.Exclude, modInfo.Exclude...)
-		newHash, err := hashdir.Generate(modInfo.Location, exclude...)
+		newHash, err := hash.GetForApp(mod, modInfo.Location, exclude...)
 
 		if err != nil {
 			return nil, err
 		}
 
 		// Check if we need to build/lint/test
-		diff := false
+		var oldHash string
 		switch change {
 		case changeTypeBuild:
-			diff = lockInfo.BuildHash != newHash
+			oldHash = lockInfo.BuildHash
 		case changeTypeTest:
-			diff = lockInfo.TestHash != newHash
+			oldHash = lockInfo.TestHash
 		case changeTypeLint:
-			diff = lockInfo.LintHash != newHash
+			oldHash = lockInfo.LintHash
 		}
 
-		if diff {
+		if oldHash != newHash {
 			out = append(out, modInfo)
 		}
 	}
@@ -119,8 +120,8 @@ func streamCommand(command, wd string) error {
 	return cmd.Wait()
 }
 
-func rangeChangedModules(pj *files.ProjectFile, fn rangeFn, ct changeType) error {
-	changed, err := getChangedModules(pj, ct)
+func rangeChangedModules(mod deps.Module, pj *files.ProjectFile, fn rangeFn, ct changeType) error {
+	changed, err := getChangedModules(mod, pj, ct)
 
 	if err != nil || len(changed) == 0 {
 		return err
@@ -140,7 +141,7 @@ func rangeChangedModules(pj *files.ProjectFile, fn rangeFn, ct changeType) error
 		}
 
 		exclude := append(pj.Exclude, module.Exclude...)
-		newHash, err := hashdir.Generate(module.Location, exclude...)
+		newHash, err := hash.GetForApp(mod, module.Location, exclude...)
 
 		if err != nil {
 			return err

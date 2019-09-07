@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/davidsbond/mona/internal/command"
+	"github.com/davidsbond/mona/internal/deps"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -29,7 +30,7 @@ func TestBuild(t *testing.T) {
 			defer deleteModuleFiles(t, tc.ModuleDirs...)
 			defer deleteProjectFiles(t)
 
-			if err := command.Build(pj); err != nil {
+			if err := command.Build(deps.Module{}, pj); err != nil {
 				assert.Fail(t, err.Error())
 				return
 			}

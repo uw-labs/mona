@@ -4,14 +4,15 @@ import (
 	"context"
 
 	"github.com/apex/log"
+	"github.com/davidsbond/mona/internal/deps"
 	"github.com/davidsbond/mona/internal/environment"
 	"github.com/davidsbond/mona/internal/files"
 )
 
 // Build will execute the build commands for all modules where changes
 // are detected.
-func Build(pj *files.ProjectFile) error {
-	return rangeChangedModules(pj, buildModule, changeTypeBuild)
+func Build(mod deps.Module, pj *files.ProjectFile) error {
+	return rangeChangedModules(mod, pj, buildModule, changeTypeBuild)
 }
 
 func buildModule(module *files.ModuleFile) error {

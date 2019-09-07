@@ -3,9 +3,9 @@ package cmd
 import (
 	"github.com/apex/log"
 
-	"github.com/davidsbond/mona/internal/files"
-
 	"github.com/davidsbond/mona/internal/command"
+	"github.com/davidsbond/mona/internal/deps"
+	"github.com/davidsbond/mona/internal/files"
 	"github.com/urfave/cli"
 )
 
@@ -15,8 +15,8 @@ func Diff() cli.Command {
 	return cli.Command{
 		Name:  "diff",
 		Usage: "Outputs all modules where changes are detected",
-		Action: withProject(func(ctx *cli.Context, pj *files.ProjectFile) error {
-			build, test, lint, err := command.Diff(pj)
+		Action: withModAndProject(func(ctx *cli.Context, mod deps.Module, pj *files.ProjectFile) error {
+			build, test, lint, err := command.Diff(mod, pj)
 
 			if err != nil {
 				return err

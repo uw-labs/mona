@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/davidsbond/mona/internal/command"
+	"github.com/davidsbond/mona/internal/deps"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -28,7 +29,7 @@ func TestDiff(t *testing.T) {
 			defer deleteProjectFiles(t)
 			defer deleteModuleFiles(t, tc.ModuleDirs...)
 
-			build, test, lint, err := command.Diff(pj)
+			build, test, lint, err := command.Diff(deps.Module{}, pj)
 
 			if err != nil {
 				assert.Fail(t, err.Error())
