@@ -4,32 +4,32 @@ import (
 	"context"
 
 	"github.com/apex/log"
+	"github.com/davidsbond/mona/internal/config"
 	"github.com/davidsbond/mona/internal/deps"
 	"github.com/davidsbond/mona/internal/environment"
-	"github.com/davidsbond/mona/internal/files"
 )
 
-// Test attempts to run the test command for all modules where changes
+// Test attempts to run the test command for all apps where changes
 // are detected.
-func Test(mod deps.Module, pj *files.ProjectFile) error {
-	return rangeChangedModules(mod, pj, testModule, changeTypeTest)
+func Test(mod deps.Module, pj *config.ProjectFile) error {
+	return rangeChangedApps(mod, pj, testApp, changeTypeTest)
 }
 
-func testModule(module *files.ModuleFile) error {
-	log.Infof("Testing module %s at %s", module.Name, module.Location)
+func testApp(app *config.AppFile) error {
+	log.Infof("Testing app %s at %s", app.Name, app.Location)
 
-	if module.Commands.Test.Run == "" {
+	if app.Commands.Test.Run == "" {
 		return nil
 	}
 
 	// Run command locally if no image is set
-	if module.Commands.Test.Image == "" {
-		return streamCommand(module.Commands.Test.Run, module.Location)
+	if app.Commands.Test.Image == "" {
+		return streamCommand(app.Commands.Test.Run, app.Location)
 	}
 
 	env, err := environment.NewDockerEnvironment(
-		module.Commands.Test.Image,
-		module.Location,
+		app.Commands.Test.Image,
+		app.Location,
 	)
 
 	if err != nil {
@@ -37,5 +37,5 @@ func testModule(module *files.ModuleFile) error {
 	}
 
 	ctx := context.Background()
-	return env.Execute(ctx, module.Commands.Test.Run)
+	return env.Execute(ctx, app.Commands.Test.Run)
 }

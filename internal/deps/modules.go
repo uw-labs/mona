@@ -46,9 +46,9 @@ func ParseModule(moduleFile string) (mod Module, err error) {
 			continue
 		}
 
-		if readingDeps && !strings.Contains(line, "// indirect") {
-			// We ignore indirect dependencies
+		if readingDeps {
 			line = strings.TrimSpace(line)
+			line = strings.TrimSuffix(line, "// indirect")
 			parts := strings.Split(line, " ")
 			mod.Deps[parts[0]] = parts[1]
 			// TODO: need to deal with replace and edit,

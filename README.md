@@ -5,7 +5,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/davidsbond/mona)](https://goreportcard.com/report/github.com/davidsbond/mona)
 [![Docker Pulls](https://img.shields.io/docker/pulls/davidsbond/mona.svg)](https://hub.docker.com/r/davidsbond/mona)
 
-Mona is a command-line tool for managing monorepos and is intended for use in CI pipelines. Each independent part of your repository is considered a module than can be built, tested or linted. Each module has a respective `module.yml` file with information on commands to run, artifacts to store and files to exclude when generating hashes. The `mona.yml` file is used at the root of the project. Module changes are stored in a `mona.lock` file that should be shared across your builds to ensure they're treated incrementally.
+Mona is a command-line tool for managing monorepos and is intended for use in CI pipelines. Each independent part of your repository is considered an app than can be built, tested or linted. Each app has a respective `app.yml` file with information on commands to run, artifacts to store and files to exclude when generating hashes. The `mona.yml` file is used at the root of the project. App changes are stored in a `mona.lock` file that should be shared across your builds to ensure they're treated incrementally.
 
 A typical project structure may look like this:
 
@@ -14,10 +14,10 @@ A typical project structure may look like this:
 ├── src
 │   ├── api
 │   │   ├── main.go
-│   │   └── module.yml
+│   │   └── app.yml
 │   └── ui
 │       ├── main.go
-│       └── module.yml
+│       └── app.yml
 ├── mona.lock
 └── mona.yml
 
@@ -52,58 +52,58 @@ The `mona.yml` file defines your project and is used to signify the root of the 
 ```yaml
 # mona.yml
 name: project # The name of the project
-exclude:      # File patterns to ignore across all modules
+exclude:      # File patterns to ignore across all apps
   - "*.exe"
 ```
 
-### Adding modules
+### Adding apps
 
-Each application/library in your monorepo is represented as a mona module. You can add these to your project by using the `mona add-module` command like so:
+Each application/library in your monorepo is represented as a mona app. You can add these to your project by using the `mona add-app` command like so:
 
 ```bash
-$ mona add-module apps/ui
-• Created new module ui at apps/ui
+$ mona add-app apps/ui
+• Created new app ui at apps/ui
 ```
 
-Within your new module, you'll find a `module.yml` file with several keys:
+Within your new app, you'll find a `app.yml` file with several keys:
 
 ```yaml
-# module.yml
-name: module
+# app.yml
+name: app
 commands:
   build:
-    run: "make build"                      # Command to run to build the module
+    run: "make build"                      # Command to run to build the app
     image: docker.io/library/golang:alpine # Image to execute the build command in
   test:
-    run: "make build"                      # Command to run to test the module
+    run: "make build"                      # Command to run to test the app
     image: docker.io/library/golang:alpine # Image to execute the test command in
   lint:
-    run: "make build"                      # Command to run to lint the module
+    run: "make build"                      # Command to run to lint the app
     image: docker.io/library/golang:alpine # Image to execute the lint command in
 exclude:                                   # File patterns to ignore
   - "*.txt"
 ```
 
-In here you can specify how to build/test your module. Note that this must be a single line command, so it is recommended to pass responsibility for building/testing to a `Makefile` or other script runner.
+In here you can specify how to build/test your app. Note that this must be a single line command, so it is recommended to pass responsibility for building/testing to a `Makefile` or other script runner.
 
 You can also provide file patterns to ignore from hash generation using the `exclude` key.
 
 ### Checking for changes
 
-Mona generates hashes to determine if code within respective modules has changed. You can list what has changed using the `mona diff` command:
+Mona generates hashes to determine if code within respective apps has changed. You can list what has changed using the `mona diff` command:
 
 ```bash
 $ mona diff
-• 1 module(s) to be built  
-• 1 module(s) to be tested
-• 3 module(s) to be linted
+• 1 app(s) to be built  
+• 1 app(s) to be tested
+• 3 app(s) to be linted
 ```
 
-### Building/Testing/Linting modules
+### Building/Testing/Linting apps
 
-You can build, test & lint your modified modules using the `mona build`, `mona test` & `mona lint` commands. Individual hashes are stored separately so mona will know if a module has been built, but not linted or tested etc.
+You can build, test & lint your modified apps using the `mona build`, `mona test` & `mona lint` commands. Individual hashes are stored separately so mona will know if a app has been built, but not linted or tested etc.
 
-If you provide an image for one of these commands, the module will be mounted to a docker container of your choice and execute your command from that volume's location. If the `image` key is left blank, the commands are ran on the host machine.
+If you provide an image for one of these commands, the app will be mounted to a docker container of your choice and execute your command from that volume's location. If the `image` key is left blank, the commands are ran on the host machine.
 
 The volume is created with a [bind mount](https://docs.docker.com/storage/bind-mounts/) so any build artefacts will be available on the host machine
 

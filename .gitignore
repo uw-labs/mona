@@ -8,6 +8,6 @@ dist/
 
 # Mona files
 mona
-module.yml
+app.yml
 mona.yml
 mona.lock

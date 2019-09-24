@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/davidsbond/mona/internal/command"
-	"github.com/davidsbond/mona/internal/files"
+	"github.com/davidsbond/mona/internal/config"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -31,7 +31,7 @@ func TestInit(t *testing.T) {
 			assert.FileExists(t, "mona.yml")
 			assert.FileExists(t, "mona.lock")
 
-			project, err := files.LoadProjectFile(".")
+			project, err := config.LoadProjectFile(".")
 
 			if err != nil {
 				assert.Fail(t, err.Error())
@@ -40,7 +40,7 @@ func TestInit(t *testing.T) {
 
 			assert.Equal(t, tc.ProjectName, project.Name)
 
-			lock, err := files.LoadLockFile(".")
+			lock, err := config.LoadLockFile(".")
 
 			if err != nil {
 				assert.Fail(t, err.Error())

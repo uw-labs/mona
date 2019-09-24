@@ -1,23 +1,23 @@
-package files_test
+package config_test
 
 import (
 	"os"
 	"testing"
 
-	"github.com/davidsbond/mona/internal/files"
+	"github.com/davidsbond/mona/internal/config"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestLoadModuleFile(t *testing.T) {
+func TestLoadAppFile(t *testing.T) {
 	tt := []struct {
-		Name       string
-		ModuleName string
-		Expected   *files.ModuleFile
+		Name     string
+		AppName  string
+		Expected *config.AppFile
 	}{
 		{
-			Name:       "It should load a module file",
-			ModuleName: "test",
-			Expected: &files.ModuleFile{
+			Name:    "It should load an app file",
+			AppName: "test",
+			Expected: &config.AppFile{
 				Name:     "test",
 				Location: ".",
 			},
@@ -26,12 +26,12 @@ func TestLoadModuleFile(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.Name, func(t *testing.T) {
-			if err := files.NewModuleFile(tc.ModuleName, "."); err != nil {
+			if err := config.NewAppFile(tc.AppName, "."); err != nil {
 				assert.Fail(t, err.Error())
 				return
 			}
 
-			mod, err := files.LoadModuleFile(".")
+			mod, err := config.LoadAppFile(".")
 
 			if err != nil {
 				assert.Fail(t, err.Error())
@@ -40,21 +40,21 @@ func TestLoadModuleFile(t *testing.T) {
 
 			assert.EqualValues(t, tc.Expected, mod)
 
-			if err := os.Remove("module.yml"); err != nil {
+			if err := os.Remove("app.yml"); err != nil {
 				assert.Fail(t, err.Error())
 			}
 		})
 	}
 }
 
-func TestFindModules(t *testing.T) {
+func TestFindApps(t *testing.T) {
 	tt := []struct {
-		Name    string
-		Modules map[string]string
+		Name string
+		Apps map[string]string
 	}{
 		{
-			Name: "It should find all modules",
-			Modules: map[string]string{
+			Name: "It should find all apps",
+			Apps: map[string]string{
 				"1": "./testdir/1",
 				"2": "./testdir/2",
 				"3": "./testdir/3",
@@ -64,29 +64,29 @@ func TestFindModules(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.Name, func(t *testing.T) {
-			for name, location := range tc.Modules {
+			for name, location := range tc.Apps {
 				if err := os.MkdirAll(location, os.ModePerm); err != nil {
 					assert.Fail(t, err.Error())
 					return
 				}
 
-				if err := files.NewModuleFile(name, location); err != nil {
+				if err := config.NewAppFile(name, location); err != nil {
 					assert.Fail(t, err.Error())
 					return
 				}
 			}
 
-			modules, err := files.FindModules("./testdir")
+			apps, err := config.FindApps("./testdir")
 
 			if err != nil {
 				assert.Fail(t, err.Error())
 				return
 			}
 
-			assert.Len(t, modules, len(tc.Modules))
+			assert.Len(t, apps, len(tc.Apps))
 
-			for name, location := range tc.Modules {
-				mod, err := files.LoadModuleFile(location)
+			for name, location := range tc.Apps {
+				mod, err := config.LoadAppFile(location)
 
 				if err != nil {
 					assert.Fail(t, err.Error())
@@ -103,16 +103,16 @@ func TestFindModules(t *testing.T) {
 	}
 }
 
-func TestNewModuleFile(t *testing.T) {
+func TestNewAppFile(t *testing.T) {
 	tt := []struct {
-		Name       string
-		ModuleName string
-		Expected   *files.ModuleFile
+		Name     string
+		AppName  string
+		Expected *config.AppFile
 	}{
 		{
-			Name:       "It should create a module file",
-			ModuleName: "test",
-			Expected: &files.ModuleFile{
+			Name:    "It should create an app file",
+			AppName: "test",
+			Expected: &config.AppFile{
 				Name:     "test",
 				Location: ".",
 			},
@@ -121,12 +121,12 @@ func TestNewModuleFile(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.Name, func(t *testing.T) {
-			if err := files.NewModuleFile(tc.ModuleName, "."); err != nil {
+			if err := config.NewAppFile(tc.AppName, "."); err != nil {
 				assert.Fail(t, err.Error())
 				return
 			}
 
-			mod, err := files.LoadModuleFile(".")
+			mod, err := config.LoadAppFile(".")
 
 			if err != nil {
 				assert.Fail(t, err.Error())
@@ -135,23 +135,23 @@ func TestNewModuleFile(t *testing.T) {
 
 			assert.EqualValues(t, tc.Expected, mod)
 
-			if err := os.Remove("module.yml"); err != nil {
+			if err := os.Remove("app.yml"); err != nil {
 				assert.Fail(t, err.Error())
 			}
 		})
 	}
 }
 
-func TestUpdateModuleFile(t *testing.T) {
+func TestUpdateAppFile(t *testing.T) {
 	tt := []struct {
-		Name          string
-		ModuleName    string
-		NewModuleData *files.ModuleFile
+		Name       string
+		AppName    string
+		NewAppData *config.AppFile
 	}{
 		{
-			Name:       "It should update a module file",
-			ModuleName: "test",
-			NewModuleData: &files.ModuleFile{
+			Name:    "It should update an app file",
+			AppName: "test",
+			NewAppData: &config.AppFile{
 				Name:     "test1",
 				Location: ".",
 				Exclude:  []string{"test"},
@@ -161,26 +161,26 @@ func TestUpdateModuleFile(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.Name, func(t *testing.T) {
-			if err := files.NewModuleFile(tc.ModuleName, "."); err != nil {
+			if err := config.NewAppFile(tc.AppName, "."); err != nil {
 				assert.Fail(t, err.Error())
 				return
 			}
 
-			if err := files.UpdateModuleFile(".", tc.NewModuleData); err != nil {
+			if err := config.UpdateAppFile(".", tc.NewAppData); err != nil {
 				assert.Fail(t, err.Error())
 				return
 			}
 
-			mod, err := files.LoadModuleFile(".")
+			mod, err := config.LoadAppFile(".")
 
 			if err != nil {
 				assert.Fail(t, err.Error())
 				return
 			}
 
-			assert.EqualValues(t, tc.NewModuleData, mod)
+			assert.EqualValues(t, tc.NewAppData, mod)
 
-			if err := os.Remove("module.yml"); err != nil {
+			if err := os.Remove("app.yml"); err != nil {
 				assert.Fail(t, err.Error())
 			}
 		})

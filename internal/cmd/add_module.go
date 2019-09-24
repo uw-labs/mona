@@ -7,22 +7,22 @@ import (
 
 	"github.com/apex/log"
 
-	"github.com/davidsbond/mona/internal/files"
+	"github.com/davidsbond/mona/internal/config"
 
 	"github.com/davidsbond/mona/internal/command"
 	"github.com/urfave/cli"
 )
 
-// AddModule generates a cli command that creates new mona modules within a project.
-func AddModule() cli.Command {
+// AddApp generates a cli command that creates new mona apps within a project.
+func AddApp() cli.Command {
 	cmd := cli.Command{
-		Name:      "add-module",
-		Usage:     "Initializes a new module at the provided path",
+		Name:      "add-app",
+		Usage:     "Initializes a new app at the provided path",
 		ArgsUsage: "<location>",
 		Flags: []cli.Flag{
 			cli.StringFlag{
 				Name:  "name",
-				Usage: "The name of the module, defaults to base of the module directory",
+				Usage: "The name of the app, defaults to base of the app directory",
 			},
 		},
 		// Before the command is called, check if the name provided is blank. If so, set it
@@ -40,15 +40,15 @@ func AddModule() cli.Command {
 
 			return ctx.Set("name", filepath.Base(dir))
 		},
-		Action: withProject(func(ctx *cli.Context, pj *files.ProjectFile) error {
+		Action: withProject(func(ctx *cli.Context, pj *config.ProjectFile) error {
 			name := ctx.String("name")
 			dir := ctx.Args().First()
 
-			if err := command.AddModule(pj, name, dir); err != nil {
+			if err := command.AddApp(pj, name, dir); err != nil {
 				return err
 			}
 
-			log.Infof("Created new module %s at %s", name, dir)
+			log.Infof("Created new app %s at %s", name, dir)
 			return nil
 		}),
 	}

@@ -5,18 +5,18 @@ package cmd
 import (
 	"path/filepath"
 
+	"github.com/davidsbond/mona/internal/config"
 	"github.com/davidsbond/mona/internal/deps"
-	"github.com/davidsbond/mona/internal/files"
 	"github.com/urfave/cli"
 )
 
 type (
 	// The ActionFunc type is a method that takes a CLI context and the
 	// current project as an argument and returns a single error.
-	ActionFunc func(ctx *cli.Context, p *files.ProjectFile) error
+	ActionFunc func(ctx *cli.Context, p *config.ProjectFile) error
 	// The BuildActionFunc type is same as ActionFunc, but it also takes
 	// go module config as an argument.
-	BuildActionFunc func(ctx *cli.Context, mod deps.Module, p *files.ProjectFile) error
+	BuildActionFunc func(ctx *cli.Context, mod deps.Module, p *config.ProjectFile) error
 )
 
 func withProject(fn ActionFunc) cli.ActionFunc {
@@ -46,15 +46,15 @@ func withModAndProject(fn BuildActionFunc) cli.ActionFunc {
 	}
 }
 
-func getRootAndProject(ctx *cli.Context) (root string, project *files.ProjectFile, err error) {
+func getRootAndProject(ctx *cli.Context) (root string, project *config.ProjectFile, err error) {
 	wd := ctx.GlobalString("wd")
 
-	root, err = files.GetProjectRoot(wd)
+	root, err = config.GetProjectRoot(wd)
 	if err != nil {
 		return "", nil, err
 	}
 
-	project, err = files.LoadProjectFile(root)
+	project, err = config.LoadProjectFile(root)
 
 	return root, project, err
 }

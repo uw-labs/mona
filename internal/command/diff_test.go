@@ -11,12 +11,12 @@ import (
 func TestDiff(t *testing.T) {
 	tt := []struct {
 		Name          string
-		ModuleDirs    []string
+		AppDirs       []string
 		ExpectedDiffs []string
 	}{
 		{
-			Name:          "It should detect changes in modules",
-			ModuleDirs:    []string{"test/a", "test/b"},
+			Name:          "It should detect changes in apps",
+			AppDirs:       []string{"test/a", "test/b"},
 			ExpectedDiffs: []string{"a"},
 		},
 	}
@@ -24,10 +24,10 @@ func TestDiff(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.Name, func(t *testing.T) {
 			pj := setupProject(t)
-			setupModules(t, pj, tc.ModuleDirs...)
+			setupApps(t, pj, tc.AppDirs...)
 
 			defer deleteProjectFiles(t)
-			defer deleteModuleFiles(t, tc.ModuleDirs...)
+			defer deleteAppFiles(t, tc.AppDirs...)
 
 			build, test, lint, err := command.Diff(deps.Module{}, pj)
 

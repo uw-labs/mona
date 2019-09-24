@@ -1,4 +1,4 @@
-package files
+package config
 
 import (
 	"errors"
@@ -22,15 +22,15 @@ var (
 
 type (
 	// The LockFile type represents the structure of a lock file, it stores the project name,
-	// version and the last build hashes used for each module
+	// version and the last build hashes used for each app
 	LockFile struct {
-		Name    string                    `yaml:"name"`
-		Modules map[string]*ModuleVersion `yaml:"modules,omitempty"`
+		Name string                 `yaml:"name"`
+		Apps map[string]*AppVersion `yaml:"apps,omitempty"`
 	}
 
-	// The ModuleVersion type represents individual module information as stored
+	// The AppVersion type represents individual app information as stored
 	// in the lock file.
-	ModuleVersion struct {
+	AppVersion struct {
 		BuildHash string `yaml:"build"`
 		TestHash  string `yaml:"test"`
 		LintHash  string `yaml:"lint"`
@@ -48,8 +48,8 @@ func NewLockFile(dir string, name string) error {
 	}
 
 	lock := LockFile{
-		Name:    name,
-		Modules: make(map[string]*ModuleVersion),
+		Name: name,
+		Apps: make(map[string]*AppVersion),
 	}
 
 	return multierror.Append(
@@ -102,16 +102,16 @@ func LoadLockFile(wd string) (*LockFile, error) {
 		return nil, err
 	}
 
-	if out.Modules == nil {
-		out.Modules = make(map[string]*ModuleVersion)
+	if out.Apps == nil {
+		out.Apps = make(map[string]*AppVersion)
 	}
 
 	return &out, file.Close()
 }
 
-// AddModule adds a new module entry to the lock file in the provided working directory.
-func AddModule(l *LockFile, wd, name string) error {
-	l.Modules[name] = &ModuleVersion{}
+// AddApp adds a new app entry to the lock file in the provided working directory.
+func AddApp(l *LockFile, wd, name string) error {
+	l.Apps[name] = &AppVersion{}
 
 	return UpdateLockFile(wd, l)
 }

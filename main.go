@@ -8,7 +8,7 @@ import (
 
 	"github.com/apex/log"
 	apexcli "github.com/apex/log/handlers/cli"
-	"github.com/davidsbond/mona/cmd"
+	"github.com/davidsbond/mona/internal/cmd"
 	"github.com/urfave/cli"
 )
 
@@ -24,7 +24,7 @@ func init() {
 
 func main() {
 	app := cli.NewApp()
-	app.Usage = "A monorepo management tool"
+	app.Usage = "A go monorepo management tool"
 	app.Author = "David Bond"
 	app.Email = "davidsbond93@gmail.com"
 	app.Copyright = "2019 David Bond"
@@ -33,7 +33,7 @@ func main() {
 
 	app.Commands = []cli.Command{
 		cmd.Init(),
-		cmd.AddModule(),
+		cmd.AddApp(),
 		cmd.Diff(),
 		cmd.Build(),
 		cmd.Test(),

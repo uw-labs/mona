@@ -11,12 +11,12 @@ import (
 func TestBuild(t *testing.T) {
 	tt := []struct {
 		Name              string
-		ModuleDirs        []string
+		AppDirs           []string
 		ExpectedArtifacts []string
 	}{
 		{
-			Name:              "It should build all new modules",
-			ModuleDirs:        []string{"test/a", "test/b"},
+			Name:              "It should build all new apps",
+			AppDirs:           []string{"test/a", "test/b"},
 			ExpectedArtifacts: []string{"test/a/a", "test/b/b"},
 		},
 	}
@@ -24,10 +24,10 @@ func TestBuild(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.Name, func(t *testing.T) {
 			pj := setupProject(t)
-			setupModules(t, pj, tc.ModuleDirs...)
-			setupModuleCode(t, tc.ModuleDirs...)
+			setupApps(t, pj, tc.AppDirs...)
+			setupAppCode(t, tc.AppDirs...)
 
-			defer deleteModuleFiles(t, tc.ModuleDirs...)
+			defer deleteAppFiles(t, tc.AppDirs...)
 			defer deleteProjectFiles(t)
 
 			if err := command.Build(deps.Module{}, pj); err != nil {

@@ -4,32 +4,32 @@ import (
 	"context"
 
 	"github.com/apex/log"
+	"github.com/davidsbond/mona/internal/config"
 	"github.com/davidsbond/mona/internal/deps"
 	"github.com/davidsbond/mona/internal/environment"
-	"github.com/davidsbond/mona/internal/files"
 )
 
-// Build will execute the build commands for all modules where changes
+// Build will execute the build commands for all apps where changes
 // are detected.
-func Build(mod deps.Module, pj *files.ProjectFile) error {
-	return rangeChangedModules(mod, pj, buildModule, changeTypeBuild)
+func Build(mod deps.Module, pj *config.ProjectFile) error {
+	return rangeChangedApps(mod, pj, buildApp, changeTypeBuild)
 }
 
-func buildModule(module *files.ModuleFile) error {
-	log.Infof("Building module %s at %s", module.Name, module.Location)
+func buildApp(app *config.AppFile) error {
+	log.Infof("Building app %s at %s", app.Name, app.Location)
 
-	if module.Commands.Build.Run == "" {
+	if app.Commands.Build.Run == "" {
 		return nil
 	}
 
 	// Run command locally if no image is set
-	if module.Commands.Build.Image == "" {
-		return streamCommand(module.Commands.Build.Run, module.Location)
+	if app.Commands.Build.Image == "" {
+		return streamCommand(app.Commands.Build.Run, app.Location)
 	}
 
 	env, err := environment.NewDockerEnvironment(
-		module.Commands.Build.Image,
-		module.Location,
+		app.Commands.Build.Image,
+		app.Location,
 	)
 
 	if err != nil {
@@ -37,5 +37,5 @@ func buildModule(module *files.ModuleFile) error {
 	}
 
 	ctx := context.Background()
-	return env.Execute(ctx, module.Commands.Build.Run)
+	return env.Execute(ctx, app.Commands.Build.Run)
 }

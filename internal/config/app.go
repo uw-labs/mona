@@ -1,4 +1,4 @@
-package files
+package config
 
 import (
 	"errors"
@@ -16,44 +16,44 @@ import (
 )
 
 const (
-	moduleFileName = "module.yml"
-	moduleFilePerm = 0777
+	appFileName = "app.yml"
+	appFilePerm = 0777
 )
 
 var (
-	// ErrNoModule is the error returned when a module for a requested directory
+	// ErrNoApp is the error returned when an app for a requested directory
 	// does not exist.
-	ErrNoModule = errors.New("could not find module.yml at the specified location")
+	ErrNoApp = errors.New("could not find app.yml at the specified location")
 )
 
 type (
-	// The ModuleFile type represents the data held in the "module.yml" file in each module
+	// The AppFile type represents the data held in the "app.yml" file in each app
 	// directory
-	ModuleFile struct {
-		Name     string   `yaml:"name"`              // The name of the module
+	AppFile struct {
+		Name     string   `yaml:"name"`              // The name of the app
 		Exclude  []string `yaml:"exclude,omitempty"` // File matchers to exclude files from hash generation.
-		Location string   `yaml:"-"`                 // The location of the module, not included in the module file but initialized externally for ease
+		Location string   `yaml:"-"`                 // The location of the app, not included in the app file but initialized externally for ease
 		Commands struct {
 			Build struct {
 				Run   string `yaml:"run"`   // The command to run
 				Image string `yaml:"image"` // The docker image to use
-			} `yaml:"build"` // Command for building the module
+			} `yaml:"build"` // Command for building the app
 			Test struct {
 				Run   string `yaml:"run"`   // The command to run
 				Image string `yaml:"image"` // The docker image to use
-			} `yaml:"test"` // Command for testing the module
+			} `yaml:"test"` // Command for testing the app
 			Lint struct {
 				Run   string `yaml:"run"`   // The command to run
 				Image string `yaml:"image"` // The docker image to use
-			} `yaml:"lint"` // Command for linting the module
-		} `yaml:"commands"` // Commands that can be executed against the module
+			} `yaml:"lint"` // Command for linting the app
+		} `yaml:"commands"` // Commands that can be executed against the app
 	}
 )
 
-// NewModuleFile creates a new "module.yml" file with the given name at the given
+// NewAppFile creates a new "app.yml" file with the given name at the given
 // location.
-func NewModuleFile(name, location string) error {
-	location = filepath.Join(location, moduleFileName)
+func NewAppFile(name, location string) error {
+	location = filepath.Join(location, appFileName)
 	file, err := os.Create(location)
 
 	if os.IsNotExist(err) {
@@ -64,7 +64,7 @@ func NewModuleFile(name, location string) error {
 		return err
 	}
 
-	mod := ModuleFile{
+	mod := AppFile{
 		Name: name,
 	}
 
@@ -74,12 +74,12 @@ func NewModuleFile(name, location string) error {
 		ErrorOrNil()
 }
 
-// FindModules attempts to find all "module.yml" files in subdirectories of the given
+// FindApps attempts to find all "app.yml" files in subdirectories of the given
 // path and load them into memory.
-func FindModules(dir string) (out []*ModuleFile, err error) {
-	log.Debugf("Searching for modules in %s", dir)
+func FindApps(dir string) (out []*AppFile, err error) {
+	log.Debugf("Searching for apps in %s", dir)
 
-	var moduleMux sync.Mutex
+	var appMux sync.Mutex
 	var skipMux sync.Mutex
 	var skip []string
 
@@ -101,21 +101,21 @@ func FindModules(dir string) (out []*ModuleFile, err error) {
 			return nil
 		}
 
-		if info.Name() != moduleFileName {
+		if info.Name() != appFileName {
 			return nil
 		}
 
-		module, err := LoadModuleFile(strings.TrimSuffix(path, moduleFileName))
+		app, err := LoadAppFile(strings.TrimSuffix(path, appFileName))
 
 		if err != nil {
 			return err
 		}
 
-		log.Debugf("Found module %s at %s", module.Name, module.Location)
+		log.Debugf("Found app %s at %s", app.Name, app.Location)
 
-		moduleMux.Lock()
-		out = append(out, module)
-		moduleMux.Unlock()
+		appMux.Lock()
+		out = append(out, app)
+		appMux.Unlock()
 
 		dir, _ := filepath.Split(path)
 
@@ -129,23 +129,23 @@ func FindModules(dir string) (out []*ModuleFile, err error) {
 	return
 }
 
-// LoadModuleFile attempts to load a "module.yml" file into memory from
+// LoadAppFile attempts to load a "app.yml" file into memory from
 // the given location
-func LoadModuleFile(location string) (*ModuleFile, error) {
+func LoadAppFile(location string) (*AppFile, error) {
 	file, err := os.OpenFile(
-		filepath.Join(location, moduleFileName),
+		filepath.Join(location, appFileName),
 		os.O_RDONLY,
-		moduleFilePerm)
+		appFilePerm)
 
 	if os.IsNotExist(err) {
-		return nil, ErrNoModule
+		return nil, ErrNoApp
 	}
 
 	if err != nil {
 		return nil, err
 	}
 
-	var out ModuleFile
+	var out AppFile
 
 	if err := yaml.NewDecoder(file).Decode(&out); err != nil {
 		return nil, err
@@ -155,16 +155,16 @@ func LoadModuleFile(location string) (*ModuleFile, error) {
 	return &out, file.Close()
 }
 
-// UpdateModuleFile replaces the contents of "module.yml" at the given
-// location with the module data provided.
-func UpdateModuleFile(location string, module *ModuleFile) error {
+// UpdateAppFile replaces the contents of "app.yml" at the given
+// location with the app data provided.
+func UpdateAppFile(location string, app *AppFile) error {
 	file, err := os.OpenFile(
-		filepath.Join(location, moduleFileName),
+		filepath.Join(location, appFileName),
 		os.O_WRONLY,
-		moduleFilePerm)
+		appFilePerm)
 
 	if os.IsNotExist(err) {
-		return ErrNoModule
+		return ErrNoApp
 	}
 
 	if err != nil {
@@ -172,7 +172,7 @@ func UpdateModuleFile(location string, module *ModuleFile) error {
 	}
 
 	return multierror.Append(
-		yaml.NewEncoder(file).Encode(module),
+		yaml.NewEncoder(file).Encode(app),
 		file.Close()).
 		ErrorOrNil()
 }

@@ -1,9 +1,9 @@
-package files_test
+package config_test
 
 import (
 	"testing"
 
-	"github.com/davidsbond/mona/internal/files"
+	"github.com/davidsbond/mona/internal/config"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -20,7 +20,7 @@ func TestNewLockFile(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.Name, func(t *testing.T) {
-			if err := files.NewLockFile(".", tc.ProjectName); err != nil {
+			if err := config.NewLockFile(".", tc.ProjectName); err != nil {
 				assert.Fail(t, err.Error())
 				return
 			}
@@ -28,7 +28,7 @@ func TestNewLockFile(t *testing.T) {
 			defer deleteLockFile(t)
 			assert.FileExists(t, "mona.lock")
 
-			lock, err := files.LoadLockFile(".")
+			lock, err := config.LoadLockFile(".")
 
 			if err != nil {
 				assert.Fail(t, err.Error())
@@ -55,7 +55,7 @@ func TestUpdateLockFile(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.Name, func(t *testing.T) {
-			if err := files.NewLockFile(".", tc.ProjectName); err != nil {
+			if err := config.NewLockFile(".", tc.ProjectName); err != nil {
 				assert.Fail(t, err.Error())
 				return
 			}
@@ -63,14 +63,14 @@ func TestUpdateLockFile(t *testing.T) {
 			defer deleteLockFile(t)
 			assert.FileExists(t, "mona.lock")
 
-			if err := files.UpdateLockFile(".", &files.LockFile{
+			if err := config.UpdateLockFile(".", &config.LockFile{
 				Name: tc.NewProjectName,
 			}); err != nil {
 				assert.Fail(t, err.Error())
 				return
 			}
 
-			lock, err := files.LoadLockFile(".")
+			lock, err := config.LoadLockFile(".")
 
 			if err != nil {
 				assert.Fail(t, err.Error())
@@ -96,7 +96,7 @@ func TestLoadLockFile(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.Name, func(t *testing.T) {
-			if err := files.NewLockFile(".", tc.ProjectName); err != nil {
+			if err := config.NewLockFile(".", tc.ProjectName); err != nil {
 				assert.Fail(t, err.Error())
 				return
 			}
@@ -104,7 +104,7 @@ func TestLoadLockFile(t *testing.T) {
 			defer deleteLockFile(t)
 			assert.FileExists(t, "mona.lock")
 
-			lock, err := files.LoadLockFile(".")
+			lock, err := config.LoadLockFile(".")
 
 			if err != nil {
 				assert.Fail(t, err.Error())
@@ -116,26 +116,26 @@ func TestLoadLockFile(t *testing.T) {
 	}
 }
 
-func TestAddModule(t *testing.T) {
+func TestAddApp(t *testing.T) {
 	tt := []struct {
-		Name           string
-		ProjectName    string
-		ModuleName     string
-		ModuleLocation string
-		ModuleHash     string
+		Name        string
+		ProjectName string
+		AppName     string
+		AppLocation string
+		AppHash     string
 	}{
 		{
-			Name:           "It should add a module to a lock file",
-			ProjectName:    "test",
-			ModuleName:     "test",
-			ModuleLocation: "test",
-			ModuleHash:     "1234",
+			Name:        "It should add an app to a lock file",
+			ProjectName: "test",
+			AppName:     "test",
+			AppLocation: "test",
+			AppHash:     "1234",
 		},
 	}
 
 	for _, tc := range tt {
 		t.Run(tc.Name, func(t *testing.T) {
-			if err := files.NewLockFile(".", tc.ProjectName); err != nil {
+			if err := config.NewLockFile(".", tc.ProjectName); err != nil {
 				assert.Fail(t, err.Error())
 				return
 			}
@@ -143,25 +143,25 @@ func TestAddModule(t *testing.T) {
 			defer deleteLockFile(t)
 			assert.FileExists(t, "mona.lock")
 
-			lock, err := files.LoadLockFile(".")
+			lock, err := config.LoadLockFile(".")
 
 			if err != nil {
 				assert.Fail(t, err.Error())
 				return
 			}
 
-			if err := files.AddModule(lock, ".", tc.ModuleName); err != nil {
+			if err := config.AddApp(lock, ".", tc.AppName); err != nil {
 				assert.Fail(t, err.Error())
 			}
 
-			newLock, err := files.LoadLockFile(".")
+			newLock, err := config.LoadLockFile(".")
 
 			if err != nil {
 				assert.Fail(t, err.Error())
 				return
 			}
 
-			assert.Len(t, newLock.Modules, 1)
+			assert.Len(t, newLock.Apps, 1)
 		})
 	}
 }

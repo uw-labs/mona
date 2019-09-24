@@ -26,7 +26,7 @@ type (
 
 // NewDockerEnvironment creates a new Environment implementation that will use the local
 // docker client to execute commands. All files within the 'volumeDir' will be mounted to
-// the docker image under the /module directory.
+// the docker image under the /app directory.
 func NewDockerEnvironment(image, volumeDir string) (Environment, error) {
 	cli, err := client.NewEnvClient()
 
@@ -54,7 +54,7 @@ func (d *Docker) Execute(ctx context.Context, command string) error {
 	body, err := d.cli.ContainerCreate(ctx,
 		&container.Config{
 			Image:      d.image,
-			WorkingDir: "/module",
+			WorkingDir: "/app",
 			Cmd:        strings.Split(command, " "),
 		},
 		&container.HostConfig{
@@ -62,7 +62,7 @@ func (d *Docker) Execute(ctx context.Context, command string) error {
 				{
 					Type:   mount.TypeBind,
 					Source: d.volumeDir,
-					Target: "/module",
+					Target: "/app",
 				},
 			},
 		}, nil, "")

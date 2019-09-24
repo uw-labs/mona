@@ -10,15 +10,15 @@ import (
 	"strings"
 
 	"github.com/apex/log"
+	"github.com/davidsbond/mona/internal/config"
 	"github.com/davidsbond/mona/internal/deps"
-	"github.com/davidsbond/mona/internal/files"
 	"github.com/davidsbond/mona/internal/hash"
 	"github.com/hashicorp/go-multierror"
 )
 
 type (
 	changeType int
-	rangeFn    func(*files.ModuleFile) error
+	rangeFn    func(*config.AppFile) error
 )
 
 const (
@@ -27,33 +27,33 @@ const (
 	changeTypeLint  changeType = 2
 )
 
-func getChangedModules(mod deps.Module, pj *files.ProjectFile, change changeType) ([]*files.ModuleFile, error) {
-	modules, err := files.FindModules(pj.Location)
+func getChangedApps(mod deps.Module, pj *config.ProjectFile, change changeType) ([]*config.AppFile, error) {
+	apps, err := config.FindApps(pj.Location)
 
 	if err != nil {
 		return nil, err
 	}
 
-	lock, err := files.LoadLockFile(pj.Location)
+	lock, err := config.LoadLockFile(pj.Location)
 
 	if err != nil {
 		return nil, err
 	}
 
-	var out []*files.ModuleFile
-	for _, modInfo := range modules {
-		lockInfo, ok := lock.Modules[modInfo.Name]
+	var out []*config.AppFile
+	for _, appInfo := range apps {
+		lockInfo, ok := lock.Apps[appInfo.Name]
 
 		if !ok {
-			// If the module isn't present in the lock file, it's probably
+			// If the app isn't present in the lock file, it's probably
 			// new and needs adding to the lock file.
-			out = append(out, modInfo)
+			out = append(out, appInfo)
 			continue
 		}
 
-		// GenerateString a new hash for the module directory
-		exclude := append(pj.Exclude, modInfo.Exclude...)
-		newHash, err := hash.GetForApp(mod, modInfo.Location, exclude...)
+		// GenerateString a new hash for the app directory
+		exclude := append(pj.Exclude, appInfo.Exclude...)
+		newHash, err := hash.GetForApp(mod, appInfo.Location, exclude...)
 
 		if err != nil {
 			return nil, err
@@ -71,7 +71,7 @@ func getChangedModules(mod deps.Module, pj *files.ProjectFile, change changeType
 		}
 
 		if oldHash != newHash {
-			out = append(out, modInfo)
+			out = append(out, appInfo)
 		}
 	}
 
@@ -120,43 +120,43 @@ func streamCommand(command, wd string) error {
 	return cmd.Wait()
 }
 
-func rangeChangedModules(mod deps.Module, pj *files.ProjectFile, fn rangeFn, ct changeType) error {
-	changed, err := getChangedModules(mod, pj, ct)
+func rangeChangedApps(mod deps.Module, pj *config.ProjectFile, fn rangeFn, ct changeType) error {
+	changed, err := getChangedApps(mod, pj, ct)
 
 	if err != nil || len(changed) == 0 {
 		return err
 	}
 
-	lock, err := files.LoadLockFile(pj.Location)
+	lock, err := config.LoadLockFile(pj.Location)
 
 	if err != nil {
 		return err
 	}
 
 	var errs []error
-	for _, module := range changed {
-		if err := fn(module); err != nil {
-			errs = append(errs, fmt.Errorf("module %s: %s", module.Name, err.Error()))
+	for _, app := range changed {
+		if err := fn(app); err != nil {
+			errs = append(errs, fmt.Errorf("app %s: %s", app.Name, err.Error()))
 			continue
 		}
 
-		exclude := append(pj.Exclude, module.Exclude...)
-		newHash, err := hash.GetForApp(mod, module.Location, exclude...)
+		exclude := append(pj.Exclude, app.Exclude...)
+		newHash, err := hash.GetForApp(mod, app.Location, exclude...)
 
 		if err != nil {
 			return err
 		}
 
-		lockInfo, modInLock := lock.Modules[module.Name]
+		lockInfo, modInLock := lock.Apps[app.Name]
 
 		if !modInLock {
-			log.Debugf("Detected new module %s at %s, adding to lock file", module.Name, module.Location)
+			log.Debugf("Detected new app %s at %s, adding to lock file", app.Name, app.Location)
 
-			if err := files.AddModule(lock, pj.Location, module.Name); err != nil {
+			if err := config.AddApp(lock, pj.Location, app.Name); err != nil {
 				return err
 			}
 
-			lockInfo = lock.Modules[module.Name]
+			lockInfo = lock.Apps[app.Name]
 		}
 
 		switch ct {
@@ -168,7 +168,7 @@ func rangeChangedModules(mod deps.Module, pj *files.ProjectFile, fn rangeFn, ct 
 			lockInfo.LintHash = newHash
 		}
 
-		if err := files.UpdateLockFile(pj.Location, lock); err != nil {
+		if err := config.UpdateLockFile(pj.Location, lock); err != nil {
 			return err
 		}
 	}

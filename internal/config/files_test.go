@@ -1,4 +1,4 @@
-package files_test
+package config_test
 
 import (
 	"os"

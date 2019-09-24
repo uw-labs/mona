@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/davidsbond/mona/internal/files"
+	"github.com/davidsbond/mona/internal/config"
 
 	"github.com/davidsbond/mona/internal/command"
 	"github.com/stretchr/testify/assert"
@@ -23,17 +23,17 @@ func deleteProjectFiles(t *testing.T) {
 	}
 }
 
-func deleteModuleFile(t *testing.T, location string) {
-	location = path.Join(location, "module.yml")
+func deleteAppFile(t *testing.T, location string) {
+	location = path.Join(location, "app.yml")
 	if err := os.Remove(location); err != nil {
 		assert.Fail(t, err.Error())
 	}
 
 }
 
-func deleteModuleFiles(t *testing.T, locations ...string) {
+func deleteAppFiles(t *testing.T, locations ...string) {
 	for _, location := range locations {
-		deleteModuleFile(t, location)
+		deleteAppFile(t, location)
 
 		if err := os.RemoveAll(location); err != nil {
 			assert.Fail(t, err.Error())
@@ -42,12 +42,12 @@ func deleteModuleFiles(t *testing.T, locations ...string) {
 	}
 }
 
-func setupProject(t *testing.T) *files.ProjectFile {
+func setupProject(t *testing.T) *config.ProjectFile {
 	if err := command.Init(".", "test"); err != nil {
 		assert.Fail(t, err.Error())
 	}
 
-	pj, err := files.LoadProjectFile(".")
+	pj, err := config.LoadProjectFile(".")
 
 	if err != nil {
 		assert.Fail(t, err.Error())
@@ -56,19 +56,19 @@ func setupProject(t *testing.T) *files.ProjectFile {
 	return pj
 }
 
-func setupModules(t *testing.T, pj *files.ProjectFile, locations ...string) {
+func setupApps(t *testing.T, pj *config.ProjectFile, locations ...string) {
 	for _, location := range locations {
 		if err := os.MkdirAll(location, 0777); err != nil {
 			assert.Fail(t, err.Error())
 		}
 
-		if err := command.AddModule(pj, filepath.Base(location), location); err != nil {
+		if err := command.AddApp(pj, filepath.Base(location), location); err != nil {
 			assert.Fail(t, err.Error())
 		}
 	}
 }
 
-func setupModuleCode(t *testing.T, locations ...string) {
+func setupAppCode(t *testing.T, locations ...string) {
 	for _, location := range locations {
 		src := filepath.Join(location, "main.go")
 		data := `
@@ -83,7 +83,7 @@ func setupModuleCode(t *testing.T, locations ...string) {
 			assert.Fail(t, err.Error())
 		}
 
-		mod, err := files.LoadModuleFile(location)
+		mod, err := config.LoadAppFile(location)
 
 		if err != nil {
 			assert.FailNow(t, err.Error())
@@ -92,7 +92,7 @@ func setupModuleCode(t *testing.T, locations ...string) {
 
 		mod.Commands.Build.Run = "go build"
 
-		if err := files.UpdateModuleFile(location, mod); err != nil {
+		if err := config.UpdateAppFile(location, mod); err != nil {
 			assert.Fail(t, err.Error())
 		}
 	}
