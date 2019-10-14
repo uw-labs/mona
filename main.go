@@ -25,8 +25,12 @@ func init() {
 func main() {
 	app := cli.NewApp()
 	app.Usage = "A go monorepo management tool"
-	app.Author = "David Bond"
-	app.Email = "davidsbond93@gmail.com"
+	app.Authors = []cli.Author{{
+		Name:  "David Bond",
+		Email: "davidsbond93@gmail.com",
+	}, {
+		Name: "Michal Bock",
+	}}
 	app.Copyright = "2019 David Bond"
 	app.Version = version
 	app.Compiled = time.Unix(compileTime, 0)
