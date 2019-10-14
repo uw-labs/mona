@@ -3,21 +3,13 @@
 package cmd
 
 import (
-	"path/filepath"
-
 	"github.com/davidsbond/mona/internal/config"
-	"github.com/davidsbond/mona/internal/deps"
 	"github.com/urfave/cli"
 )
 
-type (
-	// The ActionFunc type is a method that takes a CLI context and the
-	// current project as an argument and returns a single error.
-	ActionFunc func(ctx *cli.Context, p *config.ProjectFile) error
-	// The BuildActionFunc type is same as ActionFunc, but it also takes
-	// go module config as an argument.
-	BuildActionFunc func(ctx *cli.Context, mod deps.Module, p *config.ProjectFile) error
-)
+// The ActionFunc type is a method that takes a CLI context and the
+// current project as an argument and returns a single error.
+type ActionFunc func(ctx *cli.Context, p *config.ProjectFile) error
 
 func withProject(fn ActionFunc) cli.ActionFunc {
 	return func(ctx *cli.Context) error {
@@ -27,22 +19,6 @@ func withProject(fn ActionFunc) cli.ActionFunc {
 		}
 
 		return fn(ctx, project)
-	}
-}
-
-func withModAndProject(fn BuildActionFunc) cli.ActionFunc {
-	return func(ctx *cli.Context) error {
-		root, project, err := getRootAndProject(ctx)
-		if err != nil {
-			return err
-		}
-
-		mod, err := deps.ParseModule(filepath.Join(root, "go.mod"))
-		if err != nil {
-			return err
-		}
-
-		return fn(ctx, mod, project)
 	}
 }
 

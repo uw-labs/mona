@@ -2,24 +2,23 @@ package command
 
 import (
 	"github.com/davidsbond/mona/internal/config"
-	"github.com/davidsbond/mona/internal/deps"
 )
 
 // Diff outputs the names of all apps where changes are detected.
-func Diff(mod deps.Module, pj *config.ProjectFile) ([]string, []string, []string, error) {
-	build, err := getChangedApps(mod, pj, changeTypeBuild)
+func Diff(pj *config.ProjectFile) ([]string, []string, []string, error) {
+	build, err := getChangedApps(pj, changeTypeBuild)
 
 	if err != nil {
 		return nil, nil, nil, err
 	}
 
-	test, err := getChangedApps(mod, pj, changeTypeTest)
+	test, err := getChangedApps(pj, changeTypeTest)
 
 	if err != nil {
 		return nil, nil, nil, err
 	}
 
-	lint, err := getChangedApps(mod, pj, changeTypeLint)
+	lint, err := getChangedApps(pj, changeTypeLint)
 
 	if err != nil {
 		return nil, nil, nil, err

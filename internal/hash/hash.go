@@ -9,8 +9,8 @@ import (
 	"github.com/davidsbond/mona/pkg/hashdir"
 )
 
-func GetForApp(mod deps.Module, appPath string, excludes ...string) (string, error) {
-	appDeps, err := deps.GetForApp(mod, appPath)
+func GetAppDeps(mod deps.Module, appPath string, excludes ...string) (string, error) {
+	appDeps, err := deps.GetAppDeps(mod, appPath)
 	if err != nil {
 		return "", err
 	}
@@ -35,6 +35,14 @@ func GetForApp(mod deps.Module, appPath string, excludes ...string) (string, err
 		// Exclude current dependency going forward to avoid
 		// rehashing the same directory over and over.
 		excludes = append(excludes, dep)
+	}
+
+	appHash, err := hashdir.Generate(appPath, excludes...)
+	if err != nil {
+		return "", err
+	}
+	if _, err = hash.Write(appHash); err != nil {
+		return "", err
 	}
 
 	return base64.StdEncoding.EncodeToString(hash.Sum(nil)), nil

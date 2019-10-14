@@ -3,7 +3,6 @@ package cmd
 import (
 	"github.com/davidsbond/mona/internal/command"
 	"github.com/davidsbond/mona/internal/config"
-	"github.com/davidsbond/mona/internal/deps"
 	"github.com/urfave/cli"
 )
 
@@ -13,8 +12,8 @@ func Build() cli.Command {
 	return cli.Command{
 		Name:  "build",
 		Usage: "Builds any modified apps within the project",
-		Action: withModAndProject(func(ctx *cli.Context, mod deps.Module, pj *config.ProjectFile) error {
-			return command.Build(mod, pj)
+		Action: withProject(func(ctx *cli.Context, pj *config.ProjectFile) error {
+			return command.Build(pj)
 		}),
 	}
 }

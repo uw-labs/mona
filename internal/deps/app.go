@@ -7,12 +7,12 @@ import (
 	"strings"
 )
 
-type Deps struct {
+type AppDeps struct {
 	Internal []string
 	External []string
 }
 
-func GetForApp(mod Module, appPath string) (deps Deps, err error) {
+func GetAppDeps(mod Module, appPath string) (deps AppDeps, err error) {
 	cmd := exec.Command("go", "list", "-f", `'{{ join .Deps "\n" }}'`, appPath)
 	buf := &bytes.Buffer{}
 

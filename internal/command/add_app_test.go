@@ -3,8 +3,9 @@ package command_test
 import (
 	"testing"
 
+	"github.com/davidsbond/mona/internal/app"
+
 	"github.com/davidsbond/mona/internal/command"
-	"github.com/davidsbond/mona/internal/config"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -33,7 +34,7 @@ func TestAddApp(t *testing.T) {
 			}
 
 			assert.FileExists(t, "app.yml")
-			mod, err := config.LoadAppFile(tc.AppLocation)
+			mod, err := app.LoadApp(tc.AppLocation)
 
 			if err != nil {
 				assert.Fail(t, err.Error())

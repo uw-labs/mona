@@ -9,16 +9,17 @@ import (
 	"os/exec"
 	"strings"
 
+	"github.com/davidsbond/mona/internal/app"
+
 	"github.com/apex/log"
 	"github.com/davidsbond/mona/internal/config"
-	"github.com/davidsbond/mona/internal/deps"
 	"github.com/davidsbond/mona/internal/hash"
 	"github.com/hashicorp/go-multierror"
 )
 
 type (
 	changeType int
-	rangeFn    func(*config.AppFile) error
+	rangeFn    func(*app.App) error
 )
 
 const (
@@ -27,8 +28,8 @@ const (
 	changeTypeLint  changeType = 2
 )
 
-func getChangedApps(mod deps.Module, pj *config.ProjectFile, change changeType) ([]*config.AppFile, error) {
-	apps, err := config.FindApps(pj.Location)
+func getChangedApps(pj *config.ProjectFile, change changeType) ([]*app.App, error) {
+	apps, err := app.FindApps("./", pj.Mod)
 
 	if err != nil {
 		return nil, err
@@ -40,7 +41,7 @@ func getChangedApps(mod deps.Module, pj *config.ProjectFile, change changeType) 
 		return nil, err
 	}
 
-	var out []*config.AppFile
+	var out []*app.App
 	for _, appInfo := range apps {
 		lockInfo, ok := lock.Apps[appInfo.Name]
 
@@ -53,7 +54,7 @@ func getChangedApps(mod deps.Module, pj *config.ProjectFile, change changeType) 
 
 		// GenerateString a new hash for the app directory
 		exclude := append(pj.Exclude, appInfo.Exclude...)
-		newHash, err := hash.GetForApp(mod, appInfo.Location, exclude...)
+		newHash, err := hash.GetAppDeps(pj.Mod, appInfo.Location, exclude...)
 
 		if err != nil {
 			return nil, err
@@ -94,7 +95,7 @@ func streamOutputs(outputs ...io.ReadCloser) {
 	}
 }
 
-func streamCommand(command, wd string) error {
+func executeCommand(command, wd string) error {
 	parts := strings.Split(command, " ")
 	cmd := exec.Command(parts[0], parts[1:]...)
 	cmd.Dir = wd
@@ -120,8 +121,8 @@ func streamCommand(command, wd string) error {
 	return cmd.Wait()
 }
 
-func rangeChangedApps(mod deps.Module, pj *config.ProjectFile, fn rangeFn, ct changeType) error {
-	changed, err := getChangedApps(mod, pj, ct)
+func rangeChangedApps(pj *config.ProjectFile, ct changeType, fn rangeFn) error {
+	changed, err := getChangedApps(pj, ct)
 
 	if err != nil || len(changed) == 0 {
 		return err
@@ -141,7 +142,7 @@ func rangeChangedApps(mod deps.Module, pj *config.ProjectFile, fn rangeFn, ct ch
 		}
 
 		exclude := append(pj.Exclude, app.Exclude...)
-		newHash, err := hash.GetForApp(mod, app.Location, exclude...)
+		newHash, err := hash.GetAppDeps(pj.Mod, app.Location, exclude...)
 
 		if err != nil {
 			return err

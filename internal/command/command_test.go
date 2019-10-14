@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/davidsbond/mona/internal/app"
+
 	"github.com/davidsbond/mona/internal/config"
 
 	"github.com/davidsbond/mona/internal/command"
@@ -83,7 +85,7 @@ func setupAppCode(t *testing.T, locations ...string) {
 			assert.Fail(t, err.Error())
 		}
 
-		mod, err := config.LoadAppFile(location)
+		mod, err := app.LoadApp(location)
 
 		if err != nil {
 			assert.FailNow(t, err.Error())
@@ -92,7 +94,7 @@ func setupAppCode(t *testing.T, locations ...string) {
 
 		mod.Commands.Build.Run = "go build"
 
-		if err := config.UpdateAppFile(location, mod); err != nil {
+		if err := app.SaveApp(location, mod); err != nil {
 			assert.Fail(t, err.Error())
 		}
 	}

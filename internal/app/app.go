@@ -1,4 +1,4 @@
-package config
+package app
 
 import (
 	"errors"
@@ -9,10 +9,12 @@ import (
 	"sync"
 
 	"github.com/apex/log"
-
 	"github.com/hashicorp/go-multierror"
 	"github.com/iafan/cwalk"
 	"gopkg.in/yaml.v2"
+
+	"github.com/davidsbond/mona/internal/config"
+	"github.com/davidsbond/mona/internal/deps"
 )
 
 const (
@@ -27,31 +29,21 @@ var (
 )
 
 type (
-	// The AppFile type represents the data held in the "app.yml" file in each app
-	// directory
-	AppFile struct {
+	// The App a configuration for a single app that is held in the "app.yml" file.
+	App struct {
 		Name     string   `yaml:"name"`              // The name of the app
 		Exclude  []string `yaml:"exclude,omitempty"` // File matchers to exclude files from hash generation.
 		Location string   `yaml:"-"`                 // The location of the app, not included in the app file but initialized externally for ease
 		Commands struct {
-			Build struct {
-				Run   string `yaml:"run"`   // The command to run
-				Image string `yaml:"image"` // The docker image to use
-			} `yaml:"build"` // Command for building the app
-			Test struct {
-				Run   string `yaml:"run"`   // The command to run
-				Image string `yaml:"image"` // The docker image to use
-			} `yaml:"test"` // Command for testing the app
-			Lint struct {
-				Run   string `yaml:"run"`   // The command to run
-				Image string `yaml:"image"` // The docker image to use
-			} `yaml:"lint"` // Command for linting the app
+			Build config.CommandConfig // Command for building the app
+			Test  config.CommandConfig // Command for testing the app
+			Lint  config.CommandConfig // Command for linting the app
 		} `yaml:"commands"` // Commands that can be executed against the app
+		Deps deps.AppDeps `yaml:"-"`
 	}
 )
 
-// NewAppFile creates a new "app.yml" file with the given name at the given
-// location.
+// NewAppFile creates a new "app.yml" file with the given name at the given location.
 func NewAppFile(name, location string) error {
 	location = filepath.Join(location, appFileName)
 	file, err := os.Create(location)
@@ -64,19 +56,19 @@ func NewAppFile(name, location string) error {
 		return err
 	}
 
-	mod := AppFile{
+	mod := App{
 		Name: name,
 	}
 
 	return multierror.Append(
 		yaml.NewEncoder(file).Encode(mod),
-		file.Close()).
-		ErrorOrNil()
+		file.Close(),
+	).ErrorOrNil()
 }
 
 // FindApps attempts to find all "app.yml" files in subdirectories of the given
 // path and load them into memory.
-func FindApps(dir string) (out []*AppFile, err error) {
+func FindApps(dir string, mod deps.Module) (out []*App, err error) {
 	log.Debugf("Searching for apps in %s", dir)
 
 	var appMux sync.Mutex
@@ -105,8 +97,7 @@ func FindApps(dir string) (out []*AppFile, err error) {
 			return nil
 		}
 
-		app, err := LoadAppFile(strings.TrimSuffix(path, appFileName))
-
+		app, err := LoadApp(strings.TrimSuffix(path, appFileName), mod)
 		if err != nil {
 			return err
 		}
@@ -129,9 +120,9 @@ func FindApps(dir string) (out []*AppFile, err error) {
 	return
 }
 
-// LoadAppFile attempts to load a "app.yml" file into memory from
-// the given location
-func LoadAppFile(location string) (*AppFile, error) {
+// LoadApp attempts to load a "app.yml" file into memory from
+// the given location.
+func LoadApp(location string, mod deps.Module) (*App, error) {
 	file, err := os.OpenFile(
 		filepath.Join(location, appFileName),
 		os.O_RDONLY,
@@ -140,24 +131,28 @@ func LoadAppFile(location string) (*AppFile, error) {
 	if os.IsNotExist(err) {
 		return nil, ErrNoApp
 	}
-
 	if err != nil {
 		return nil, err
 	}
+	defer file.Close()
 
-	var out AppFile
-
+	var out App
 	if err := yaml.NewDecoder(file).Decode(&out); err != nil {
 		return nil, err
 	}
 
-	out.Location = location
-	return &out, file.Close()
+	out.Location = "./" + location
+	out.Deps, err = deps.GetAppDeps(mod, out.Location)
+	if err != nil {
+		return nil, err
+	}
+
+	return &out, nil
 }
 
-// UpdateAppFile replaces the contents of "app.yml" at the given
+// SaveApp replaces the contents of "app.yml" at the given
 // location with the app data provided.
-func UpdateAppFile(location string, app *AppFile) error {
+func SaveApp(location string, app *App) error {
 	file, err := os.OpenFile(
 		filepath.Join(location, appFileName),
 		os.O_WRONLY,

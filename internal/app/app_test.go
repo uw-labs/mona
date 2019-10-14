@@ -1,23 +1,24 @@
-package config_test
+package app_test
 
 import (
 	"os"
 	"testing"
 
-	"github.com/davidsbond/mona/internal/config"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/davidsbond/mona/internal/app"
 )
 
 func TestLoadAppFile(t *testing.T) {
 	tt := []struct {
 		Name     string
 		AppName  string
-		Expected *config.AppFile
+		Expected *app.App
 	}{
 		{
 			Name:    "It should load an app file",
 			AppName: "test",
-			Expected: &config.AppFile{
+			Expected: &app.App{
 				Name:     "test",
 				Location: ".",
 			},
@@ -26,12 +27,12 @@ func TestLoadAppFile(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.Name, func(t *testing.T) {
-			if err := config.NewAppFile(tc.AppName, "."); err != nil {
+			if err := app.NewAppFile(tc.AppName, "."); err != nil {
 				assert.Fail(t, err.Error())
 				return
 			}
 
-			mod, err := config.LoadAppFile(".")
+			mod, err := app.LoadApp(".")
 
 			if err != nil {
 				assert.Fail(t, err.Error())
@@ -70,13 +71,13 @@ func TestFindApps(t *testing.T) {
 					return
 				}
 
-				if err := config.NewAppFile(name, location); err != nil {
+				if err := app.NewAppFile(name, location); err != nil {
 					assert.Fail(t, err.Error())
 					return
 				}
 			}
 
-			apps, err := config.FindApps("./testdir")
+			apps, err := app.FindApps("./testdir")
 
 			if err != nil {
 				assert.Fail(t, err.Error())
@@ -86,7 +87,7 @@ func TestFindApps(t *testing.T) {
 			assert.Len(t, apps, len(tc.Apps))
 
 			for name, location := range tc.Apps {
-				mod, err := config.LoadAppFile(location)
+				mod, err := app.LoadApp(location)
 
 				if err != nil {
 					assert.Fail(t, err.Error())
@@ -107,12 +108,12 @@ func TestNewAppFile(t *testing.T) {
 	tt := []struct {
 		Name     string
 		AppName  string
-		Expected *config.AppFile
+		Expected *app.App
 	}{
 		{
 			Name:    "It should create an app file",
 			AppName: "test",
-			Expected: &config.AppFile{
+			Expected: &app.App{
 				Name:     "test",
 				Location: ".",
 			},
@@ -121,12 +122,12 @@ func TestNewAppFile(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.Name, func(t *testing.T) {
-			if err := config.NewAppFile(tc.AppName, "."); err != nil {
+			if err := app.NewAppFile(tc.AppName, "."); err != nil {
 				assert.Fail(t, err.Error())
 				return
 			}
 
-			mod, err := config.LoadAppFile(".")
+			mod, err := app.LoadApp(".")
 
 			if err != nil {
 				assert.Fail(t, err.Error())
@@ -146,12 +147,12 @@ func TestUpdateAppFile(t *testing.T) {
 	tt := []struct {
 		Name       string
 		AppName    string
-		NewAppData *config.AppFile
+		NewAppData *app.App
 	}{
 		{
 			Name:    "It should update an app file",
 			AppName: "test",
-			NewAppData: &config.AppFile{
+			NewAppData: &app.App{
 				Name:     "test1",
 				Location: ".",
 				Exclude:  []string{"test"},
@@ -161,17 +162,17 @@ func TestUpdateAppFile(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.Name, func(t *testing.T) {
-			if err := config.NewAppFile(tc.AppName, "."); err != nil {
+			if err := app.NewAppFile(tc.AppName, "."); err != nil {
 				assert.Fail(t, err.Error())
 				return
 			}
 
-			if err := config.UpdateAppFile(".", tc.NewAppData); err != nil {
+			if err := app.SaveApp(".", tc.NewAppData); err != nil {
 				assert.Fail(t, err.Error())
 				return
 			}
 
-			mod, err := config.LoadAppFile(".")
+			mod, err := app.LoadApp(".")
 
 			if err != nil {
 				assert.Fail(t, err.Error())

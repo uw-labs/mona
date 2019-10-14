@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/davidsbond/mona/internal/deps"
+
 	"github.com/apex/log"
 
 	"github.com/hashicorp/go-multierror"
@@ -27,9 +29,11 @@ var (
 type (
 	// The ProjectFile type represents the structure of the "mona.yml" file.
 	ProjectFile struct {
-		Name     string   `yaml:"name"`              // The name of the project
-		Exclude  []string `yaml:"exclude,omitempty"` // Global file patterns to ignore during hash generation
-		Location string   `yaml:"-"`                 // The root project directory, not set in the yaml file but set on load for convenience
+		Name     string      `yaml:"name"`              // The name of the project
+		Exclude  []string    `yaml:"exclude,omitempty"` // Global file patterns to ignore during hash generation
+		Location string      `yaml:"-"`                 // The root project directory, not set in the yaml file but set on load for convenience
+		BinDir   string      `yaml:"binDir"`            // Relative path from the root of the project to the directory where compiled binaries will be placed.
+		Mod      deps.Module `yaml:"-"`
 	}
 )
 
@@ -44,7 +48,8 @@ func NewProjectFile(dir string, name string) error {
 	}
 
 	pj := ProjectFile{
-		Name: name,
+		Name:   name,
+		BinDir: "bin",
 	}
 
 	return multierror.Append(
@@ -64,19 +69,23 @@ func LoadProjectFile(wd string) (*ProjectFile, error) {
 	if os.IsNotExist(err) {
 		return nil, ErrNoProject
 	}
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
 
+	var out ProjectFile
+	if err := yaml.NewDecoder(file).Decode(&out); err != nil {
+		return nil, err
+	}
+	out.Location = wd
+
+	out.Mod, err = deps.ParseModule(filepath.Join(wd, "go.mod"))
 	if err != nil {
 		return nil, err
 	}
 
-	var out ProjectFile
-
-	if err := yaml.NewDecoder(file).Decode(&out); err != nil {
-		return nil, err
-	}
-
-	out.Location = wd
-	return &out, file.Close()
+	return &out, nil
 }
 
 // GetProjectRoot attempts to locate the root of the mona project based on the provided

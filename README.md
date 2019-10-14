@@ -5,6 +5,14 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/davidsbond/mona)](https://goreportcard.com/report/github.com/davidsbond/mona)
 [![Docker Pulls](https://img.shields.io/docker/pulls/davidsbond/mona.svg)](https://hub.docker.com/r/davidsbond/mona)
 
+
+# TODO
+- add command to run all 3 jobs
+- create mona.lock file as necessary
+- merge cmd and command packages
+- cleanup code structure
+- fix tests and linter errors
+
 Mona is a command-line tool for managing monorepos and is intended for use in CI pipelines. Each independent part of your repository is considered an app than can be built, tested or linted. Each app has a respective `app.yml` file with information on commands to run, artifacts to store and files to exclude when generating hashes. The `mona.yml` file is used at the root of the project. App changes are stored in a `mona.lock` file that should be shared across your builds to ensure they're treated incrementally.
 
 A typical project structure may look like this:
