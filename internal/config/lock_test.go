@@ -28,14 +28,12 @@ func TestNewLockFile(t *testing.T) {
 			defer deleteLockFile(t)
 			assert.FileExists(t, "mona.lock")
 
-			lock, err := config.LoadLockFile(".")
+			_, err := config.LoadLockFile(".")
 
 			if err != nil {
 				assert.Fail(t, err.Error())
 				return
 			}
-
-			assert.Equal(t, tc.ProjectName, lock.Name)
 		})
 	}
 }
@@ -63,21 +61,17 @@ func TestUpdateLockFile(t *testing.T) {
 			defer deleteLockFile(t)
 			assert.FileExists(t, "mona.lock")
 
-			if err := config.UpdateLockFile(".", &config.LockFile{
-				Name: tc.NewProjectName,
-			}); err != nil {
+			if err := config.UpdateLockFile(".", &config.LockFile{}); err != nil {
 				assert.Fail(t, err.Error())
 				return
 			}
 
-			lock, err := config.LoadLockFile(".")
+			_, err := config.LoadLockFile(".")
 
 			if err != nil {
 				assert.Fail(t, err.Error())
 				return
 			}
-
-			assert.Equal(t, tc.NewProjectName, lock.Name)
 		})
 	}
 
@@ -104,14 +98,12 @@ func TestLoadLockFile(t *testing.T) {
 			defer deleteLockFile(t)
 			assert.FileExists(t, "mona.lock")
 
-			lock, err := config.LoadLockFile(".")
+			_, err := config.LoadLockFile(".")
 
 			if err != nil {
 				assert.Fail(t, err.Error())
 				return
 			}
-
-			assert.Equal(t, tc.ProjectName, lock.Name)
 		})
 	}
 }

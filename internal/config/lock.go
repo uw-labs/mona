@@ -1,7 +1,6 @@
 package config
 
 import (
-	"errors"
 	"os"
 	"path/filepath"
 
@@ -14,17 +13,10 @@ const (
 	lockFilePerm = 0644
 )
 
-var (
-	// ErrNoLock is the error returned when no lock file is present in the current
-	// working directory.
-	ErrNoLock = errors.New(`no "mona.lock" file in current wd`)
-)
-
 type (
 	// The LockFile type represents the structure of a lock file, it stores the project name,
 	// version and the last build hashes used for each app
 	LockFile struct {
-		Name string                 `yaml:"name"`
 		Apps map[string]*AppVersion `yaml:"apps,omitempty"`
 	}
 
@@ -48,7 +40,6 @@ func NewLockFile(dir string, name string) error {
 	}
 
 	lock := LockFile{
-		Name: name,
 		Apps: make(map[string]*AppVersion),
 	}
 
@@ -63,12 +54,8 @@ func NewLockFile(dir string, name string) error {
 func UpdateLockFile(wd string, lock *LockFile) error {
 	file, err := os.OpenFile(
 		filepath.Join(wd, lockFileName),
-		os.O_WRONLY,
+		os.O_CREATE|os.O_WRONLY,
 		lockFilePerm)
-
-	if os.IsNotExist(err) {
-		return ErrNoLock
-	}
 
 	if err != nil {
 		return err
@@ -89,7 +76,9 @@ func LoadLockFile(wd string) (*LockFile, error) {
 		lockFilePerm)
 
 	if os.IsNotExist(err) {
-		return nil, ErrNoLock
+		return &LockFile{
+			Apps: make(map[string]*AppVersion),
+		}, nil
 	}
 
 	if err != nil {

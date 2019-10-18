@@ -8,7 +8,6 @@
 
 # TODO
 - add command to run all 3 jobs
-- create mona.lock file as necessary
 - merge cmd and command packages
 - cleanup code structure
 - fix tests and linter errors
