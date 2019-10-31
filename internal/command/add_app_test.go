@@ -3,10 +3,10 @@ package command_test
 import (
 	"testing"
 
-	"github.com/davidsbond/mona/internal/app"
-
-	"github.com/davidsbond/mona/internal/command"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/davidsbond/mona/internal/app"
+	"github.com/davidsbond/mona/internal/command"
 )
 
 func TestAddApp(t *testing.T) {

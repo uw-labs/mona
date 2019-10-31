@@ -23,10 +23,11 @@ func (app *App) Lint(checked map[string]bool) error {
 	flags := append([]string{"run"}, app.Commands.Lint.Flags...)
 	flags = append(flags, app.Location)
 
+	checking := make([]string, 0)
 	for _, dep := range app.Deps.Internal {
 		if !checked[dep] {
 			flags = append(flags, "./"+dep)
-			checked[dep] = true
+			checking = append(checking, dep)
 		}
 	}
 
@@ -34,13 +35,21 @@ func (app *App) Lint(checked map[string]bool) error {
 	cmd.Env = append(os.Environ(), app.Commands.Lint.EnvToList()...)
 	log.Info(cmd.String())
 
-	return executeCommand(cmd)
+	if err := executeCommand(cmd); err != nil {
+		return err
+	}
+
+	for _, dep := range checking {
+		checked[dep] = true
+	}
+	return nil
 }
 
 func (app *App) Test(checked map[string]bool) error {
 	flags := append([]string{"test"}, app.Commands.Test.Flags...)
 	flags = append(flags, app.Location)
 
+	checking := make([]string, 0)
 	for _, dep := range app.Deps.Internal {
 		if !checked[dep] {
 			flags = append(flags, "./"+dep)
@@ -52,5 +61,12 @@ func (app *App) Test(checked map[string]bool) error {
 	cmd.Env = append(os.Environ(), app.Commands.Test.EnvToList()...)
 	log.Info(cmd.String())
 
-	return executeCommand(cmd)
+	if err := executeCommand(cmd); err != nil {
+		return err
+	}
+
+	for _, dep := range checking {
+		checked[dep] = true
+	}
+	return nil
 }

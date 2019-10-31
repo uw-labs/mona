@@ -3,173 +3,133 @@
 package command
 
 import (
-	"bufio"
 	"fmt"
-	"io"
-	"os/exec"
-	"strings"
-
-	"github.com/davidsbond/mona/internal/app"
 
 	"github.com/apex/log"
+	"github.com/hashicorp/go-multierror"
+
+	"github.com/davidsbond/mona/internal/app"
 	"github.com/davidsbond/mona/internal/config"
 	"github.com/davidsbond/mona/internal/hash"
-	"github.com/hashicorp/go-multierror"
 )
+
+type Config struct {
+	Project  *config.Project
+	FailFast bool
+}
 
 type (
 	changeType int
-	rangeFn    func(*app.App) error
+	rangeFn    func(*app.App, map[changeType]bool) error
+	changedApp struct {
+		app         *app.App
+		newHash     string
+		changeTypes map[changeType]bool
+	}
 )
 
 const (
-	changeTypeBuild changeType = 0
-	changeTypeTest  changeType = 1
-	changeTypeLint  changeType = 2
+	changeTypeLint changeType = iota
+	changeTypeTest
+	changeTypeBuild
 )
 
-func getChangedApps(pj *config.Project, change changeType) ([]*app.App, error) {
+func getLockAndChangedApps(pj *config.Project) (lock *config.LockFile, out []changedApp, err error) {
 	apps, err := app.FindApps("./", pj.Mod)
-
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	lock, err := config.LoadLockFile(pj.Location)
-
+	lock, err = config.LoadLockFile(pj.Location)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	var out []*app.App
 	for _, appInfo := range apps {
-		lockInfo, ok := lock.Apps[appInfo.Name]
-
-		if !ok {
-			// If the app isn't present in the lock file, it's probably
-			// new and needs adding to the lock file.
-			out = append(out, appInfo)
-			continue
-		}
+		lockInfo := lock.Apps[appInfo.Name]
 
 		// GenerateString a new hash for the app directory
 		exclude := append(pj.Exclude, appInfo.Exclude...)
 		newHash, err := hash.GetAppDeps(pj.Mod, appInfo.Location, exclude...)
-
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 
-		// Check if we need to build/lint/test
-		var oldHash string
-		switch change {
-		case changeTypeBuild:
-			oldHash = lockInfo.BuildHash
-		case changeTypeTest:
-			oldHash = lockInfo.TestHash
-		case changeTypeLint:
-			oldHash = lockInfo.LintHash
+		changes := make(map[changeType]bool, 3)
+
+		if lockInfo.LintHash != newHash {
+			changes[changeTypeLint] = true
 		}
-
-		if oldHash != newHash {
-			out = append(out, appInfo)
+		if lockInfo.TestHash != newHash {
+			changes[changeTypeTest] = true
+		}
+		if lockInfo.BuildHash != newHash {
+			changes[changeTypeBuild] = true
+		}
+		if len(changes) != 0 {
+			out = append(out, changedApp{
+				app:         appInfo,
+				newHash:     newHash,
+				changeTypes: changes,
+			})
 		}
 	}
 
-	return out, nil
+	return lock, out, nil
 }
 
-func streamOutputs(outputs ...io.ReadCloser) {
-	for _, output := range outputs {
-		go func(o io.ReadCloser) {
-			defer o.Close()
-
-			scanner := bufio.NewScanner(o)
-			scanner.Split(bufio.ScanLines)
-
-			for scanner.Scan() {
-				m := scanner.Text()
-				fmt.Println(m)
-			}
-		}(output)
-	}
-}
-
-func executeCommand(command, wd string) error {
-	parts := strings.Split(command, " ")
-	cmd := exec.Command(parts[0], parts[1:]...)
-	cmd.Dir = wd
-
-	stdout, err := cmd.StdoutPipe()
-
-	if err != nil {
-		return err
-	}
-
-	stderr, err := cmd.StderrPipe()
-
-	if err != nil {
-		return err
-	}
-
-	streamOutputs(stdout, stderr)
-
-	if err := cmd.Start(); err != nil {
-		return err
-	}
-
-	return cmd.Wait()
-}
-
-func rangeChangedApps(pj *config.Project, ct changeType, fn rangeFn) error {
-	changed, err := getChangedApps(pj, ct)
+func rangeChangedApps(cfg Config, cts []changeType, fn rangeFn) error {
+	lock, changed, err := getLockAndChangedApps(cfg.Project)
 
 	if err != nil || len(changed) == 0 {
 		return err
 	}
 
-	lock, err := config.LoadLockFile(pj.Location)
-
-	if err != nil {
-		return err
-	}
-
 	var errs []error
-	for _, app := range changed {
-		if err := fn(app); err != nil {
-			errs = append(errs, fmt.Errorf("app %s: %s", app.Name, err.Error()))
+	for _, change := range changed {
+		if len(cts) == 1 && !change.changeTypes[cts[0]] {
+			continue
+		}
+		if err := fn(change.app, change.changeTypes); err != nil {
+			errs = append(errs, fmt.Errorf("app %s: %s", change.app.Name, err.Error()))
+
+			if cfg.FailFast {
+				return errs[0]
+			}
 			continue
 		}
 
-		exclude := append(pj.Exclude, app.Exclude...)
-		newHash, err := hash.GetAppDeps(pj.Mod, app.Location, exclude...)
+		exclude := append(cfg.Project.Exclude, change.app.Exclude...)
+		newHash, err := hash.GetAppDeps(cfg.Project.Mod, change.app.Location, exclude...)
 
 		if err != nil {
 			return err
 		}
 
-		lockInfo, modInLock := lock.Apps[app.Name]
+		lockInfo, modInLock := lock.Apps[change.app.Name]
 
 		if !modInLock {
-			log.Debugf("Detected new app %s at %s, adding to lock file", app.Name, app.Location)
+			log.Debugf("Detected new appInfo %s at %s, adding to lock file", change.app.Name, change.app.Location)
 
-			if err := config.AddApp(lock, pj.Location, app.Name); err != nil {
+			if err := config.AddApp(lock, cfg.Project.Location, change.app.Name); err != nil {
 				return err
 			}
 
-			lockInfo = lock.Apps[app.Name]
+			lockInfo = lock.Apps[change.app.Name]
 		}
 
-		switch ct {
-		case changeTypeBuild:
-			lockInfo.BuildHash = newHash
-		case changeTypeTest:
-			lockInfo.TestHash = newHash
-		case changeTypeLint:
-			lockInfo.LintHash = newHash
+		for _, ct := range cts {
+			switch ct {
+			case changeTypeLint:
+				lockInfo.LintHash = newHash
+			case changeTypeTest:
+				lockInfo.TestHash = newHash
+			case changeTypeBuild:
+				lockInfo.BuildHash = newHash
+			}
 		}
 
-		if err := config.UpdateLockFile(pj.Location, lock); err != nil {
+		if err := config.UpdateLockFile(cfg.Project.Location, lock); err != nil {
 			return err
 		}
 	}

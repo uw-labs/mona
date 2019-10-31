@@ -8,8 +8,9 @@ import (
 
 	"github.com/apex/log"
 	apexcli "github.com/apex/log/handlers/cli"
-	"github.com/davidsbond/mona/internal/cmd"
 	"github.com/urfave/cli"
+
+	"github.com/davidsbond/mona/internal/cmd"
 )
 
 var (
@@ -39,6 +40,7 @@ func main() {
 		cmd.Init(),
 		cmd.AddApp(),
 		cmd.Diff(),
+		cmd.Run(),
 		cmd.Build(),
 		cmd.Test(),
 		cmd.Lint(),
@@ -51,8 +53,14 @@ func main() {
 			Usage:  "Flag that contains the current working directory",
 		},
 		cli.BoolFlag{
-			Name:  "verbose",
-			Usage: "If set, enables verbose logging output",
+			Name:   "fail-fast",
+			Usage:  "If set, causes a command to terminate after encountering first error",
+			EnvVar: "MONA_FAIL_FAST",
+		},
+		cli.BoolFlag{
+			Name:   "verbose",
+			Usage:  "If set, enables verbose logging output",
+			EnvVar: "MONA_VERBOSE",
 		},
 	}
 

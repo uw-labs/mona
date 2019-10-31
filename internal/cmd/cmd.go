@@ -3,34 +3,33 @@
 package cmd
 
 import (
-	"github.com/davidsbond/mona/internal/config"
 	"github.com/urfave/cli"
+
+	"github.com/davidsbond/mona/internal/command"
+	"github.com/davidsbond/mona/internal/config"
 )
 
 // The ActionFunc type is a method that takes a CLI context and the
 // current project as an argument and returns a single error.
-type ActionFunc func(ctx *cli.Context, p *config.Project) error
+type ActionFunc func(ctx *cli.Context, cfg command.Config) error
 
 func withProject(fn ActionFunc) cli.ActionFunc {
 	return func(ctx *cli.Context) error {
-		_, project, err := getRootAndProject(ctx)
+		wd := ctx.GlobalString("wd")
+
+		root, err := config.GetProjectRoot(wd)
 		if err != nil {
 			return err
 		}
 
-		return fn(ctx, project)
+		project, err := config.LoadProject(root)
+		if err != nil {
+			return err
+		}
+
+		return fn(ctx, command.Config{
+			Project:  project,
+			FailFast: ctx.GlobalBool("fail-fast"),
+		})
 	}
-}
-
-func getRootAndProject(ctx *cli.Context) (root string, project *config.Project, err error) {
-	wd := ctx.GlobalString("wd")
-
-	root, err = config.GetProjectRoot(wd)
-	if err != nil {
-		return "", nil, err
-	}
-
-	project, err = config.LoadProject(root)
-
-	return root, project, err
 }

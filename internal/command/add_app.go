@@ -5,7 +5,6 @@ import (
 	"path/filepath"
 
 	"github.com/davidsbond/mona/internal/app"
-
 	"github.com/davidsbond/mona/internal/config"
 )
 

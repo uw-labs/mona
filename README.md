@@ -11,8 +11,6 @@
 - check that -o flag is not set for build
 - add command to list all apps
 - add flag to force running any command
-- add command to run all 3 jobs
-- merge cmd and command packages
 - cleanup code structure
 - fix tests and linter errors
 

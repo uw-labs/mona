@@ -7,12 +7,11 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/davidsbond/mona/internal/app"
-
-	"github.com/davidsbond/mona/internal/config"
-
-	"github.com/davidsbond/mona/internal/command"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/davidsbond/mona/internal/app"
+	"github.com/davidsbond/mona/internal/command"
+	"github.com/davidsbond/mona/internal/config"
 )
 
 func deleteProjectFiles(t *testing.T) {

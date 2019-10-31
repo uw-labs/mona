@@ -5,39 +5,23 @@ import (
 )
 
 // Diff outputs the names of all apps where changes are detected.
-func Diff(pj *config.Project) ([]string, []string, []string, error) {
-	build, err := getChangedApps(pj, changeTypeBuild)
-
+func Diff(pj *config.Project) (lint []string, test []string, build []string, err error) {
+	_, changes, err := getLockAndChangedApps(pj)
 	if err != nil {
 		return nil, nil, nil, err
 	}
 
-	test, err := getChangedApps(pj, changeTypeTest)
-
-	if err != nil {
-		return nil, nil, nil, err
+	for _, change := range changes {
+		if change.changeTypes[changeTypeLint] {
+			lint = append(lint, change.app.Name)
+		}
+		if change.changeTypes[changeTypeTest] {
+			test = append(test, change.app.Name)
+		}
+		if change.changeTypes[changeTypeBuild] {
+			build = append(build, change.app.Name)
+		}
 	}
 
-	lint, err := getChangedApps(pj, changeTypeLint)
-
-	if err != nil {
-		return nil, nil, nil, err
-	}
-
-	var buildNames []string
-	for _, app := range build {
-		buildNames = append(buildNames, app.Name)
-	}
-
-	var testNames []string
-	for _, app := range test {
-		testNames = append(testNames, app.Name)
-	}
-
-	var lintNames []string
-	for _, app := range lint {
-		lintNames = append(lintNames, app.Name)
-	}
-
-	return buildNames, testNames, lintNames, nil
+	return lint, test, build, nil
 }

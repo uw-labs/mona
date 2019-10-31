@@ -5,9 +5,9 @@ import (
 	"sort"
 
 	"github.com/apex/log"
+	"github.com/urfave/cli"
 
 	"github.com/davidsbond/mona/internal/command"
-	"github.com/urfave/cli"
 )
 
 // Init generates a cli command for initializing new mona projects.

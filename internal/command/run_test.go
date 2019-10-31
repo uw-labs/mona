@@ -3,9 +3,10 @@ package command_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/davidsbond/mona/internal/command"
 	"github.com/davidsbond/mona/internal/deps"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestBuild(t *testing.T) {
