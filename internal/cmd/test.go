@@ -11,7 +11,7 @@ func Test() cli.Command {
 	return cli.Command{
 		Name:  "test",
 		Usage: "Runs tests for all apps that have been created/changed since the last test run",
-		Action: withProject(func(ctx *cli.Context, pj *config.ProjectFile) error {
+		Action: withProject(func(ctx *cli.Context, pj *config.Project) error {
 			return command.Test(pj)
 		}),
 	}

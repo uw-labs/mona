@@ -44,12 +44,12 @@ func deleteAppFiles(t *testing.T, locations ...string) {
 	}
 }
 
-func setupProject(t *testing.T) *config.ProjectFile {
+func setupProject(t *testing.T) *config.Project {
 	if err := command.Init(".", "test"); err != nil {
 		assert.Fail(t, err.Error())
 	}
 
-	pj, err := config.LoadProjectFile(".")
+	pj, err := config.LoadProject(".")
 
 	if err != nil {
 		assert.Fail(t, err.Error())
@@ -58,7 +58,7 @@ func setupProject(t *testing.T) *config.ProjectFile {
 	return pj
 }
 
-func setupApps(t *testing.T, pj *config.ProjectFile, locations ...string) {
+func setupApps(t *testing.T, pj *config.Project, locations ...string) {
 	for _, location := range locations {
 		if err := os.MkdirAll(location, 0777); err != nil {
 			assert.Fail(t, err.Error())

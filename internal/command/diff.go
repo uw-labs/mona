@@ -5,7 +5,7 @@ import (
 )
 
 // Diff outputs the names of all apps where changes are detected.
-func Diff(pj *config.ProjectFile) ([]string, []string, []string, error) {
+func Diff(pj *config.Project) ([]string, []string, []string, error) {
 	build, err := getChangedApps(pj, changeTypeBuild)
 
 	if err != nil {

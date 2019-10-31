@@ -14,7 +14,7 @@ func Diff() cli.Command {
 	return cli.Command{
 		Name:  "diff",
 		Usage: "Outputs all apps where changes are detected",
-		Action: withProject(func(ctx *cli.Context, pj *config.ProjectFile) error {
+		Action: withProject(func(ctx *cli.Context, pj *config.Project) error {
 			build, test, lint, err := command.Diff(pj)
 
 			if err != nil {

@@ -31,7 +31,7 @@ func TestInit(t *testing.T) {
 			assert.FileExists(t, "mona.yml")
 			assert.FileExists(t, "mona.lock")
 
-			project, err := config.LoadProjectFile(".")
+			project, err := config.LoadProject(".")
 
 			if err != nil {
 				assert.Fail(t, err.Error())

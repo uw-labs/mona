@@ -9,7 +9,7 @@ import (
 
 // The ActionFunc type is a method that takes a CLI context and the
 // current project as an argument and returns a single error.
-type ActionFunc func(ctx *cli.Context, p *config.ProjectFile) error
+type ActionFunc func(ctx *cli.Context, p *config.Project) error
 
 func withProject(fn ActionFunc) cli.ActionFunc {
 	return func(ctx *cli.Context) error {
@@ -22,7 +22,7 @@ func withProject(fn ActionFunc) cli.ActionFunc {
 	}
 }
 
-func getRootAndProject(ctx *cli.Context) (root string, project *config.ProjectFile, err error) {
+func getRootAndProject(ctx *cli.Context) (root string, project *config.Project, err error) {
 	wd := ctx.GlobalString("wd")
 
 	root, err = config.GetProjectRoot(wd)
@@ -30,7 +30,7 @@ func getRootAndProject(ctx *cli.Context) (root string, project *config.ProjectFi
 		return "", nil, err
 	}
 
-	project, err = config.LoadProjectFile(root)
+	project, err = config.LoadProject(root)
 
 	return root, project, err
 }

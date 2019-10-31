@@ -12,7 +12,7 @@ func Build() cli.Command {
 	return cli.Command{
 		Name:  "build",
 		Usage: "Builds any modified apps within the project",
-		Action: withProject(func(ctx *cli.Context, pj *config.ProjectFile) error {
+		Action: withProject(func(ctx *cli.Context, pj *config.Project) error {
 			return command.Build(pj)
 		}),
 	}

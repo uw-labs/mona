@@ -11,7 +11,7 @@ func Lint() cli.Command {
 	return cli.Command{
 		Name:  "lint",
 		Usage: "Lints any new/modified apps",
-		Action: withProject(func(ctx *cli.Context, pj *config.ProjectFile) error {
+		Action: withProject(func(ctx *cli.Context, pj *config.Project) error {
 			return command.Lint(pj)
 		}),
 	}

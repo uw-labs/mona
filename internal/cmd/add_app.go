@@ -40,7 +40,7 @@ func AddApp() cli.Command {
 
 			return ctx.Set("name", filepath.Base(dir))
 		},
-		Action: withProject(func(ctx *cli.Context, pj *config.ProjectFile) error {
+		Action: withProject(func(ctx *cli.Context, pj *config.Project) error {
 			name := ctx.String("name")
 			dir := ctx.Args().First()
 

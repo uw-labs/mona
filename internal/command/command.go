@@ -28,7 +28,7 @@ const (
 	changeTypeLint  changeType = 2
 )
 
-func getChangedApps(pj *config.ProjectFile, change changeType) ([]*app.App, error) {
+func getChangedApps(pj *config.Project, change changeType) ([]*app.App, error) {
 	apps, err := app.FindApps("./", pj.Mod)
 
 	if err != nil {
@@ -121,7 +121,7 @@ func executeCommand(command, wd string) error {
 	return cmd.Wait()
 }
 
-func rangeChangedApps(pj *config.ProjectFile, ct changeType, fn rangeFn) error {
+func rangeChangedApps(pj *config.Project, ct changeType, fn rangeFn) error {
 	changed, err := getChangedApps(pj, ct)
 
 	if err != nil || len(changed) == 0 {

@@ -16,6 +16,7 @@ import (
 )
 
 const (
+	goModFileName   = "go.mod"
 	projectFileName = "mona.yml"
 	projectFilePerm = 0777
 )
@@ -24,11 +25,14 @@ var (
 	// ErrNoProject is the error returned when a project file is not
 	// found in the current directory
 	ErrNoProject = errors.New("failed to find project file in current path")
+	// ErrNoGoModFile is an error signifying that a directory where
+	// the user wants to initialise a project doesn't contain go.mod file.
+	ErrNoGoModFile = errors.New("no go.mod file, run 'go mod init' first")
 )
 
 type (
-	// The ProjectFile type represents the structure of the "mona.yml" file.
-	ProjectFile struct {
+	// Project type represents the structure of the "mona.yml" file.
+	Project struct {
 		Name     string      `yaml:"name"`              // The name of the project
 		Exclude  []string    `yaml:"exclude,omitempty"` // Global file patterns to ignore during hash generation
 		Location string      `yaml:"-"`                 // The root project directory, not set in the yaml file but set on load for convenience
@@ -37,9 +41,14 @@ type (
 	}
 )
 
-// NewProjectFile creates a new "mona.yml" file in the provided directory with the given
-// name.
-func NewProjectFile(dir string, name string) error {
+// NewProject creates a new "mona.yml" file in the provided directory with the given name.
+func NewProject(dir string, name string) error {
+	if _, err := os.Stat(filepath.Join(dir, goModFileName)); err != nil {
+		if os.IsNotExist(err) {
+			return ErrNoGoModFile
+		}
+		return err
+	}
 	location := filepath.Join(dir, projectFileName)
 	file, err := os.Create(location)
 
@@ -47,7 +56,7 @@ func NewProjectFile(dir string, name string) error {
 		return err
 	}
 
-	pj := ProjectFile{
+	pj := Project{
 		Name:   name,
 		BinDir: "bin",
 	}
@@ -58,9 +67,9 @@ func NewProjectFile(dir string, name string) error {
 		ErrorOrNil()
 }
 
-// LoadProjectFile attempts to read a "mona.yml" file into memory from the provided
+// LoadProject attempts to read a "mona.yml" file into memory from the provided
 // working directory
-func LoadProjectFile(wd string) (*ProjectFile, error) {
+func LoadProject(wd string) (*Project, error) {
 	file, err := os.OpenFile(
 		filepath.Join(wd, projectFileName),
 		os.O_RDONLY,
@@ -74,7 +83,7 @@ func LoadProjectFile(wd string) (*ProjectFile, error) {
 	}
 	defer file.Close()
 
-	var out ProjectFile
+	var out Project
 	if err := yaml.NewDecoder(file).Decode(&out); err != nil {
 		return nil, err
 	}

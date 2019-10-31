@@ -9,7 +9,7 @@ import (
 
 // Test attempts to run the test command for all apps where changes
 // are detected.
-func Test(pj *config.ProjectFile) error {
+func Test(pj *config.Project) error {
 	checked := make(map[string]bool)
 
 	return rangeChangedApps(pj, changeTypeTest, func(app *app.App) error {

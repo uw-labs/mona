@@ -10,7 +10,7 @@ import (
 )
 
 // AddApp creates a new "app.yaml" file in the specified directory
-func AddApp(pj *config.ProjectFile, name, location string) error {
+func AddApp(pj *config.Project, name, location string) error {
 	apps, err := app.FindApps(pj.Location, pj.Mod)
 
 	if err != nil {

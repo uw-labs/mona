@@ -9,7 +9,7 @@ import (
 
 // Lint iterates over all new/modified apps and executes their lint command. Once complete,
 // the lint hash is updated in the lock file.
-func Lint(pj *config.ProjectFile) error {
+func Lint(pj *config.Project) error {
 	checked := make(map[string]bool)
 
 	return rangeChangedApps(pj, changeTypeLint, func(app *app.App) error {

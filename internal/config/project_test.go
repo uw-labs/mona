@@ -1,74 +1,66 @@
 package config_test
 
 import (
+	"io/ioutil"
+	"os"
 	"testing"
 
+	"github.com/davidsbond/mona/internal/deps"
+
+	"github.com/stretchr/testify/require"
+
 	"github.com/davidsbond/mona/internal/config"
-	"github.com/stretchr/testify/assert"
 )
 
-func TestNewProjectFile(t *testing.T) {
-	tt := []struct {
-		Name        string
-		ProjectName string
-	}{
-		{
-			Name:        "It should create a project file",
-			ProjectName: "test",
-		},
-	}
+var goModData = []byte(`module github.com/some/project
 
-	for _, tc := range tt {
-		t.Run(tc.Name, func(t *testing.T) {
-			if err := config.NewProjectFile(".", tc.ProjectName); err != nil {
-				assert.Fail(t, err.Error())
-				return
-			}
+go 1.12
 
-			defer deleteProjectFile(t)
+require (
+	github.com/urfave/cli v1.20.0
+)
 
-			assert.FileExists(t, "mona.yml")
-			proj, err := config.LoadProjectFile(".")
+`)
 
-			if err != nil {
-				assert.Fail(t, err.Error())
-				return
-			}
-
-			assert.Equal(t, tc.ProjectName, proj.Name)
-		})
-	}
+func deleteProjectFile(t *testing.T) {
+	require.NoError(t, os.Remove("mona.yml"))
 }
 
-func TestLoadProjectFile(t *testing.T) {
-	tt := []struct {
-		Name        string
-		ProjectName string
-	}{
-		{
-			Name:        "It should create a project file",
-			ProjectName: "test",
+func createGoMod(t *testing.T) {
+	require.NoError(t, ioutil.WriteFile("go.mod", goModData, os.ModePerm))
+}
+
+func deleteGoMod(t *testing.T) {
+	require.NoError(t, os.Remove("go.mod"))
+}
+
+func TestProjectCreateAndLoad(t *testing.T) {
+	createGoMod(t)
+	defer deleteGoMod(t)
+
+	require.NoError(t, config.NewProject(".", "test"))
+	defer deleteProjectFile(t)
+
+	require.FileExists(t, "mona.yml")
+
+	project, err := config.LoadProject(".")
+	require.NoError(t, err)
+
+	expected := &config.Project{
+		Name:     "test",
+		Location: ".",
+		BinDir:   "bin",
+		Mod: deps.Module{
+			Name: "github.com/some/project",
+			Deps: map[string]string{
+				"github.com/urfave/cli": "v1.20.0",
+			},
 		},
 	}
 
-	for _, tc := range tt {
-		t.Run(tc.Name, func(t *testing.T) {
-			if err := config.NewProjectFile(".", tc.ProjectName); err != nil {
-				assert.Fail(t, err.Error())
-				return
-			}
+	require.Equal(t, expected, project)
+}
 
-			defer deleteProjectFile(t)
-			assert.FileExists(t, "mona.yml")
-
-			proj, err := config.LoadProjectFile(".")
-
-			if err != nil {
-				assert.Fail(t, err.Error())
-				return
-			}
-
-			assert.Equal(t, tc.ProjectName, proj.Name)
-		})
-	}
+func TestNewProject_NoGoModFile(t *testing.T) {
+	require.Equal(t, config.ErrNoGoModFile, config.NewProject(".", "test"))
 }

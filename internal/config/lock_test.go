@@ -1,11 +1,18 @@
 package config_test
 
 import (
+	"os"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 
 	"github.com/davidsbond/mona/internal/config"
 	"github.com/stretchr/testify/assert"
 )
+
+func deleteLockFile(t *testing.T) {
+	require.NoError(t, os.Remove("mona.lock"))
+}
 
 func TestNewLockFile(t *testing.T) {
 	tt := []struct {
