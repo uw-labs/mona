@@ -6,13 +6,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/davidsbond/mona/internal/deps"
-
 	"github.com/apex/log"
-
 	"github.com/hashicorp/go-multierror"
-
 	"gopkg.in/yaml.v2"
+
+	"github.com/davidsbond/mona/internal/deps"
 )
 
 const (

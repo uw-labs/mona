@@ -35,7 +35,7 @@ type (
 		Exclude  []string `yaml:"exclude,omitempty"` // File matchers to exclude files from hash generation.
 		Location string   `yaml:"-"`                 // The location of the app, not included in the app file but initialized externally for ease
 		Commands struct {
-			Build config.CommandConfig // Command for building the app
+			Build config.BuildConfig   // Command for building the app
 			Test  config.CommandConfig // Command for testing the app
 			Lint  config.CommandConfig // Command for linting the app
 		} `yaml:"commands"` // Commands that can be executed against the app
@@ -139,6 +139,15 @@ func LoadApp(location string, mod deps.Module) (*App, error) {
 	var out App
 	if err := yaml.NewDecoder(file).Decode(&out); err != nil {
 		return nil, err
+	}
+
+	out.Commands.Lint.ExcludeMap = make(map[string]bool, len(out.Exclude))
+	for _, exclude := range out.Commands.Lint.Exclude {
+		out.Commands.Lint.ExcludeMap[exclude] = true
+	}
+	out.Commands.Test.ExcludeMap = make(map[string]bool, len(out.Exclude))
+	for _, exclude := range out.Commands.Test.Exclude {
+		out.Commands.Test.ExcludeMap[exclude] = true
 	}
 
 	out.Location = "./" + location

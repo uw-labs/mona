@@ -7,6 +7,7 @@
 
 
 # TODO
+- persist version for successful steps when using run command
 - global config for lint, test, build...
 - check that -o flag is not set for build
 - add command to list all apps

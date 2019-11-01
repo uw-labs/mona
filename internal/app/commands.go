@@ -9,8 +9,9 @@ import (
 )
 
 func (app *App) Build(binDir string) error {
-	flags := append([]string{"build"}, app.Commands.Build.Flags...)
-	flags = append(flags, fmt.Sprintf("-o=%s/%s", binDir, app.Name), app.Location)
+	flags := append([]string{"build"}, fmt.Sprintf("-o=%s/%s", binDir, app.Name))
+	flags = append(flags, app.Commands.Build.AllFlags()...)
+	flags = append(flags, app.Location)
 
 	cmd := exec.Command("go", flags...)
 	cmd.Env = append(os.Environ(), app.Commands.Build.EnvToList()...)
@@ -25,15 +26,15 @@ func (app *App) Lint(checked map[string]bool) error {
 
 	checking := make([]string, 0)
 	for _, dep := range app.Deps.Internal {
-		if !checked[dep] {
+		if !checked[dep] && !app.Commands.Lint.ExcludeMap[dep] {
 			flags = append(flags, "./"+dep)
 			checking = append(checking, dep)
+			log.Debug(dep)
 		}
 	}
 
 	cmd := exec.Command("golangci-lint", flags...)
 	cmd.Env = append(os.Environ(), app.Commands.Lint.EnvToList()...)
-	log.Info(cmd.String())
 
 	if err := executeCommand(cmd); err != nil {
 		return err
@@ -51,7 +52,7 @@ func (app *App) Test(checked map[string]bool) error {
 
 	checking := make([]string, 0)
 	for _, dep := range app.Deps.Internal {
-		if !checked[dep] {
+		if !checked[dep] && !app.Commands.Lint.ExcludeMap[dep] {
 			flags = append(flags, "./"+dep)
 			checked[dep] = true
 		}
@@ -59,7 +60,6 @@ func (app *App) Test(checked map[string]bool) error {
 
 	cmd := exec.Command("go", flags...)
 	cmd.Env = append(os.Environ(), app.Commands.Test.EnvToList()...)
-	log.Info(cmd.String())
 
 	if err := executeCommand(cmd); err != nil {
 		return err
