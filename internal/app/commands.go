@@ -52,9 +52,10 @@ func (app *App) Test(checked map[string]bool) error {
 
 	checking := make([]string, 0)
 	for _, dep := range app.Deps.Internal {
-		if !checked[dep] && !app.Commands.Lint.ExcludeMap[dep] {
+		if !checked[dep] && !app.Commands.Test.ExcludeMap[dep] {
 			flags = append(flags, "./"+dep)
 			checked[dep] = true
+			log.Debug(dep)
 		}
 	}
 

@@ -141,11 +141,11 @@ func LoadApp(location string, mod deps.Module) (*App, error) {
 		return nil, err
 	}
 
-	out.Commands.Lint.ExcludeMap = make(map[string]bool, len(out.Exclude))
+	out.Commands.Lint.ExcludeMap = make(map[string]bool, len(out.Commands.Lint.Exclude))
 	for _, exclude := range out.Commands.Lint.Exclude {
 		out.Commands.Lint.ExcludeMap[exclude] = true
 	}
-	out.Commands.Test.ExcludeMap = make(map[string]bool, len(out.Exclude))
+	out.Commands.Test.ExcludeMap = make(map[string]bool, len(out.Commands.Test.Exclude))
 	for _, exclude := range out.Commands.Test.Exclude {
 		out.Commands.Test.ExcludeMap[exclude] = true
 	}
