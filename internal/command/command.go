@@ -46,7 +46,10 @@ func getLockAndChangedApps(pj *config.Project) (lock *config.LockFile, out []cha
 	}
 
 	for _, appInfo := range apps {
-		lockInfo := lock.Apps[appInfo.Name]
+		lockInfo, ok := lock.Apps[appInfo.Name]
+		if !ok {
+			lockInfo = &config.AppVersion{}
+		}
 
 		// GenerateString a new hash for the app directory
 		exclude := append(pj.Exclude, appInfo.Exclude...)
