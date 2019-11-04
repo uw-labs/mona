@@ -14,15 +14,16 @@ func Diff() cli.Command {
 		Name:  "diff",
 		Usage: "Outputs all apps where changes are detected",
 		Action: withProject(func(ctx *cli.Context, cfg command.Config) error {
-			lint, test, build, err := command.Diff(cfg.Project)
+			summary, err := command.Diff(cfg.Project)
 
 			if err != nil {
 				return err
 			}
 
-			log.Infof("%d app(s) to be linted", len(lint))
-			log.Infof("%d app(s) to be tested", len(test))
-			log.Infof("%d app(s) to be built", len(build))
+			log.Infof("%d app(s) in project", len(summary.All))
+			log.Infof("%d app(s) to be linted", len(summary.Lint))
+			log.Infof("%d app(s) to be tested", len(summary.Test))
+			log.Infof("%d app(s) to be built", len(summary.Build))
 
 			return nil
 		}),

@@ -69,13 +69,11 @@ func getLockAndChangedApps(pj *config.Project) (lock *config.LockFile, out []cha
 		if lockInfo.BuildHash != newHash {
 			changes[changeTypeBuild] = true
 		}
-		if len(changes) != 0 {
-			out = append(out, changedApp{
-				app:         appInfo,
-				newHash:     newHash,
-				changeTypes: changes,
-			})
-		}
+		out = append(out, changedApp{
+			app:         appInfo,
+			newHash:     newHash,
+			changeTypes: changes,
+		})
 	}
 
 	return lock, out, nil
