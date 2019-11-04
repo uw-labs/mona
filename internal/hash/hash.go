@@ -3,28 +3,20 @@ package hash
 import (
 	"crypto/md5"
 	"encoding/base64"
-	"sort"
 
-	"github.com/davidsbond/mona/internal/deps"
+	"github.com/davidsbond/mona/internal/app"
 	"github.com/davidsbond/mona/pkg/hashdir"
 )
 
-func GetAppDeps(mod deps.Module, appPath string, excludes ...string) (string, error) {
-	appDeps, err := deps.GetAppDeps(mod, appPath)
-	if err != nil {
-		return "", err
-	}
-	sort.Sort(sort.StringSlice(appDeps.Internal))
-	sort.Sort(sort.StringSlice(appDeps.External))
-
+func GetForApp(appInfo *app.App, excludes ...string) (string, error) {
 	hash := md5.New()
-	for _, dep := range appDeps.External {
+	for _, dep := range appInfo.Deps.External {
 		if _, err := hash.Write([]byte(dep)); err != nil {
 			return "", err
 		}
 	}
 
-	for _, dep := range appDeps.Internal {
+	for _, dep := range appInfo.Deps.Internal {
 		depHash, err := hashdir.Generate(dep, excludes...)
 		if err != nil {
 			return "", err
@@ -37,7 +29,7 @@ func GetAppDeps(mod deps.Module, appPath string, excludes ...string) (string, er
 		excludes = append(excludes, dep)
 	}
 
-	appHash, err := hashdir.Generate(appPath, excludes...)
+	appHash, err := hashdir.Generate(appInfo.Location, excludes...)
 	if err != nil {
 		return "", err
 	}

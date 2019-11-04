@@ -4,7 +4,11 @@ import (
 	"bytes"
 	"io"
 	"os/exec"
+	"sort"
 	"strings"
+
+	"github.com/apex/log"
+	"github.com/pkg/errors"
 )
 
 type AppDeps struct {
@@ -13,12 +17,15 @@ type AppDeps struct {
 }
 
 func GetAppDeps(mod Module, appPath string) (deps AppDeps, err error) {
+	log.Debugf("Getting dependencies for app at %s", appPath)
 	cmd := exec.Command("go", "list", "-f", `'{{ join .Deps "\n" }}'`, appPath)
 	buf := &bytes.Buffer{}
+	errBuf := &bytes.Buffer{}
 
 	cmd.Stdout = buf
+	cmd.Stderr = errBuf
 	if err := cmd.Run(); err != nil {
-		return deps, err
+		return deps, errors.Wrap(err, errBuf.String())
 	}
 
 	allDeps := make([]string, 0)
@@ -46,5 +53,8 @@ func GetAppDeps(mod Module, appPath string) (deps AppDeps, err error) {
 			}
 		}
 	}
+	sort.Sort(sort.StringSlice(deps.Internal))
+	sort.Sort(sort.StringSlice(deps.External))
+
 	return deps, nil
 }

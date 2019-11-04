@@ -53,7 +53,7 @@ func getLockAndChangedApps(pj *config.Project) (lock *config.LockFile, out []cha
 
 		// GenerateString a new hash for the app directory
 		exclude := append(pj.Exclude, appInfo.Exclude...)
-		newHash, err := hash.GetAppDeps(pj.Mod, appInfo.Location, exclude...)
+		newHash, err := hash.GetForApp(appInfo, exclude...)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -100,13 +100,6 @@ func rangeChangedApps(cfg Config, cts []changeType, fn rangeFn) error {
 			continue
 		}
 
-		exclude := append(cfg.Project.Exclude, change.app.Exclude...)
-		newHash, err := hash.GetAppDeps(cfg.Project.Mod, change.app.Location, exclude...)
-
-		if err != nil {
-			return err
-		}
-
 		lockInfo, modInLock := lock.Apps[change.app.Name]
 
 		if !modInLock {
@@ -122,11 +115,11 @@ func rangeChangedApps(cfg Config, cts []changeType, fn rangeFn) error {
 		for _, ct := range cts {
 			switch ct {
 			case changeTypeLint:
-				lockInfo.LintHash = newHash
+				lockInfo.LintHash = change.newHash
 			case changeTypeTest:
-				lockInfo.TestHash = newHash
+				lockInfo.TestHash = change.newHash
 			case changeTypeBuild:
-				lockInfo.BuildHash = newHash
+				lockInfo.BuildHash = change.newHash
 			}
 		}
 

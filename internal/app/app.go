@@ -68,15 +68,22 @@ func NewAppFile(name, location string) error {
 
 // FindApps attempts to find all "app.yml" files in subdirectories of the given
 // path and load them into memory.
-func FindApps(dir string, mod deps.Module) (out []*App, err error) {
+func FindApps(projectDir string, mod deps.Module) (out []*App, outErr error) {
+	dir := projectDir
 	log.Debugf("Searching for apps in %s", dir)
 
-	var appMux sync.Mutex
-	var skipMux sync.Mutex
-	var skip []string
+	var (
+		appMux  sync.Mutex
+		errMux  sync.Mutex
+		skipMux sync.Mutex
+		skip    []string
+	)
 
-	err = cwalk.Walk(dir, func(path string, info os.FileInfo, err error) error {
+	walkErr := cwalk.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
+			errMux.Lock()
+			outErr = multierror.Append(outErr, err)
+			errMux.Unlock()
 			return err
 		}
 
@@ -99,6 +106,9 @@ func FindApps(dir string, mod deps.Module) (out []*App, err error) {
 
 		app, err := LoadApp(strings.TrimSuffix(path, appFileName), mod)
 		if err != nil {
+			errMux.Lock()
+			outErr = multierror.Append(outErr, err)
+			errMux.Unlock()
 			return err
 		}
 
@@ -116,8 +126,11 @@ func FindApps(dir string, mod deps.Module) (out []*App, err error) {
 
 		return filepath.SkipDir
 	})
+	if walkErr != nil {
+		outErr = multierror.Append(outErr, walkErr)
+	}
 
-	return
+	return out, outErr
 }
 
 // LoadApp attempts to load a "app.yml" file into memory from
