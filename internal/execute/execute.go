@@ -1,4 +1,4 @@
-package app
+package execute
 
 import (
 	"bufio"
@@ -7,7 +7,7 @@ import (
 	"os/exec"
 )
 
-func executeCommand(cmd *exec.Cmd) error {
+func Command(cmd *exec.Cmd) error {
 	stdout, err := cmd.StdoutPipe()
 
 	if err != nil {

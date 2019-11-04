@@ -62,6 +62,11 @@ func main() {
 			Usage:  "If set, enables verbose logging output",
 			EnvVar: "MONA_VERBOSE",
 		},
+		cli.StringFlag{
+			Name:   "compare-git-branch",
+			EnvVar: "MONA_COMPARE_GIT_BRANCH",
+			Value:  "master",
+		},
 	}
 
 	app.Before = func(ctx *cli.Context) error {

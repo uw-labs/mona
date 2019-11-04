@@ -36,6 +36,7 @@ type (
 		Location string      `yaml:"-"`                 // The root project directory, not set in the yaml file but set on load for convenience
 		BinDir   string      `yaml:"binDir"`            // Relative path from the root of the project to the directory where compiled binaries will be placed.
 		Mod      deps.Module `yaml:"-"`
+		Branch   string      `yaml:"-"`
 	}
 )
 
@@ -67,7 +68,7 @@ func NewProject(dir string, name string) error {
 
 // LoadProject attempts to read a "mona.yml" file into memory from the provided
 // working directory
-func LoadProject(wd string) (*Project, error) {
+func LoadProject(wd, branch string) (*Project, error) {
 	file, err := os.OpenFile(
 		filepath.Join(wd, projectFileName),
 		os.O_RDONLY,
@@ -85,12 +86,13 @@ func LoadProject(wd string) (*Project, error) {
 	if err := yaml.NewDecoder(file).Decode(&out); err != nil {
 		return nil, err
 	}
-	out.Location = wd
 
-	out.Mod, err = deps.ParseModule(filepath.Join(wd, "go.mod"))
+	out.Mod, err = deps.ParseModuleFile(filepath.Join(wd, "go.mod"))
 	if err != nil {
 		return nil, err
 	}
+	out.Location = wd
+	out.Branch = branch
 
 	return &out, nil
 }

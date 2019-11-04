@@ -163,7 +163,7 @@ func LoadApp(location string, mod deps.Module) (*App, error) {
 		out.Commands.Test.ExcludeMap[exclude] = true
 	}
 
-	out.Location = "./" + location
+	out.Location = location
 	out.Deps, err = deps.GetAppDeps(mod, out.Location)
 	if err != nil {
 		return nil, err

@@ -13,14 +13,18 @@ type Module struct {
 	Deps map[string]string
 }
 
-func ParseModule(moduleFile string) (mod Module, err error) {
+func ParseModuleFile(moduleFile string) (mod Module, err error) {
 	f, err := os.Open(moduleFile)
 	if err != nil {
 		return mod, err
 	}
 	defer f.Close()
 
-	r := bufio.NewReader(f)
+	return ParseModule(f)
+}
+
+func ParseModule(reader io.Reader) (mod Module, err error) {
+	r := bufio.NewReader(reader)
 
 	// Read module name
 	line, err := r.ReadString('\n')

@@ -3,8 +3,8 @@
 package cmd
 
 import (
+	"github.com/apex/log"
 	"github.com/urfave/cli"
-
 	"github.com/uw-labs/mona/internal/command"
 	"github.com/uw-labs/mona/internal/config"
 )
@@ -13,23 +13,24 @@ import (
 // current project as an argument and returns a single error.
 type ActionFunc func(ctx *cli.Context, cfg command.Config) error
 
-func withProject(fn ActionFunc) cli.ActionFunc {
-	return func(ctx *cli.Context) error {
+func withCMDConfig(fn ActionFunc) cli.ActionFunc {
+	return func(ctx *cli.Context) (err error) {
 		wd := ctx.GlobalString("wd")
+
+		branch := ctx.GlobalString("compare-git-branch")
+		log.Debugf("Comparing against %s branch.", branch)
 
 		root, err := config.GetProjectRoot(wd)
 		if err != nil {
 			return err
 		}
 
-		project, err := config.LoadProject(root)
+		cfg, err := command.NewConfig(root, branch)
 		if err != nil {
 			return err
 		}
+		cfg.FailFast = ctx.GlobalBool("fail-fast")
 
-		return fn(ctx, command.Config{
-			Project:  project,
-			FailFast: ctx.GlobalBool("fail-fast"),
-		})
+		return fn(ctx, cfg)
 	}
 }

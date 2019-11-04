@@ -18,7 +18,7 @@ type AppDeps struct {
 
 func GetAppDeps(mod Module, appPath string) (deps AppDeps, err error) {
 	log.Debugf("Getting dependencies for app at %s", appPath)
-	cmd := exec.Command("go", "list", "-f", `'{{ join .Deps "\n" }}'`, appPath)
+	cmd := exec.Command("go", "list", "-f", `'{{ join .Deps "\n" }}'`, "./"+appPath)
 	buf := &bytes.Buffer{}
 	errBuf := &bytes.Buffer{}
 
