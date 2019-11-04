@@ -1,8 +1,8 @@
 # mona
 
-[![GoDoc](https://godoc.org/github.com/davidsbond/mona?status.svg)](http://godoc.org/github.com/davidsbond/mona)
+[![GoDoc](https://godoc.org/github.com/uw-labs/mona?status.svg)](http://godoc.org/github.com/uw-labs/mona)
 [![CircleCI](https://circleci.com/gh/davidsbond/mona/tree/master.svg?style=shield)](https://circleci.com/gh/davidsbond/mona/tree/master)
-[![Go Report Card](https://goreportcard.com/badge/github.com/davidsbond/mona)](https://goreportcard.com/report/github.com/davidsbond/mona)
+[![Go Report Card](https://goreportcard.com/badge/github.com/uw-labs/mona)](https://goreportcard.com/report/github.com/uw-labs/mona)
 [![Docker Pulls](https://img.shields.io/docker/pulls/davidsbond/mona.svg)](https://hub.docker.com/r/davidsbond/mona)
 
 
@@ -39,14 +39,14 @@ Below are steps on how to install mona and set up your first mona project.
 
 ### Installation
 
-You can download the latest version of mona from the [releases](https://github.com/davidsbond/mona/releases) and place it anywhere
+You can download the latest version of mona from the [releases](https://github.com/uw-labs/mona/releases) and place it anywhere
 in your `$PATH`.
 
 Alternatively, you can download and compile the source code using `go get` and `make`
 
 ```bash
-$ go get -u github.com/davidsbond/mona
-$ cd $GOPATH/src/github.com/davidsbond/mona
+$ go get -u github.com/uw-labs/mona
+$ cd $GOPATH/src/github.com/uw-labs/mona
 $ make build
 >
 ```

@@ -3,7 +3,7 @@ package cmd
 import (
 	"github.com/urfave/cli"
 
-	"github.com/davidsbond/mona/internal/command"
+	"github.com/uw-labs/mona/internal/command"
 )
 
 // Run generates a cli command that lints, tests and builds any modified apps

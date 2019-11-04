@@ -13,8 +13,8 @@ import (
 	"github.com/iafan/cwalk"
 	"gopkg.in/yaml.v2"
 
-	"github.com/davidsbond/mona/internal/config"
-	"github.com/davidsbond/mona/internal/deps"
+	"github.com/uw-labs/mona/internal/config"
+	"github.com/uw-labs/mona/internal/deps"
 )
 
 const (

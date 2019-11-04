@@ -5,8 +5,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/davidsbond/mona/pkg/hashdir"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/uw-labs/mona/pkg/hashdir"
 )
 
 func TestGenerate(t *testing.T) {

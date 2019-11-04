@@ -10,7 +10,7 @@ import (
 	"github.com/hashicorp/go-multierror"
 	"gopkg.in/yaml.v2"
 
-	"github.com/davidsbond/mona/internal/deps"
+	"github.com/uw-labs/mona/internal/deps"
 )
 
 const (

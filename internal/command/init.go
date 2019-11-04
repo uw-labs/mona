@@ -1,6 +1,6 @@
 package command
 
-import "github.com/davidsbond/mona/internal/config"
+import "github.com/uw-labs/mona/internal/config"
 
 // Init creates a new project and lock file in the provided working directory
 // with the given name.

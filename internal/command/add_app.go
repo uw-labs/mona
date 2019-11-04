@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/davidsbond/mona/internal/app"
-	"github.com/davidsbond/mona/internal/config"
+	"github.com/uw-labs/mona/internal/app"
+	"github.com/uw-labs/mona/internal/config"
 )
 
 // AddApp creates a new "app.yaml" file in the specified directory

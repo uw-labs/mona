@@ -5,8 +5,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/davidsbond/mona/internal/app"
-	"github.com/davidsbond/mona/internal/command"
+	"github.com/uw-labs/mona/internal/app"
+	"github.com/uw-labs/mona/internal/command"
 )
 
 func TestAddApp(t *testing.T) {

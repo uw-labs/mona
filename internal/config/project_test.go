@@ -5,11 +5,10 @@ import (
 	"os"
 	"testing"
 
-	"github.com/davidsbond/mona/internal/deps"
-
 	"github.com/stretchr/testify/require"
 
-	"github.com/davidsbond/mona/internal/config"
+	"github.com/uw-labs/mona/internal/config"
+	"github.com/uw-labs/mona/internal/deps"
 )
 
 var goModData = []byte(`module github.com/some/project

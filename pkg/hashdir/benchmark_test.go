@@ -6,9 +6,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/davidsbond/mona/pkg/hashdir"
-
 	"github.com/stretchr/testify/assert"
+
+	"github.com/uw-labs/mona/pkg/hashdir"
 )
 
 func BenchmarkGenerate(b *testing.B) {

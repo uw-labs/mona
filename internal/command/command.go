@@ -8,9 +8,9 @@ import (
 	"github.com/apex/log"
 	"github.com/hashicorp/go-multierror"
 
-	"github.com/davidsbond/mona/internal/app"
-	"github.com/davidsbond/mona/internal/config"
-	"github.com/davidsbond/mona/internal/hash"
+	"github.com/uw-labs/mona/internal/app"
+	"github.com/uw-labs/mona/internal/config"
+	"github.com/uw-labs/mona/internal/hash"
 )
 
 type Config struct {

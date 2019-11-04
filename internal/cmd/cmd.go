@@ -5,8 +5,8 @@ package cmd
 import (
 	"github.com/urfave/cli"
 
-	"github.com/davidsbond/mona/internal/command"
-	"github.com/davidsbond/mona/internal/config"
+	"github.com/uw-labs/mona/internal/command"
+	"github.com/uw-labs/mona/internal/config"
 )
 
 // The ActionFunc type is a method that takes a CLI context and the

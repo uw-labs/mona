@@ -1,4 +1,4 @@
-module github.com/davidsbond/mona
+module github.com/uw-labs/mona
 
 go 1.12
 

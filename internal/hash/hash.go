@@ -4,8 +4,8 @@ import (
 	"crypto/md5"
 	"encoding/base64"
 
-	"github.com/davidsbond/mona/internal/app"
-	"github.com/davidsbond/mona/pkg/hashdir"
+	"github.com/uw-labs/mona/internal/app"
+	"github.com/uw-labs/mona/pkg/hashdir"
 )
 
 func GetForApp(appInfo *app.App, excludes ...string) (string, error) {

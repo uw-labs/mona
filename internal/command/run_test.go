@@ -5,8 +5,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/davidsbond/mona/internal/command"
-	"github.com/davidsbond/mona/internal/deps"
+	"github.com/uw-labs/mona/internal/command"
+	"github.com/uw-labs/mona/internal/deps"
 )
 
 func TestBuild(t *testing.T) {

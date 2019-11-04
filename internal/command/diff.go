@@ -1,7 +1,7 @@
 package command
 
 import (
-	"github.com/davidsbond/mona/internal/config"
+	"github.com/uw-labs/mona/internal/config"
 )
 
 // DiffSummary lists all the app names that changed.

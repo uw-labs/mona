@@ -8,7 +8,7 @@ import (
 	"github.com/apex/log"
 	"github.com/urfave/cli"
 
-	"github.com/davidsbond/mona/internal/command"
+	"github.com/uw-labs/mona/internal/command"
 )
 
 // AddApp generates a cli command that creates new mona apps within a project.

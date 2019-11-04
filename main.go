@@ -10,7 +10,7 @@ import (
 	apexcli "github.com/apex/log/handlers/cli"
 	"github.com/urfave/cli"
 
-	"github.com/davidsbond/mona/internal/cmd"
+	"github.com/uw-labs/mona/internal/cmd"
 )
 
 var (

@@ -4,10 +4,10 @@ import (
 	"os"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/davidsbond/mona/internal/config"
-	"github.com/stretchr/testify/assert"
+	"github.com/uw-labs/mona/internal/config"
 )
 
 func deleteLockFile(t *testing.T) {

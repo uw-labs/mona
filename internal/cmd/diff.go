@@ -4,7 +4,7 @@ import (
 	"github.com/apex/log"
 	"github.com/urfave/cli"
 
-	"github.com/davidsbond/mona/internal/command"
+	"github.com/uw-labs/mona/internal/command"
 )
 
 // Diff generates a cli command that prints out apps that have changed within

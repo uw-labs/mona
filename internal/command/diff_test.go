@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/davidsbond/mona/internal/command"
+	"github.com/uw-labs/mona/internal/command"
 )
 
 func TestDiff(t *testing.T) {

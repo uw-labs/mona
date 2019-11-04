@@ -5,7 +5,7 @@ import (
 
 	"github.com/apex/log"
 
-	"github.com/davidsbond/mona/internal/app"
+	"github.com/uw-labs/mona/internal/app"
 )
 
 // Run iterates over all new/modified apps and executes their lint, test and build commands
