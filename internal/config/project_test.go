@@ -8,7 +8,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/uw-labs/mona/internal/config"
-	"github.com/uw-labs/mona/internal/deps"
 )
 
 var goModData = []byte(`module github.com/some/project
@@ -49,7 +48,7 @@ func TestProjectCreateAndLoad(t *testing.T) {
 		Name:     "test",
 		Location: ".",
 		BinDir:   "bin",
-		Mod: deps.Module{
+		Mod: golang.Module{
 			Name: "github.com/some/project",
 			Deps: map[string]string{
 				"github.com/urfave/cli": "v1.20.0",

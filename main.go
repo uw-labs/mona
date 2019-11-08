@@ -1,16 +1,17 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"sort"
 	"strconv"
 	"time"
 
 	"github.com/apex/log"
-	apexcli "github.com/apex/log/handlers/cli"
 	"github.com/urfave/cli"
 
-	"github.com/uw-labs/mona/internal/cmd"
+	"github.com/uw-labs/mona/internal/git"
+	"github.com/uw-labs/mona/internal/golang"
 )
 
 var (
@@ -36,63 +37,78 @@ func main() {
 	app.Version = version
 	app.Compiled = time.Unix(compileTime, 0)
 
-	app.Commands = []cli.Command{
-		cmd.Init(),
-		cmd.AddApp(),
-		cmd.Diff(),
-		cmd.Run(),
-		cmd.Build(),
-		cmd.Test(),
-		cmd.Lint(),
-	}
-
 	app.Flags = []cli.Flag{
-		cli.StringFlag{
-			Name:   "wd",
-			Hidden: true,
-			Usage:  "Flag that contains the current working directory",
-		},
-		cli.BoolFlag{
-			Name:   "fail-fast",
-			Usage:  "If set, causes a command to terminate after encountering first error",
-			EnvVar: "MONA_FAIL_FAST",
-		},
-		cli.BoolFlag{
-			Name:   "verbose",
-			Usage:  "If set, enables verbose logging output",
-			EnvVar: "MONA_VERBOSE",
-		},
 		cli.StringFlag{
 			Name:   "compare-git-branch",
 			EnvVar: "MONA_COMPARE_GIT_BRANCH",
 			Value:  "master",
 		},
 	}
-
-	app.Before = func(ctx *cli.Context) error {
-		log.SetHandler(apexcli.Default)
-
-		if ctx.Bool("verbose") {
-			log.SetLevel(log.DebugLevel)
-		} else {
-			log.SetLevel(log.InfoLevel)
-		}
-
-		log.Infof("%s v%s", app.Name, app.Version)
-
-		wd, err := os.Getwd()
-
-		if err != nil {
-			return err
-		}
-
-		return ctx.Set("wd", wd)
-	}
+	app.Commands = []cli.Command{{
+		Name: "diff",
+		Subcommands: []cli.Command{{
+			Name: "test",
+			Action: withModAndDiff(func(ctx *cli.Context, mod golang.Module, diff git.GoDiff) error {
+				for pkg := range diff.Packages {
+					fmt.Println(pkg)
+				}
+				cmds, err := golang.FindAllCommands(mod.Name)
+				if err != nil {
+					return err
+				}
+				// Find all commands that depend on the changed packages.
+				for _, cmd := range cmds {
+					changed, err := diff.Changed(cmd, mod)
+					if err != nil {
+						return err
+					}
+					if changed && !diff.Packages[cmd] {
+						fmt.Println(cmd)
+					}
+				}
+				return nil
+			}),
+		}, {
+			Name: "build",
+			Action: withModAndDiff(func(ctx *cli.Context, mod golang.Module, diff git.GoDiff) error {
+				cmds, err := golang.FindAllCommands(mod.Name)
+				if err != nil {
+					return err
+				}
+				// Find all commands that depend on the changed packages.
+				for _, cmd := range cmds {
+					changed, err := diff.Changed(cmd, mod)
+					if err != nil {
+						return err
+					}
+					if changed {
+						fmt.Println(cmd)
+					}
+				}
+				return nil
+			}),
+		}},
+	}}
 
 	sort.Sort(cli.FlagsByName(app.Flags))
 	sort.Sort(cli.CommandsByName(app.Commands))
 
 	if err := app.Run(os.Args); err != nil {
 		log.Fatal(err.Error())
+	}
+}
+
+func withModAndDiff(f func(ctx *cli.Context, mod golang.Module, diff git.GoDiff) error) func(*cli.Context) error {
+	return func(ctx *cli.Context) error {
+		mod, err := golang.ParseModuleFile("go.mod")
+		if err != nil {
+			return err
+		}
+		diff, err := git.GetGoDiff(mod, ctx.GlobalString("compare-git-branch"))
+		if err != nil {
+			return err
+		}
+
+		return f(ctx, mod, diff)
 	}
 }

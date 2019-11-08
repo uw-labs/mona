@@ -6,7 +6,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/uw-labs/mona/internal/command"
-	"github.com/uw-labs/mona/internal/deps"
 )
 
 func TestBuild(t *testing.T) {
@@ -31,7 +30,7 @@ func TestBuild(t *testing.T) {
 			defer deleteAppFiles(t, tc.AppDirs...)
 			defer deleteProjectFiles(t)
 
-			if err := command.Build(deps.Module{}, pj); err != nil {
+			if err := command.Build(golang.Module{}, pj); err != nil {
 				assert.Fail(t, err.Error())
 				return
 			}

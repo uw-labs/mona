@@ -1,4 +1,4 @@
-package deps
+package golang
 
 import (
 	"bufio"
@@ -9,8 +9,8 @@ import (
 
 type Module struct {
 	Name string
-	// Deps is a map of dependency to its version
-	Deps map[string]string
+	// Requires is a map of dependency to its version
+	Requires map[string]string
 }
 
 func ParseModuleFile(moduleFile string) (mod Module, err error) {
@@ -32,7 +32,7 @@ func ParseModule(reader io.Reader) (mod Module, err error) {
 		return mod, err
 	}
 	mod.Name = strings.TrimPrefix(strings.TrimSpace(line), "module ")
-	mod.Deps = make(map[string]string)
+	mod.Requires = make(map[string]string)
 
 	// Read dependencies
 	readingDeps := false
@@ -54,7 +54,7 @@ func ParseModule(reader io.Reader) (mod Module, err error) {
 			line = strings.TrimSpace(line)
 			line = strings.TrimSuffix(line, "// indirect")
 			parts := strings.Split(line, " ")
-			mod.Deps[parts[0]] = parts[1]
+			mod.Requires[parts[0]] = parts[1]
 			// TODO: need to deal with replace and edit,
 			//  might be better to use some go tooling
 		}

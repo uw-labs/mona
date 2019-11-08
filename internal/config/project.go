@@ -10,7 +10,7 @@ import (
 	"github.com/hashicorp/go-multierror"
 	"gopkg.in/yaml.v2"
 
-	"github.com/uw-labs/mona/internal/deps"
+	"github.com/uw-labs/mona/internal/golang"
 )
 
 const (
@@ -31,12 +31,12 @@ var (
 type (
 	// Project type represents the structure of the "mona.yml" file.
 	Project struct {
-		Name     string      `yaml:"name"`              // The name of the project
-		Exclude  []string    `yaml:"exclude,omitempty"` // Global file patterns to ignore during hash generation
-		Location string      `yaml:"-"`                 // The root project directory, not set in the yaml file but set on load for convenience
-		BinDir   string      `yaml:"binDir"`            // Relative path from the root of the project to the directory where compiled binaries will be placed.
-		Mod      deps.Module `yaml:"-"`
-		Branch   string      `yaml:"-"`
+		Name     string        `yaml:"name"`              // The name of the project
+		Exclude  []string      `yaml:"exclude,omitempty"` // Global file patterns to ignore during hash generation
+		Location string        `yaml:"-"`                 // The root project directory, not set in the yaml file but set on load for convenience
+		BinDir   string        `yaml:"binDir"`            // Relative path from the root of the project to the directory where compiled binaries will be placed.
+		Mod      golang.Module `yaml:"-"`
+		Branch   string        `yaml:"-"`
 	}
 )
 
@@ -87,7 +87,7 @@ func LoadProject(wd, branch string) (*Project, error) {
 		return nil, err
 	}
 
-	out.Mod, err = deps.ParseModuleFile(filepath.Join(wd, "go.mod"))
+	out.Mod, err = golang.ParseModuleFile(filepath.Join(wd, "go.mod"))
 	if err != nil {
 		return nil, err
 	}

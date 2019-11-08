@@ -14,7 +14,7 @@ import (
 	"gopkg.in/yaml.v2"
 
 	"github.com/uw-labs/mona/internal/config"
-	"github.com/uw-labs/mona/internal/deps"
+	"github.com/uw-labs/mona/internal/golang"
 )
 
 const (
@@ -39,7 +39,7 @@ type (
 			Test  config.CommandConfig // Command for testing the app
 			Lint  config.CommandConfig // Command for linting the app
 		} `yaml:"commands"` // Commands that can be executed against the app
-		Deps deps.AppDeps `yaml:"-"`
+		Deps golang.Dependencies `yaml:"-"`
 	}
 )
 
@@ -68,7 +68,7 @@ func NewAppFile(name, location string) error {
 
 // FindApps attempts to find all "app.yml" files in subdirectories of the given
 // path and load them into memory.
-func FindApps(projectDir string, mod deps.Module) (out []*App, outErr error) {
+func FindApps(projectDir string, mod golang.Module) (out []*App, outErr error) {
 	dir := projectDir
 	log.Debugf("Searching for apps in %s", dir)
 
@@ -135,7 +135,7 @@ func FindApps(projectDir string, mod deps.Module) (out []*App, outErr error) {
 
 // LoadApp attempts to load a "app.yml" file into memory from
 // the given location.
-func LoadApp(location string, mod deps.Module) (*App, error) {
+func LoadApp(location string, mod golang.Module) (*App, error) {
 	file, err := os.OpenFile(
 		filepath.Join(location, appFileName),
 		os.O_RDONLY,
@@ -164,7 +164,7 @@ func LoadApp(location string, mod deps.Module) (*App, error) {
 	}
 
 	out.Location = location
-	out.Deps, err = deps.GetAppDeps(mod, out.Location)
+	out.Deps, err = golang.GetDependencies(out.Location, mod)
 	if err != nil {
 		return nil, err
 	}
