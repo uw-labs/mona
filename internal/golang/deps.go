@@ -1,31 +1,27 @@
-package deps
+package golang
 
 import (
-	"bytes"
 	"io"
 	"os/exec"
 	"sort"
 	"strings"
 
 	"github.com/apex/log"
-	"github.com/pkg/errors"
+
+	"github.com/uw-labs/mona/internal/executil"
 )
 
-type AppDeps struct {
+type Dependencies struct {
 	Internal []string
 	External []string
 }
 
-func GetAppDeps(mod Module, appPath string) (deps AppDeps, err error) {
-	log.Debugf("Getting dependencies for app at %s", appPath)
-	cmd := exec.Command("go", "list", "-f", `'{{ join .Deps "\n" }}'`, appPath)
-	buf := &bytes.Buffer{}
-	errBuf := &bytes.Buffer{}
-
-	cmd.Stdout = buf
-	cmd.Stderr = errBuf
-	if err := cmd.Run(); err != nil {
-		return deps, errors.Wrap(err, errBuf.String())
+func GetDependencies(pkg string, mod Module) (deps Dependencies, err error) {
+	log.Debugf("Getting dependencies for %s", pkg)
+	cmd := exec.Command("go", "list", "-f", `'{{ join .Deps "\n" }}'`, "./"+pkg)
+	buf, err := executil.RunCommand(cmd)
+	if err != nil {
+		return deps, err
 	}
 
 	allDeps := make([]string, 0)
@@ -45,7 +41,7 @@ func GetAppDeps(mod Module, appPath string) (deps AppDeps, err error) {
 			deps.Internal = append(deps.Internal, strings.TrimPrefix(dep, mod.Name+"/"))
 			continue
 		}
-		for m, v := range mod.Deps {
+		for m, v := range mod.Requires {
 			if strings.HasPrefix(dep, m) && !seen[m] {
 				deps.External = append(deps.External, m+"@"+v)
 				seen[m] = true

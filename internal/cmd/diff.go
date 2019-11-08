@@ -13,17 +13,28 @@ func Diff() cli.Command {
 	return cli.Command{
 		Name:  "diff",
 		Usage: "Outputs all apps where changes are detected",
-		Action: withProject(func(ctx *cli.Context, cfg command.Config) error {
-			summary, err := command.Diff(cfg.Project)
+		Action: withCMDConfig(func(ctx *cli.Context, cfg command.Config) error {
+			summary, err := command.Diff(cfg)
 
 			if err != nil {
 				return err
 			}
 
 			log.Infof("%d app(s) in project", len(summary.All))
-			log.Infof("%d app(s) to be linted", len(summary.Lint))
-			log.Infof("%d app(s) to be tested", len(summary.Test))
-			log.Infof("%d app(s) to be built", len(summary.Build))
+			for _, appInfo := range cfg.Apps {
+				log.Debugf("\t%s", appInfo.Name)
+				for _, dep := range appInfo.Deps.Internal {
+					log.Debugf("\t\t%s", dep)
+				}
+			}
+			log.Infof("%d app(s) changed", len(summary.ChangedApps))
+			for _, appName := range summary.ChangedApps {
+				log.Debugf("\t%s", appName)
+			}
+			log.Infof("%d pkg(s) changed", len(cfg.Diff.Packages))
+			for pkg := range cfg.Diff.Packages {
+				log.Debugf("\t%s", pkg)
+			}
 
 			return nil
 		}),

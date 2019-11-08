@@ -12,7 +12,7 @@ func Run() cli.Command {
 	return cli.Command{
 		Name:  "run",
 		Usage: "Run lints, tests and builds any modified apps within the project",
-		Action: withProject(func(ctx *cli.Context, cfg command.Config) error {
+		Action: withCMDConfig(func(ctx *cli.Context, cfg command.Config) error {
 			return command.Run(cfg)
 		}),
 	}
@@ -23,7 +23,7 @@ func Lint() cli.Command {
 	return cli.Command{
 		Name:  "lint",
 		Usage: "Lints any new/modified apps",
-		Action: withProject(func(ctx *cli.Context, cfg command.Config) error {
+		Action: withCMDConfig(func(ctx *cli.Context, cfg command.Config) error {
 			return command.Lint(cfg)
 		}),
 	}
@@ -34,7 +34,7 @@ func Test() cli.Command {
 	return cli.Command{
 		Name:  "test",
 		Usage: "Runs tests for all apps that have been created/changed since the last test run",
-		Action: withProject(func(ctx *cli.Context, cfg command.Config) error {
+		Action: withCMDConfig(func(ctx *cli.Context, cfg command.Config) error {
 			return command.Test(cfg)
 		}),
 	}
@@ -46,7 +46,7 @@ func Build() cli.Command {
 	return cli.Command{
 		Name:  "build",
 		Usage: "Builds any modified apps within the project",
-		Action: withProject(func(ctx *cli.Context, cfg command.Config) error {
+		Action: withCMDConfig(func(ctx *cli.Context, cfg command.Config) error {
 			return command.Build(cfg)
 		}),
 	}
